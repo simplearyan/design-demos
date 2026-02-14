@@ -37,6 +37,6 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add screenshots/ index-preview.html
+          git add -f screenshots/ index-preview.html
           git commit -m "chore: update design previews [skip ci]" || echo "No changes to commit"
           git push
