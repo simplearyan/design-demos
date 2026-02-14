@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" class="dark cursor-none">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // ANTIGRAVITY PROTOCOL</title>
+    
+    <!-- Fonts: Space Grotesk (Display) & JetBrains Mono (Technical) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@200;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#000000',
+                        matter: '#111111',
+                        border: '#222222',
+                        text: '#EAEAEA',
+                        mute: '#666666',
+                        neon: '#CCFF00', // Signature Acid Lime
+                        signal: '#FF3333'
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': `linear-gradient(to right, #222 1px, transparent 1px), linear-gradient(to bottom, #222 1px, transparent 1px)`,
+                        'dots': `radial-gradient(#333 1px, transparent 1px)`
+                    },
+                    backgroundSize: {
+                        'grid': '4rem 4rem',
+                        'dots': '1.5rem 1.5rem'
+                    },
+                    animation: {
+                        'spin-slow': 'spin 20s linear infinite',
+                        'ticker': 'ticker 30s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        ticker: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    },
+                    cursor: {
+                        'none': 'none',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Base Reset */
+        body {
+            background-color: #000;
+            color: #EAEAEA;
+            overflow-x: hidden;
+        }
+
+        /* Custom Cursor */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #CCFF00;
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(204, 255, 0, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        
+        /* Hover State for Cursor */
+        body.hovering .cursor-outline {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(204, 255, 0, 0.1);
+            border-color: #CCFF00;
+        }
+
+        /* Technical Grid Overlay */
+        .tech-overlay {
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        }
+
+        /* Text Stroke */
+        .text-outline {
+            -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+            color: transparent;
+            transition: all 0.3s;
+        }
+        .group:hover .text-outline {
+            color: #CCFF00;
+            -webkit-text-stroke: 0px;
+        }
+
+        /* Glitch Effect on Hover */
+        .glitch-hover:hover {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #CCFF00;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+        /* Preloader */
+        #preloader {
+            transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+        .reveal-text {
+            transform: translateY(100%);
+            transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+        .loaded .reveal-text {
+            transform: translateY(0);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb:hover { background: #CCFF00; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Custom Cursor Elements -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 bg-void z-[100] flex flex-col justify-between p-8 border-b border-neon/20">
+        <div class="flex justify-between font-mono text-xs text-neon">
+            <span>INITIALIZING...</span>
+            <span>v3.0.0</span>
+        </div>
+        <div class="text-6xl md:text-9xl font-bold font-sans tracking-tighter opacity-0 animate-pulse" id="loader-text">
+            ARYAN.DS
+        </div>
+        <div class="w-full h-px bg-border relative overflow-hidden">
+            <div class="absolute inset-0 bg-neon w-full h-full origin-left animate-[ticker_2s_ease-in-out]"></div>
+        </div>
+    </div>
+
+    <!-- Background Grid -->
+    <div class="fixed inset-0 bg-grid-pattern bg-grid opacity-10 pointer-events-none z-0 tech-overlay"></div>
+    <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
+        <div class="absolute top-20 left-10 w-4 h-4 border-l border-t border-mute"></div>
+        <div class="absolute top-20 right-10 w-4 h-4 border-r border-t border-mute"></div>
+        <div class="absolute bottom-20 left-10 w-4 h-4 border-l border-b border-mute"></div>
+        <div class="absolute bottom-20 right-10 w-4 h-4 border-r border-b border-mute"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-6 py-6 mix-blend-difference">
+        <div class="flex justify-between items-center max-w-[1800px] mx-auto">
+            <a href="#" class="font-bold text-xl tracking-tighter hover:text-neon transition-colors group flex items-center gap-2" data-hover>
+                <div class="w-2 h-2 bg-neon rounded-full group-hover:scale-150 transition-transform"></div>
+                ARYAN.DS
+            </a>
+
+            <div class="hidden md:flex gap-12 font-mono text-xs tracking-[0.2em]">
+                <a href="notes.html" class="hover:text-neon transition-colors relative group" data-hover>
+                    <span class="absolute -left-4 opacity-0 group-hover:opacity-100 transition-opacity text-neon">></span>
+                    NOTES_DB
+                </a>
+                <a href="solutions.html" class="hover:text-neon transition-colors relative group" data-hover>
+                    <span class="absolute -left-4 opacity-0 group-hover:opacity-100 transition-opacity text-neon">></span>
+                    SOLUTIONS
+                </a>
+                <a href="#projects" class="hover:text-neon transition-colors relative group" data-hover>
+                    <span class="absolute -left-4 opacity-0 group-hover:opacity-100 transition-opacity text-neon">></span>
+                    DEV_LOGS
+                </a>
+            </div>
+
+            <a href="https://github.com" target="_blank" class="font-mono text-xs border border-white/20 px-4 py-2 hover:bg-neon hover:text-black hover:border-neon transition-all duration-300" data-hover>
+                GITHUB_PROFILE
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-32 pb-20 px-6">
+        
+        <!-- Hero Section -->
+        <section class="min-h-[85vh] flex flex-col justify-center max-w-[1800px] mx-auto relative">
+            <div class="overflow-hidden">
+                <h1 class="text-[14vw] leading-[0.8] font-bold tracking-tighter reveal-text">
+                    DATA<span class="text-neon">.</span>SCIENCE
+                </h1>
+            </div>
+            <div class="overflow-hidden">
+                <h1 class="text-[14vw] leading-[0.8] font-bold tracking-tighter text-outline reveal-text ml-[10vw]">
+                    ENGINEER
+                </h1>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 mt-20 gap-8 border-t border-border pt-8 reveal-text delay-300">
+                <div class="md:col-span-4 font-mono text-sm text-mute leading-relaxed">
+                    <p class="mb-4 text-neon">/// SYSTEM_STATUS: ONLINE</p>
+                    <p>Documenting the intersection of statistical analysis, Python development, and game physics.</p>
+                </div>
+                <div class="md:col-span-4 md:col-start-9 flex flex-col gap-4">
+                    <div class="flex items-center justify-between border-b border-border pb-2 group cursor-pointer" data-hover>
+                        <span class="font-mono text-xs text-mute">CURRENT_FOCUS</span>
+                        <span class="font-sans font-bold group-hover:text-neon transition-colors">IIT MADRAS BS DEGREE</span>
+                    </div>
+                    <div class="flex items-center justify-between border-b border-border pb-2 group cursor-pointer" data-hover>
+                        <span class="font-mono text-xs text-mute">LATEST_PROJECT</span>
+                        <span class="font-sans font-bold group-hover:text-neon transition-colors">UNITY PHYSICS ENGINE</span>
+                    </div>
+                    <div class="flex items-center justify-between border-b border-border pb-2 group cursor-pointer" data-hover>
+                        <span class="font-mono text-xs text-mute">LOCATION</span>
+                        <span class="font-sans font-bold group-hover:text-neon transition-colors">INDIA</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Decoration -->
+            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-64 h-64 border border-border rounded-full animate-spin-slow opacity-20 pointer-events-none md:block hidden"></div>
+            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-40 h-40 border border-neon rounded-full animate-float opacity-20 pointer-events-none md:block hidden"></div>
+        </section>
+
+        <!-- Marquee Strip -->
+        <div class="w-full bg-neon text-black py-3 overflow-hidden font-mono text-sm font-bold tracking-widest relative z-20 -mx-6 transform -rotate-1 origin-left">
+            <div class="animate-ticker whitespace-nowrap">
+                PYTHON DEVELOPER /// STATISTICAL ANALYSIS /// GAME PHYSICS /// UNITY ENGINE /// DATA VISUALIZATION /// MACHINE LEARNING /// PYTHON DEVELOPER /// STATISTICAL ANALYSIS /// GAME PHYSICS /// UNITY ENGINE
+            </div>
+        </div>
+
+        <!-- Featured Projects Grid -->
+        <section id="projects" class="py-32 max-w-[1800px] mx-auto">
+            <div class="flex items-end justify-between mb-16 border-b border-border pb-4">
+                <h2 class="text-4xl font-bold tracking-tighter">SELECTED_MODULES</h2>
+                <span class="font-mono text-xs text-neon">[03]</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
+                
+                <!-- Project 1 -->
+                <a href="notes.html" class="bg-void p-12 group relative overflow-hidden min-h-[500px] flex flex-col justify-between hover:bg-matter transition-colors" data-hover>
+                    <div class="absolute top-4 right-4 font-mono text-xs text-mute group-hover:text-neon transition-colors">001</div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-8 text-neon">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-2 group-hover:translate-x-2 transition-transform duration-500">Academic Notes</h3>
+                        <p class="font-mono text-xs text-mute max-w-sm">
+                            Comprehensive documentation of Data Science curriculum. Statistics, Math, and Python.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-4 mt-12 relative z-10">
+                        <span class="font-mono text-xs border border-border px-3 py-1 rounded-full group-hover:border-neon group-hover:text-neon transition-colors">ARCHIVE</span>
+                        <span class="font-mono text-xs border border-border px-3 py-1 rounded-full group-hover:border-neon group-hover:text-neon transition-colors">READ_ONLY</span>
+                    </div>
+
+                    <!-- Hover Image/Effect -->
+                    <div class="absolute inset-0 bg-bg-dots opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
+                </a>
+
+                <!-- Project 2 -->
+                <a href="solutions.html" class="bg-void p-12 group relative overflow-hidden min-h-[500px] flex flex-col justify-between hover:bg-matter transition-colors" data-hover>
+                    <div class="absolute top-4 right-4 font-mono text-xs text-mute group-hover:text-neon transition-colors">002</div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-8 text-neon">
+                            <i data-lucide="terminal" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-2 group-hover:translate-x-2 transition-transform duration-500">Solutions DB</h3>
+                        <p class="font-mono text-xs text-mute max-w-sm">
+                            Graded assignment logic, code breakdowns, and quiz walkthroughs.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-4 mt-12 relative z-10">
+                        <span class="font-mono text-xs border border-border px-3 py-1 rounded-full group-hover:border-neon group-hover:text-neon transition-colors">PYTHON</span>
+                        <span class="font-mono text-xs border border-border px-3 py-1 rounded-full group-hover:border-neon group-hover:text-neon transition-colors">ALGORITHMS</span>
+                    </div>
+                </a>
+
+                <!-- Project 3 -->
+                <div class="bg-void p-12 group relative overflow-hidden min-h-[500px] flex flex-col justify-between hover:bg-matter transition-colors md:col-span-2 cursor-pointer" data-hover>
+                    <div class="absolute top-4 right-4 font-mono text-xs text-mute group-hover:text-neon transition-colors">003</div>
+                    
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-12 relative z-10">
+                        <div>
+                            <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-8 text-neon">
+                                <i data-lucide="gamepad-2" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-3xl font-bold mb-2 group-hover:translate-x-2 transition-transform duration-500">Dev Logs: Unity Engine</h3>
+                            <p class="font-mono text-xs text-mute max-w-sm">
+                                Building a custom 2D physics engine from scratch using C#.
+                            </p>
+                        </div>
+
+                        <!-- Visual Tech Stack -->
+                        <div class="flex gap-2">
+                            <div class="w-24 h-32 border border-border bg-black flex items-center justify-center group-hover:-translate-y-4 transition-transform duration-300 delay-75">
+                                <span class="font-mono text-[10px] -rotate-90 text-mute">UNITY</span>
+                            </div>
+                            <div class="w-24 h-32 border border-border bg-black flex items-center justify-center group-hover:-translate-y-4 transition-transform duration-300 delay-100">
+                                <span class="font-mono text-[10px] -rotate-90 text-mute">BLENDER</span>
+                            </div>
+                            <div class="w-24 h-32 border border-border bg-black flex items-center justify-center group-hover:-translate-y-4 transition-transform duration-300 delay-150">
+                                <span class="font-mono text-[10px] -rotate-90 text-mute">C_SHARP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 mt-12 relative z-10">
+                        <span class="font-mono text-xs border border-border px-3 py-1 rounded-full group-hover:border-neon group-hover:text-neon transition-colors">GAME_DEV</span>
+                        <span class="font-mono text-xs border border-border px-3 py-1 rounded-full group-hover:border-neon group-hover:text-neon transition-colors">PHYSICS</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer / Contact -->
+        <footer class="max-w-[1800px] mx-auto pt-20 border-t border-border">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
+                <div>
+                    <h2 class="text-6xl md:text-8xl font-bold tracking-tighter mb-8 hover:text-outline transition-all cursor-default">
+                        LET'S<br>BUILD.
+                    </h2>
+                    <a href="mailto:contact@aryan.ds" class="font-mono text-lg text-neon hover:underline decoration-wavy underline-offset-8" data-hover>
+                        hello@aryan.ds
+                    </a>
+                </div>
+                
+                <div class="flex flex-col justify-end">
+                    <div class="grid grid-cols-2 gap-8 font-mono text-xs text-mute mb-12">
+                        <div class="space-y-4">
+                            <p class="text-white">SOCIALS</p>
+                            <a href="#" class="block hover:text-neon transition-colors" data-hover>GITHUB</a>
+                            <a href="#" class="block hover:text-neon transition-colors" data-hover>LINKEDIN</a>
+                            <a href="#" class="block hover:text-neon transition-colors" data-hover>TWITTER / X</a>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-white">NAVIGATION</p>
+                            <a href="notes.html" class="block hover:text-neon transition-colors" data-hover>NOTES</a>
+                            <a href="solutions.html" class="block hover:text-neon transition-colors" data-hover>SOLUTIONS</a>
+                            <a href="#" class="block hover:text-neon transition-colors" data-hover>HOME</a>
+                        </div>
+                    </div>
+                    <div class="text-xs font-mono text-border">
+                        &copy; 2026 ARYAN.DS // ANTIGRAVITY THEME
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Custom Cursor Logic
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            // Dot follows instantly
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+
+            // Outline follows with delay (simulating weight)
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        // Hover Effect for interactive elements
+        document.querySelectorAll('[data-hover]').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+        // Preloader Logic
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('preloader');
+            const text = document.getElementById('loader-text');
+            
+            setTimeout(() => {
+                text.classList.remove('opacity-0');
+            }, 500);
+
+            setTimeout(() => {
+                loader.style.transform = 'translateY(-100%)';
+                document.body.classList.add('loaded');
+            }, 2500);
+        });
+    </script>
+</body>
+</html>

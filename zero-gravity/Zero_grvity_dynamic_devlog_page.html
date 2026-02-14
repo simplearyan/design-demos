@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // LOG_004</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        accent: '#F97316', // Orange for Game Dev
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Base Transitions */
+        body { transition: background-color 0.5s ease, color 0.5s ease; }
+
+        /* THEME ENGINE */
+        body[data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-main: #18181b;
+            --text-muted: #71717a;
+            --border: #e4e4e7;
+            --card-bg: #f4f4f5;
+            --card-hover: #e4e4e7;
+            --blob-opacity: 0;
+            --code-bg: #18181b; /* Code blocks stay dark for contrast */
+        }
+
+        body[data-theme="dark"] {
+            --bg-color: #09090b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --card-bg: #18181b;
+            --card-hover: #27272a;
+            --blob-opacity: 0;
+            --code-bg: #000000;
+        }
+
+        body[data-theme="aurora"] {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-hover: rgba(255, 255, 255, 0.08);
+            --blob-opacity: 0.4;
+            --code-bg: rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Adaptive Components */
+        .adaptive-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .code-window {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border);
+        }
+
+        /* Typography Toggles */
+        body.font-outfit { font-family: 'Outfit', sans-serif; }
+        body.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Aurora Elements */
+        .aurora-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: var(--blob-opacity);
+            transition: opacity 0.8s ease; overflow: hidden;
+        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
+        .blob-1 { top: -10%; left: 20%; width: 60vw; height: 60vw; background: #F97316; animation: blob 25s infinite alternate; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #8B5CF6; animation: blob 20s infinite alternate-reverse; }
+
+        /* Article Typography */
+        .prose p { margin-bottom: 1.5rem; color: var(--text-muted); line-height: 1.8; font-size: 1.125rem; }
+        .prose h2 { color: var(--text-main); font-weight: 700; font-size: 1.8rem; margin-top: 3rem; margin-bottom: 1rem; letter-spacing: -0.02em; }
+        .prose ul { margin-bottom: 1.5rem; list-style-type: none; padding-left: 0; }
+        .prose li { position: relative; padding-left: 1.5rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .prose li::before { content: "—"; position: absolute; left: 0; color: #F97316; }
+    </style>
+</head>
+<body class="font-jakarta min-h-screen relative selection:bg-orange-500/30" data-theme="dark">
+
+    <!-- Aurora Background Layer -->
+    <div class="aurora-layer">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="absolute inset-0 opacity-[0.05] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 border-b border-[var(--border)] bg-[var(--bg-color)]/80 backdrop-blur-md transition-colors duration-500">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-105 transition-transform">
+                    A
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg tracking-tight leading-none">ARYAN.DS</span>
+                    <span class="text-[10px] font-mono opacity-50 tracking-widest">PORTFOLIO</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium opacity-80">
+                <a href="index.html" class="hover:text-blue-500 hover:opacity-100 transition-all">Home</a>
+                <a href="devlogs.html" class="hover:text-orange-500 hover:opacity-100 transition-all font-bold">Dev Logs</a>
+            </div>
+
+            <!-- Settings / Actions -->
+            <div class="flex items-center gap-4">
+                <div class="relative group">
+                    <button class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors border border-transparent hover:border-[var(--border)]">
+                        <i data-lucide="settings-2" class="w-5 h-5 text-[var(--text-main)]"></i>
+                    </button>
+                    <!-- Settings Dropdown -->
+                    <div class="absolute right-0 top-full mt-2 w-64 p-4 rounded-2xl adaptive-card shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 z-50">
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-[10px] font-mono uppercase opacity-50 mb-2 tracking-wider text-[var(--text-main)]">Theme</p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="setTheme('light')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-[var(--text-main)]">
+                                        <i data-lucide="sun" class="w-4 h-4"></i> Light
+                                    </button>
+                                    <button onclick="setTheme('dark')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-[var(--text-main)]">
+                                        <i data-lucide="moon" class="w-4 h-4"></i> Dark
+                                    </button>
+                                    <button onclick="setTheme('aurora')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-purple-400">
+                                        <i data-lucide="sparkles" class="w-4 h-4"></i> Aurora
+                                    </button>
+                                </div>
+                            </div>
+                            <hr class="border-[var(--border)]">
+                            <div>
+                                <p class="text-[10px] font-mono uppercase opacity-50 mb-2 tracking-wider text-[var(--text-main)]">Typography</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="setFont('jakarta')" class="p-2 rounded-lg border border-[var(--border)] hover:border-orange-500 transition-colors text-xs font-jakarta text-[var(--text-main)]">Jakarta</button>
+                                    <button onclick="setFont('outfit')" class="p-2 rounded-lg border border-[var(--border)] hover:border-orange-500 transition-colors text-xs font-outfit text-[var(--text-main)]">Outfit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto">
+        
+        <!-- Breadcrumb -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-8 animate-fade-in">
+            <div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+                <a href="devlogs.html" class="hover:text-orange-500 transition-colors">DEV_LOGS</a>
+                <span>/</span>
+                <span class="text-orange-500">PHYSICS_ENGINE_V0.4</span>
+            </div>
+            
+            <div class="flex gap-2">
+                <span class="px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-mono font-bold">C#</span>
+                <span class="px-3 py-1 rounded-full border border-[var(--border)] text-[var(--text-muted)] text-xs font-mono">UNITY</span>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="mb-12 border-l-4 border-orange-500 pl-6 animate-fade-in">
+            <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-4 leading-[1.1]">
+                Collision Resolution: <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">Impulse Method</span>
+            </h1>
+            <div class="flex items-center gap-4 text-sm text-[var(--text-muted)]">
+                <span>By Aryan S.</span> &bull; <span>Oct 24, 2025</span> &bull; <span>4 min read</span>
+            </div>
+        </header>
+
+        <!-- Diagram Card -->
+        <div class="adaptive-card p-8 rounded-2xl mb-16 flex flex-col items-center justify-center relative overflow-hidden group">
+            <div class="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]"></div>
+            
+            <!-- SVG Diagram -->
+            <svg width="400" height="200" viewBox="0 0 400 200" class="relative z-10 w-full max-w-md drop-shadow-xl">
+                <!-- Objects - using currentColor to adapt to theme text -->
+                <circle cx="150" cy="100" r="40" fill="var(--card-bg)" stroke="#F97316" stroke-width="2" class="group-hover:translate-x-2 transition-transform duration-700" />
+                <text x="145" y="105" fill="var(--text-main)" font-family="monospace" font-size="12">A</text>
+                
+                <circle cx="250" cy="100" r="40" fill="var(--card-bg)" stroke="#8B5CF6" stroke-width="2" class="group-hover:-translate-x-2 transition-transform duration-700" />
+                <text x="245" y="105" fill="var(--text-main)" font-family="monospace" font-size="12">B</text>
+
+                <!-- Normal Vector -->
+                <line x1="190" y1="100" x2="210" y2="100" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4,2" />
+                
+                <!-- Impulse Vectors -->
+                <line x1="150" y1="100" x2="120" y2="100" stroke="#F97316" stroke-width="2" marker-end="url(#arrowA)" class="opacity-0 group-hover:opacity-100 transition-opacity delay-100" />
+                <line x1="250" y1="100" x2="280" y2="100" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowB)" class="opacity-0 group-hover:opacity-100 transition-opacity delay-100" />
+
+                <defs>
+                    <marker id="arrowA" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#F97316" /></marker>
+                    <marker id="arrowB" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#8B5CF6" /></marker>
+                </defs>
+            </svg>
+            <p class="text-xs font-mono text-[var(--text-muted)] mt-6">FIG 1.0: IMPULSE VECTORS</p>
+        </div>
+
+        <!-- Article Content -->
+        <article class="prose max-w-none">
+            <p>
+                Earlier versions of my physics engine used a <strong>penalty-based method</strong> for collisions. While simple to implement, it resulted in "spongy" interactions. To fix this, I refactored the solver to use <strong>Impulse Resolution</strong>.
+            </p>
+
+            <h2>The Math</h2>
+            <p>
+                The magnitude of the impulse scalar $j$ is calculated using the coefficient of restitution $e$ (bounciness) and the relative velocity along the normal.
+            </p>
+
+            <div class="my-10 p-8 rounded-xl adaptive-card flex justify-center">
+                <div class="text-xl md:text-2xl font-serif italic text-[var(--text-main)] text-center leading-relaxed">
+                    j = <span class="inline-flex flex-col items-center align-middle mx-2">
+                        <span class="border-b border-[var(--text-muted)] pb-2 mb-1">-(1 + e) &cdot; (v<sub>rel</sub> &cdot; n)</span>
+                        <span>m<sub>A</sub><sup>-1</sup> + m<sub>B</sub><sup>-1</sup></span>
+                    </span>
+                </div>
+            </div>
+
+            <h2>Implementation</h2>
+            <p>
+                Here is the simplified C# implementation used in the solver loop.
+            </p>
+        </article>
+
+        <!-- Code Block -->
+        <div class="code-window rounded-xl overflow-hidden my-10 relative group shadow-2xl">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-white/5">
+                <div class="flex gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+                </div>
+                <span class="text-xs font-mono text-gray-500">PhysicsSolver.cs</span>
+            </div>
+            
+            <div class="p-6 overflow-x-auto">
+                <pre class="font-mono text-sm leading-relaxed text-gray-300"><code class="language-csharp"><span class="text-purple-400">public void</span> <span class="text-blue-400">ResolveCollision</span>(Body a, Body b, Contact contact) {
+    <span class="text-gray-500">// 1. Calculate relative velocity</span>
+    Vector2 relativeVel = b.Velocity - a.Velocity;
+
+    <span class="text-gray-500">// 2. Calculate velocity along normal</span>
+    <span class="text-purple-300">float</span> velAlongNormal = Vector2.Dot(relativeVel, contact.Normal);
+
+    <span class="text-purple-400">if</span> (velAlongNormal > 0) <span class="text-purple-400">return</span>;
+
+    <span class="text-gray-500">// 3. Calculate impulse scalar</span>
+    <span class="text-purple-300">float</span> j = -(1 + e) * velAlongNormal;
+    j /= a.InvMass + b.InvMass;
+
+    <span class="text-gray-500">// 4. Apply impulse</span>
+    Vector2 impulse = j * contact.Normal;
+    a.Velocity -= a.InvMass * impulse;
+}</code></pre>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-[var(--border)] py-12">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <span class="text-sm text-[var(--text-muted)]">© 2026 Aryan.DS</span>
+            <div class="flex gap-6 text-sm font-medium text-[var(--text-muted)]">
+                <a href="devlogs.html" class="hover:text-orange-500 transition-colors">Back to Logs</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Shared Theme Logic
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            if (theme === 'light') { document.documentElement.classList.remove('dark'); } 
+            else { document.documentElement.classList.add('dark'); }
+            localStorage.setItem('theme', theme);
+        }
+
+        function setFont(font) {
+            document.body.classList.remove('font-jakarta', 'font-outfit');
+            document.body.classList.add('font-' + font);
+            localStorage.setItem('font', font);
+        }
+
+        window.addEventListener('load', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const savedFont = localStorage.getItem('font') || 'jakarta';
+            setTheme(savedTheme);
+            setFont(savedFont);
+        });
+    </script>
+</body>
+</html>

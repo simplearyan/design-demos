@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // SOLUTIONS ARCHIVE</title>
+    
+    <!-- Design System Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration (Shared with Index) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gravity: {
+                            base: '#09090B',
+                            surface: '#18181B',
+                            border: '#27272A',
+                            text: '#E4E4E7',
+                            muted: '#A1A1AA',
+                            accent: '#D4FF00',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        heading: ['Space Grotesk', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-tech': "linear-gradient(to right, #27272A 1px, transparent 1px), linear-gradient(to bottom, #27272A 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #09090B;
+            color: #E4E4E7;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, .font-heading { font-family: 'Space Grotesk', sans-serif; }
+        code, pre, .font-mono { font-family: 'Space Mono', monospace; }
+        ::selection { background-color: #D4FF00; color: #000000; }
+
+        /* Tech Grid Background */
+        .bg-tech-grid {
+            background-size: 4rem 4rem;
+            mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+        }
+
+        /* Card Hover Effect */
+        .solution-card { transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .solution-card:hover { transform: translateY(-4px); border-color: #D4FF00; }
+        
+        /* Filter Button Active State */
+        .filter-btn.active { background-color: #D4FF00; color: black; border-color: #D4FF00; }
+        
+        /* Status Badge Colors */
+        .badge-solved { @apply text-green-400 border-green-400/30 bg-green-400/10; }
+        .badge-pending { @apply text-yellow-400 border-yellow-400/30 bg-yellow-400/10; }
+    </style>
+</head>
+<body class="overflow-x-hidden min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 left-0 border-b border-gravity-border bg-gravity-base/90 backdrop-blur-md">
+        <div class="max-w-[1600px] mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 group cursor-pointer">
+                <div class="w-2 h-8 bg-gravity-border group-hover:bg-gravity-accent transition-colors"></div>
+                <div class="flex flex-col leading-none">
+                    <span class="font-heading font-bold text-xl tracking-tight text-white">ARYAN.DS</span>
+                    <span class="font-mono text-[10px] text-gravity-muted tracking-widest">/ SOLUTIONS_DB</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 font-mono text-xs tracking-widest font-bold">
+                <a href="index.html" class="hover:text-gravity-accent transition-colors">HOME</a>
+                <a href="notes.html" class="hover:text-gravity-accent transition-colors">NOTES</a>
+                <div class="h-4 w-px bg-gravity-border"></div>
+                <span class="text-gravity-accent">SOLUTIONS</span>
+            </div>
+            
+            <button class="md:hidden p-2 text-gravity-muted"><i data-lucide="menu" class="w-6 h-6"></i></button>
+        </div>
+    </nav>
+
+    <!-- Header / Search Section -->
+    <header class="pt-32 pb-12 border-b border-gravity-border relative bg-gravity-base">
+        <div class="absolute inset-0 bg-grid-tech bg-tech-grid opacity-20 pointer-events-none"></div>
+        <div class="max-w-[1600px] mx-auto px-6 relative z-10">
+            
+            <div class="flex flex-col md:flex-row justify-between md:items-end gap-8 mb-12">
+                <div>
+                    <div class="font-mono text-xs text-gravity-accent mb-4">/// GRADED_ASSIGNMENT_ARCHIVE</div>
+                    <h1 class="text-5xl md:text-7xl font-bold font-heading tracking-tighter text-white mb-4">
+                        PROBLEM<br>SETS
+                    </h1>
+                    <p class="text-gravity-muted max-w-lg font-mono text-xs md:text-sm leading-relaxed">
+                        Step-by-step logic for 50+ graded assignments, mock quizzes, and practice tests. Code solutions included.
+                    </p>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="w-full md:w-auto md:min-w-[400px]">
+                    <div class="relative group">
+                        <input type="text" placeholder="SEARCH_BY_WEEK_OR_TOPIC..." 
+                            class="w-full bg-gravity-surface border border-gravity-border p-4 pl-12 font-mono text-sm text-white focus:outline-none focus:border-gravity-accent transition-colors placeholder:text-gravity-muted/50">
+                        <i data-lucide="search" class="w-5 h-5 text-gravity-muted absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-gravity-accent transition-colors"></i>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 flex gap-1">
+                            <span class="text-[10px] bg-gravity-border px-1.5 py-0.5 rounded text-gravity-muted font-mono">/</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-2 font-mono text-xs font-bold tracking-wider">
+                <button class="filter-btn active px-4 py-2 border border-gravity-border hover:border-gravity-accent transition-all uppercase">All</button>
+                <button class="filter-btn px-4 py-2 border border-gravity-border hover:border-gravity-accent hover:text-white text-gravity-muted transition-all uppercase">Weeks 1-4</button>
+                <button class="filter-btn px-4 py-2 border border-gravity-border hover:border-gravity-accent hover:text-white text-gravity-muted transition-all uppercase">Weeks 5-8</button>
+                <button class="filter-btn px-4 py-2 border border-gravity-border hover:border-gravity-accent hover:text-white text-gravity-muted transition-all uppercase">Weeks 9-12</button>
+                <button class="filter-btn px-4 py-2 border border-gravity-border hover:border-gravity-accent hover:text-white text-gravity-muted transition-all uppercase">Mock Exams</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 bg-gravity-base py-16">
+        <div class="max-w-[1600px] mx-auto px-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Solution Card 1 -->
+                <article class="solution-card bg-gravity-surface border border-gravity-border p-6 flex flex-col group cursor-pointer relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-2">
+                             <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted">STATISTICS_1</span>
+                             <span class="font-mono text-[10px] border border-green-900 bg-green-900/20 text-green-400 px-2 py-1">SOLVED</span>
+                        </div>
+                        <span class="font-mono text-xs text-gravity-muted">WEEK 03</span>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Graded Assignment: Probability</h3>
+                    <p class="text-gravity-muted text-sm mb-6 leading-relaxed">
+                        Q4 logic involving conditional probability P(A|B). Includes Python simulation code to verify the answer.
+                    </p>
+
+                    <div class="bg-black/50 p-4 rounded border border-gravity-border font-mono text-xs text-gray-400 mb-6">
+                        <span class="text-purple-400">def</span> <span class="text-yellow-200">solve_q4</span>(total, favorable):<br>
+                        &nbsp;&nbsp;<span class="text-gray-500"># Simulation approach</span><br>
+                        &nbsp;&nbsp;<span class="text-purple-400">return</span> favorable / total
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
+                            <span>10/10 Score</span>
+                        </div>
+                        <span class="group-hover:translate-x-1 transition-transform text-white">VIEW_LOGIC -></span>
+                    </div>
+                </article>
+
+                <!-- Solution Card 2 -->
+                <article class="solution-card bg-gravity-surface border border-gravity-border p-6 flex flex-col group cursor-pointer relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-2">
+                             <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted">PYTHON</span>
+                             <span class="font-mono text-[10px] border border-green-900 bg-green-900/20 text-green-400 px-2 py-1">SOLVED</span>
+                        </div>
+                        <span class="font-mono text-xs text-gravity-muted">WEEK 04</span>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Graded Assignment: Functions & Matrix Ops</h3>
+                    <p class="text-gravity-muted text-sm mb-6 leading-relaxed">
+                        Optimizing matrix multiplication using list comprehensions vs NumPy. Explaining the logic for Q8 (Recursion).
+                    </p>
+
+                    <div class="bg-black/50 p-4 rounded border border-gravity-border font-mono text-xs text-gray-400 mb-6">
+                        <span class="text-purple-400">def</span> <span class="text-yellow-200">recursive_search</span>(matrix, target):<br>
+                        &nbsp;&nbsp;<span class="text-gray-500"># Base case handling</span><br>
+                        &nbsp;&nbsp;<span class="text-purple-400">if not</span> matrix: <span class="text-purple-400">return</span> False
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
+                            <span>100/100 Score</span>
+                        </div>
+                        <span class="group-hover:translate-x-1 transition-transform text-white">VIEW_LOGIC -></span>
+                    </div>
+                </article>
+
+                <!-- Solution Card 3 -->
+                <article class="solution-card bg-gravity-surface border border-gravity-border p-6 flex flex-col group cursor-pointer relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-2">
+                             <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted">MATH_2</span>
+                             <span class="font-mono text-[10px] border border-green-900 bg-green-900/20 text-green-400 px-2 py-1">SOLVED</span>
+                        </div>
+                        <span class="font-mono text-xs text-gravity-muted">QUIZ 01</span>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Mock Quiz: Linear Transformations</h3>
+                    <p class="text-gravity-muted text-sm mb-6 leading-relaxed">
+                        Visualizing transformation matrices. Why determinant zero implies non-invertibility (Q3 explanation).
+                    </p>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
+                            <span>Passed</span>
+                        </div>
+                        <span class="group-hover:translate-x-1 transition-transform text-white">VIEW_LOGIC -></span>
+                    </div>
+                </article>
+
+                <!-- Solution Card 4 -->
+                <article class="solution-card bg-gravity-surface border border-gravity-border p-6 flex flex-col group cursor-pointer relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-2">
+                             <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted">CT</span>
+                             <span class="font-mono text-[10px] border border-yellow-900 bg-yellow-900/20 text-yellow-500 px-2 py-1">PENDING</span>
+                        </div>
+                        <span class="font-mono text-xs text-gravity-muted">WEEK 05</span>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Graded Assignment: Graphs & Trees</h3>
+                    <p class="text-gravity-muted text-sm mb-6 leading-relaxed">
+                        Currently working on the BFS/DFS traversal problem (Q9). Logic draft uploaded, verifying edge cases.
+                    </p>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="clock" class="w-4 h-4 text-yellow-500"></i>
+                            <span>In Progress</span>
+                        </div>
+                        <span class="group-hover:translate-x-1 transition-transform text-white">VIEW_DRAFT -></span>
+                    </div>
+                </article>
+
+            </div>
+            
+            <!-- Pagination -->
+            <div class="mt-16 border-t border-gravity-border pt-8 flex justify-between items-center font-mono text-xs">
+                <button class="text-gravity-muted hover:text-white uppercase disabled:opacity-50"><- Previous</button>
+                <div class="flex gap-2">
+                    <span class="text-gravity-accent">1</span>
+                    <span class="text-gravity-muted hover:text-white cursor-pointer">2</span>
+                    <span class="text-gravity-muted hover:text-white cursor-pointer">3</span>
+                    <span class="text-gravity-muted">...</span>
+                </div>
+                <button class="text-gravity-muted hover:text-white uppercase">Next -></button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-gravity-border py-12">
+        <div class="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-4 bg-gravity-accent"></div>
+                <span class="font-heading font-bold text-white">ARYAN.DS</span>
+            </div>
+            <div class="font-mono text-xs text-gravity-muted">
+                <a href="index.html" class="hover:text-white mr-6">HOME</a>
+                <a href="notes.html" class="hover:text-white mr-6">NOTES</a>
+                <a href="#" class="hover:text-white">GITHUB</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        
+        // Simple Filter Logic (Visual Only)
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

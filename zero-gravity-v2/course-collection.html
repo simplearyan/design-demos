@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // STATISTICS II</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#F97316',
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Base Transitions */
+        body { transition: background-color 0.5s ease, color 0.5s ease; }
+
+        /* THEME ENGINE */
+        body[data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-main: #18181b;
+            --text-muted: #71717a;
+            --border: #e4e4e7;
+            --card-bg: #f4f4f5;
+            --card-hover: #ffffff;
+            --blob-opacity: 0;
+            --sticky-bg: rgba(255,255,255,0.8);
+        }
+
+        body[data-theme="dark"] {
+            --bg-color: #09090b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --card-bg: #18181b;
+            --card-hover: #27272a;
+            --blob-opacity: 0;
+            --sticky-bg: rgba(9,9,11,0.8);
+        }
+
+        body[data-theme="aurora"] {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-hover: rgba(255, 255, 255, 0.08);
+            --blob-opacity: 0.4;
+            --sticky-bg: rgba(0,0,0,0.8);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Layout Utilities */
+        .adaptive-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .adaptive-card:hover {
+            background-color: var(--card-hover);
+            transform: translateY(-2px);
+            border-color: #3B82F6;
+        }
+
+        /* Typography */
+        body.font-outfit { font-family: 'Outfit', sans-serif; }
+        body.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Aurora Elements */
+        .aurora-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: var(--blob-opacity);
+            transition: opacity 0.8s ease; overflow: hidden;
+        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
+        .blob-1 { top: -10%; left: 20%; width: 60vw; height: 60vw; background: #3B82F6; animation: blob 25s infinite alternate; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #8B5CF6; animation: blob 20s infinite alternate-reverse; }
+
+        @keyframes blob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, -20px) scale(1.1); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+    </style>
+</head>
+<body class="font-jakarta min-h-screen relative selection:bg-blue-500/30" data-theme="dark">
+
+    <!-- Aurora Background Layer -->
+    <div class="aurora-layer">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="absolute inset-0 opacity-[0.05] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 border-b border-[var(--border)] bg-[var(--sticky-bg)] backdrop-blur-md transition-colors duration-500">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:scale-105 transition-transform">A</div>
+                <span class="font-bold text-lg tracking-tight">ARYAN.DS</span>
+            </a>
+            
+            <div class="flex items-center gap-4">
+                <a href="notes.html" class="flex items-center gap-2 text-xs font-medium text-[var(--text-muted)] hover:text-blue-500 transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Back to Library</span>
+                </a>
+                <div class="h-4 w-px bg-[var(--border)]"></div>
+                <!-- Theme Toggle (Simplified) -->
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="max-w-7xl mx-auto px-6 pt-24 pb-20 flex flex-col lg:flex-row gap-12">
+        
+        <!-- Sidebar (Desktop Sticky / Mobile Top) -->
+        <aside class="w-full lg:w-1/3 lg:sticky lg:top-24 h-fit space-y-6 animate-fade-in">
+            
+            <!-- Course Card -->
+            <div class="adaptive-card rounded-2xl overflow-hidden shadow-xl">
+                <!-- Cover Art -->
+                <div class="h-40 bg-gradient-to-br from-blue-900 via-slate-900 to-black relative flex items-center justify-center">
+                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                    <i data-lucide="bar-chart-2" class="w-20 h-20 text-blue-500 opacity-80"></i>
+                </div>
+                
+                <div class="p-6">
+                    <div class="flex gap-2 mb-3">
+                        <span class="px-2 py-1 rounded-md bg-blue-500/10 text-blue-500 text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">Course</span>
+                        <span class="px-2 py-1 rounded-md border border-[var(--border)] text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-wider">Intermediate</span>
+                    </div>
+                    
+                    <h1 class="text-2xl font-bold mb-2">Statistics II: Inference</h1>
+                    <p class="text-sm text-[var(--text-muted)] mb-6 leading-relaxed">
+                        Master Bayesian methods, hypothesis testing, and regression analysis. Designed for Data Science undergraduates.
+                    </p>
+
+                    <!-- Progress -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-xs font-mono mb-2">
+                            <span>PROGRESS</span>
+                            <span class="text-blue-500">66%</span>
+                        </div>
+                        <div class="h-2 w-full bg-[var(--card-hover)] rounded-full overflow-hidden">
+                            <div class="h-full w-2/3 bg-blue-500 rounded-full relative">
+                                <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20">
+                            Resume
+                        </button>
+                        <button class="p-2.5 rounded-lg border border-[var(--border)] hover:bg-[var(--card-hover)] transition-colors text-[var(--text-muted)] hover:text-blue-500">
+                            <i data-lucide="share-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links (TOC) -->
+            <div class="hidden lg:block p-6 rounded-2xl adaptive-card">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-4">Jump To Module</h3>
+                <nav class="space-y-1">
+                    <a href="#mod-1" class="block px-3 py-2 rounded-lg text-sm hover:bg-[var(--card-hover)] hover:text-blue-500 transition-colors border-l-2 border-transparent hover:border-blue-500">
+                        01. Foundations of Probability
+                    </a>
+                    <a href="#mod-2" class="block px-3 py-2 rounded-lg text-sm text-blue-500 bg-blue-500/5 border-l-2 border-blue-500 font-medium">
+                        02. Bayesian Inference
+                    </a>
+                    <a href="#mod-3" class="block px-3 py-2 rounded-lg text-sm hover:bg-[var(--card-hover)] hover:text-blue-500 transition-colors border-l-2 border-transparent hover:border-blue-500">
+                        03. Hypothesis Testing
+                    </a>
+                    <a href="#mod-4" class="block px-3 py-2 rounded-lg text-sm hover:bg-[var(--card-hover)] hover:text-blue-500 transition-colors border-l-2 border-transparent hover:border-blue-500">
+                        04. Regression Models
+                    </a>
+                </nav>
+            </div>
+
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="w-full lg:w-2/3 space-y-12">
+            
+            <!-- Sticky Search/Filter Header -->
+            <div class="sticky top-16 z-30 py-4 bg-[var(--bg-color)]/95 backdrop-blur border-b border-[var(--border)] -mx-6 px-6 lg:mx-0 lg:px-0 lg:bg-transparent lg:border-none lg:backdrop-filter-none lg:static">
+                <div class="flex gap-4">
+                    <div class="relative flex-grow">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]"></i>
+                        <input type="text" placeholder="Search notes in this course..." class="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-blue-500 transition-colors placeholder:text-[var(--text-muted)]">
+                    </div>
+                    <button class="px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover)] text-[var(--text-muted)] hover:text-blue-500 transition-colors">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Module 1 -->
+            <section id="mod-1" class="animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 text-xs font-bold border border-green-500/20">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                    </div>
+                    <h2 class="text-xl font-bold">Module 1: Foundations</h2>
+                    <div class="h-px bg-[var(--border)] flex-grow"></div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Note Item -->
+                    <a href="single-note.html" class="adaptive-card p-5 rounded-xl flex items-start gap-4 group cursor-pointer">
+                        <div class="mt-1">
+                            <i data-lucide="file-text" class="w-5 h-5 text-[var(--text-muted)] group-hover:text-blue-500 transition-colors"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-base mb-1 group-hover:text-blue-500 transition-colors">Sample Space & Events</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1 mb-2">Defining outcomes, events, and axiomatic definitions.</p>
+                            <div class="flex gap-3 text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wide">
+                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 10 min</span>
+                                <span class="text-green-500">Completed</span>
+                            </div>
+                        </div>
+                        <div class="self-center">
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-[var(--text-muted)] opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </div>
+                    </a>
+
+                    <!-- Note Item -->
+                    <a href="#" class="adaptive-card p-5 rounded-xl flex items-start gap-4 group cursor-pointer">
+                        <div class="mt-1">
+                            <i data-lucide="file-code" class="w-5 h-5 text-[var(--text-muted)] group-hover:text-purple-500 transition-colors"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-base mb-1 group-hover:text-purple-500 transition-colors">Python: Random Variables</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1">Simulating discrete and continuous variables using NumPy.</p>
+                            <div class="flex gap-3 text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wide">
+                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 15 min</span>
+                                <span class="text-green-500">Completed</span>
+                            </div>
+                        </div>
+                        <div class="self-center">
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-[var(--text-muted)] opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Module 2 -->
+            <section id="mod-2" class="animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-blue-500/30">
+                        02
+                    </div>
+                    <h2 class="text-xl font-bold text-blue-500">Module 2: Bayesian Inference</h2>
+                    <div class="h-px bg-[var(--border)] flex-grow"></div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Note Item (Featured/Current) -->
+                    <a href="single-note.html" class="adaptive-card p-5 rounded-xl flex items-start gap-4 group cursor-pointer border-l-4 border-l-blue-500 bg-blue-500/5">
+                        <div class="mt-1">
+                            <i data-lucide="play-circle" class="w-5 h-5 text-blue-500"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-base mb-1 text-blue-500">Priors & Posteriors</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1 mb-2">Mathematical derivation of Bayes theorem and conjugate priors.</p>
+                            <div class="flex gap-3 text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wide">
+                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 20 min</span>
+                                <span class="text-blue-500 font-bold">In Progress</span>
+                            </div>
+                        </div>
+                        <div class="self-center">
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-blue-500 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+
+                    <!-- Note Item -->
+                    <a href="#" class="adaptive-card p-5 rounded-xl flex items-start gap-4 group cursor-pointer">
+                        <div class="mt-1">
+                            <i data-lucide="file-text" class="w-5 h-5 text-[var(--text-muted)] group-hover:text-blue-500 transition-colors"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-base mb-1 group-hover:text-blue-500 transition-colors">Markov Chain Monte Carlo</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1">Introduction to MCMC sampling methods.</p>
+                            <div class="flex gap-3 text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wide">
+                                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 25 min</span>
+                                <span>Unread</span>
+                            </div>
+                        </div>
+                        <div class="self-center">
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-[var(--text-muted)] opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Module 3 (Locked) -->
+            <section id="mod-3" class="opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-8 h-8 rounded-full bg-[var(--card-bg)] border border-[var(--border)] flex items-center justify-center text-[var(--text-muted)] text-xs font-bold">
+                        03
+                    </div>
+                    <h2 class="text-xl font-bold text-[var(--text-muted)]">Module 3: Hypothesis Testing</h2>
+                    <div class="h-px bg-[var(--border)] flex-grow"></div>
+                    <i data-lucide="lock" class="w-4 h-4 text-[var(--text-muted)]"></i>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="adaptive-card p-5 rounded-xl flex items-center justify-between border-dashed">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="file-lock" class="w-5 h-5 text-[var(--text-muted)]"></i>
+                            <div>
+                                <h3 class="font-bold text-base text-[var(--text-muted)]">Null vs Alternative</h3>
+                                <p class="text-xs text-[var(--text-muted)]">Locked content</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono border border-[var(--border)] px-2 py-1 rounded text-[var(--text-muted)]">LOCKED</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-[var(--border)] py-12 bg-[var(--card-bg)]">
+        <div class="max-w-7xl mx-auto px-6 text-center text-sm text-[var(--text-muted)]">
+            <p>&copy; 2026 Aryan.DS. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Theme Toggle Logic
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', next);
+            
+            if (next === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+            localStorage.setItem('theme', next);
+        }
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+    </script>
+</body>
+</html>

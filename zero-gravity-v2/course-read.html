@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // READING: BAYESIAN INFERENCE</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#F97316',
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Base Transitions */
+        body { transition: background-color 0.5s ease, color 0.5s ease; }
+
+        /* THEME ENGINE */
+        body[data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-main: #18181b;
+            --text-muted: #52525b;
+            --border: #e4e4e7;
+            --card-bg: #f4f4f5;
+            --card-hover: #ffffff;
+            --active-item-bg: #2563EB;
+            --active-item-text: #ffffff;
+            --playlist-bg: #f8fafc;
+            --bottom-nav: rgba(255, 255, 255, 0.9);
+            --sidebar-border: #e4e4e7;
+        }
+
+        body[data-theme="dark"] {
+            --bg-color: #09090b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --card-bg: #18181b;
+            --card-hover: #27272a;
+            --active-item-bg: rgba(59, 130, 246, 0.15);
+            --active-item-text: #60A5FA;
+            --playlist-bg: #0c0c0e;
+            --bottom-nav: rgba(9, 9, 11, 0.9);
+            --sidebar-border: #27272a;
+        }
+
+        body[data-theme="aurora"] {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-hover: rgba(255, 255, 255, 0.08);
+            --active-item-bg: rgba(59, 130, 246, 0.2);
+            --active-item-text: #60A5FA;
+            --playlist-bg: rgba(10, 10, 10, 0.8);
+            --bottom-nav: rgba(0, 0, 0, 0.8);
+            --sidebar-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Layout Utilities */
+        .adaptive-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .code-window {
+            background-color: #0d0d0d; /* Always dark for code contrast */
+            border: 1px solid var(--border);
+        }
+
+        /* Active Playlist Item */
+        .playlist-active {
+            background-color: var(--active-item-bg);
+            color: var(--active-item-text);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Typography */
+        body.font-outfit { font-family: 'Outfit', sans-serif; }
+        body.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Article Typography - Optimized for Readability */
+        .prose p { margin-bottom: 2rem; color: var(--text-muted); line-height: 1.85; font-size: 1.125rem; }
+        .prose h2 { color: var(--text-main); font-weight: 800; font-size: 1.75rem; margin-top: 3.5rem; margin-bottom: 1.25rem; letter-spacing: -0.02em; line-height: 1.3; }
+        .prose ul { margin-bottom: 2rem; list-style-type: none; padding-left: 0; }
+        .prose li { position: relative; padding-left: 1.5rem; color: var(--text-muted); margin-bottom: 0.75rem; font-size: 1.1rem; }
+        .prose li::before { content: "•"; position: absolute; left: 0; color: #3B82F6; font-weight: bold; font-size: 1.2rem; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+
+        /* Aurora Elements */
+        .aurora-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: var(--blob-opacity);
+            transition: opacity 0.8s ease; overflow: hidden;
+        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
+        .blob-1 { top: -10%; left: 20%; width: 60vw; height: 60vw; background: #3B82F6; animation: blob 25s infinite alternate; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #8B5CF6; animation: blob 20s infinite alternate-reverse; }
+
+        @keyframes blob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, -20px) scale(1.1); }
+        }
+
+        /* Smart Bars */
+        .smart-bar {
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .nav-hidden {
+            transform: translateY(-100%);
+        }
+        .bottom-hidden {
+            transform: translateY(100%);
+        }
+    </style>
+</head>
+<body class="font-jakarta min-h-screen flex flex-col relative selection:bg-blue-500/30" data-theme="dark">
+
+    <!-- Aurora Background Layer -->
+    <div class="aurora-layer">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="absolute inset-0 opacity-[0.05] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
+    </div>
+
+    <!-- Smart Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 w-full z-50 border-b border-[var(--border)] bg-[var(--bg-color)]/95 backdrop-blur-md smart-bar">
+        <div class="w-full px-4 md:px-6 h-16 flex justify-between items-center relative">
+            
+            <!-- Progress Bar -->
+            <div class="absolute bottom-0 left-0 h-[2px] bg-blue-500 transition-all duration-100 ease-out z-50" id="reading-progress" style="width: 0%"></div>
+
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:scale-105 transition-transform">A</div>
+                </a>
+                <div class="h-6 w-px bg-[var(--border)] hidden sm:block"></div>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-blue-500 tracking-wider uppercase">Statistics II</span>
+                    <span class="text-[10px] text-[var(--text-muted)] hidden sm:inline-block">Course Collection</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Desktop Sidebar Toggle -->
+                <button class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-[var(--card-hover)] transition-colors text-xs font-medium text-[var(--text-muted)]" onclick="toggleDesktopSidebar()">
+                    <i data-lucide="panel-right" class="w-4 h-4"></i> Sidebar
+                </button>
+                
+                <a href="course-collection.html" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] hover:bg-[var(--card-hover)] transition-colors text-xs font-bold">
+                    <i data-lucide="grid" class="w-4 h-4"></i> View Index
+                </a>
+                
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors" title="Switch Theme">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="flex flex-row flex-grow pt-16 h-screen overflow-hidden relative">
+        
+        <!-- Left: Reading Area (Main Content) -->
+        <main class="flex-1 overflow-y-auto h-full relative scroll-smooth min-w-0" id="main-content">
+            
+            <div class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+                
+                <!-- Video Player / Cover Metaphor -->
+                <div class="aspect-video rounded-2xl bg-gradient-to-br from-blue-900 to-slate-900 relative overflow-hidden mb-10 border border-[var(--border)] shadow-2xl flex items-center justify-center group animate-fade-in">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                    
+                    <div class="text-center z-10 p-6">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-mono mb-4 tracking-widest uppercase">
+                            Module 02 &bull; Part 1
+                        </div>
+                        <h1 class="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">Bayesian Inference</h1>
+                        <p class="text-blue-200/60 max-w-lg mx-auto text-sm md:text-base">Understanding the mathematical framework for updating beliefs with new evidence.</p>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-12 border-b border-[var(--border)] pb-6 animate-fade-in" style="animation-delay: 0.1s;">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-700 to-gray-900 flex items-center justify-center text-[10px] font-bold border border-[var(--border)]">AS</div>
+                        <div>
+                            <div class="font-bold text-sm">Aryan S.</div>
+                            <div class="text-[10px] text-[var(--text-muted)]">Posted 2 days ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <button class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors border border-transparent hover:border-[var(--border)]" title="Helpful">
+                            <i data-lucide="thumbs-up" class="w-4 h-4 text-[var(--text-muted)]"></i>
+                        </button>
+                        <button class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors border border-transparent hover:border-[var(--border)]" title="Share">
+                            <i data-lucide="share-2" class="w-4 h-4 text-[var(--text-muted)]"></i>
+                        </button>
+                        <button class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors border border-transparent hover:border-[var(--border)]" title="Download PDF">
+                            <i data-lucide="download" class="w-4 h-4 text-[var(--text-muted)]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <article class="prose max-w-none animate-fade-in" style="animation-delay: 0.2s;">
+                    
+                    <p class="lead text-xl text-[var(--text-main)] font-light mb-8">
+                        Bayesian inference is a method of statistical inference in which Bayes' theorem is used to update the probability for a hypothesis as more evidence or information becomes available.
+                    </p>
+
+                    <h2>The Core Equation</h2>
+                    <p>
+                        The fundamental equation involves the <strong>Posterior</strong>, <strong>Likelihood</strong>, <strong>Prior</strong>, and <strong>Marginal Likelihood</strong>. Unlike frequentist statistics, we treat parameters as random variables.
+                    </p>
+
+                    <!-- Math Block -->
+                    <div class="my-10 p-6 md:p-10 rounded-xl adaptive-card flex justify-center items-center overflow-x-auto">
+                        <div class="text-2xl md:text-3xl font-serif italic text-[var(--text-main)] whitespace-nowrap">
+                            P(A|B) = <span class="inline-flex flex-col items-center align-middle mx-3"><span class="border-b border-[var(--text-muted)] pb-2 mb-1">P(B|A) &cdot; P(A)</span><span>P(B)</span></span>
+                        </div>
+                    </div>
+
+                    <ul>
+                        <li><strong>P(A)</strong>: The Prior probability (what we believe before seeing data).</li>
+                        <li><strong>P(B|A)</strong>: The Likelihood (how probable is the data given our hypothesis).</li>
+                        <li><strong>P(A|B)</strong>: The Posterior (our updated belief).</li>
+                    </ul>
+
+                    <h2>Python Implementation</h2>
+                    <p>
+                        Let's simulate a simple coin flip scenario to update our belief about the fairness of a coin. We will use a grid approximation method which is intuitive for understanding the mechanics.
+                    </p>
+
+                    <!-- Code Block -->
+                    <div class="code-window rounded-xl overflow-hidden my-8 relative group shadow-xl">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-white/5">
+                            <div class="flex gap-2">
+                                <div class="w-2.5 h-2.5 rounded-full bg-red-500/20"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/20"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-green-500/20"></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-[10px] font-mono text-gray-500">bayes.py</span>
+                                <button class="text-gray-500 hover:text-white"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                            </div>
+                        </div>
+                        <div class="p-4 md:p-6 overflow-x-auto bg-[#0d0d0d]">
+                            <pre class="font-mono text-xs md:text-sm leading-relaxed text-gray-300"><code class="language-python"><span class="text-purple-400">import</span> numpy <span class="text-purple-400">as</span> np
+
+<span class="text-gray-500"># Define prior: Uniform distribution (any bias is equally likely)</span>
+prior = np.ones(100) / 100
+p_grid = np.linspace(0, 1, 100)
+
+<span class="text-purple-400">def</span> <span class="text-blue-400">update</span>(prior, heads, total):
+    likelihood = p_grid**heads * (1 - p_grid)**(total - heads)
+    posterior = likelihood * prior
+    posterior /= posterior.sum() <span class="text-gray-500"># Normalize</span>
+    <span class="text-purple-400">return</span> posterior</code></pre>
+                        </div>
+                    </div>
+
+                    <h2>Conclusion</h2>
+                    <p>
+                        Unlike frequentist methods, Bayesian approaches give us a distribution of probabilities rather than a single point estimate, allowing for richer uncertainty quantification. This is particularly useful in decision-making processes under uncertainty.
+                    </p>
+
+                </article>
+
+                <!-- Navigation Controls (Desktop) -->
+                <div class="hidden md:grid grid-cols-2 gap-4 mt-20 pt-10 border-t border-[var(--border)]">
+                    <a href="#" class="adaptive-card p-4 rounded-xl group hover:border-blue-500/50 transition-all text-left">
+                        <div class="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Previous Note</div>
+                        <div class="text-sm font-bold truncate group-hover:text-blue-500 transition-colors">Introduction to Probability</div>
+                    </a>
+                    <a href="#" class="adaptive-card p-4 rounded-xl group hover:border-blue-500/50 transition-all text-right">
+                        <div class="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Next Note</div>
+                        <div class="text-sm font-bold truncate group-hover:text-blue-500 transition-colors">Hypothesis Testing</div>
+                    </a>
+                </div>
+
+                <!-- Spacer for mobile nav -->
+                <div class="h-24 md:hidden"></div>
+            </div>
+        </main>
+
+        <!-- Right: Playlist Sidebar -->
+        <!-- Fixed width to prevent shrinking, hidden off-canvas on mobile, standard on desktop -->
+        <aside id="playlist-sidebar" class="w-96 flex-shrink-0 bg-[var(--playlist-bg)] border-l border-[var(--sidebar-border)] flex flex-col h-full fixed top-16 bottom-0 right-0 transform translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 backdrop-blur-xl lg:backdrop-blur-none lg:relative lg:top-0 lg:h-auto lg:block">
+            
+            <!-- Playlist Header -->
+            <div class="p-6 border-b border-[var(--sidebar-border)]">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-bold text-lg tracking-tight font-outfit">Course Syllabus</h2>
+                    <button class="lg:hidden p-2 rounded-full hover:bg-[var(--card-hover)]" onclick="toggleMobileSidebar()"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                
+                <!-- Progress Card -->
+                <div class="p-4 rounded-xl bg-[var(--card-bg)] border border-[var(--border)]">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Progress</span>
+                        <span class="text-xs font-mono text-blue-500 font-bold">16%</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-[var(--border)] rounded-full overflow-hidden">
+                        <div class="h-full w-[16%] bg-blue-500 rounded-full relative"></div>
+                    </div>
+                    <div class="mt-2 text-[10px] text-[var(--text-muted)] text-right">2 of 12 Modules</div>
+                </div>
+            </div>
+
+            <!-- Playlist Items (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-2">
+                
+                <!-- Item 1 (Completed) -->
+                <a href="#" class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group opacity-60 hover:opacity-100">
+                    <div class="mt-0.5">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Introduction to Probability</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">10 MIN</span>
+                    </div>
+                </a>
+
+                <!-- Item 2 (Active/Current) -->
+                <a href="#" class="playlist-active rounded-xl p-4 flex flex-col gap-2 shadow-sm transition-all relative overflow-hidden group">
+                    <div class="flex items-start gap-3 relative z-10">
+                        <div class="mt-0.5">
+                            <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                <i data-lucide="play" class="w-2.5 h-2.5 text-white fill-current"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold leading-tight mb-1 text-blue-500">Bayesian Inference</h4>
+                            <span class="text-[10px] text-blue-400 font-bold tracking-widest uppercase animate-pulse">Reading Now</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Item 3 -->
+                <a href="#" class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group">
+                    <div class="mt-0.5 text-[var(--text-muted)] font-mono text-xs font-bold w-4 text-center">03</div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Hypothesis Testing</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">20 MIN</span>
+                    </div>
+                </a>
+
+                <!-- Item 4 -->
+                <a href="#" class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group">
+                    <div class="mt-0.5 text-[var(--text-muted)] font-mono text-xs font-bold w-4 text-center">04</div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Linear Regression</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">18 MIN</span>
+                    </div>
+                </a>
+
+                <!-- Divider -->
+                <div class="px-3 py-2 text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mt-4 mb-1 border-t border-[var(--sidebar-border)] pt-4 opacity-50">
+                    Module 2: Advanced
+                </div>
+
+                <!-- Item 5 -->
+                <a href="#" class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group">
+                    <div class="mt-0.5 text-[var(--text-muted)] font-mono text-xs font-bold w-4 text-center">05</div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Logistic Regression</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">22 MIN</span>
+                    </div>
+                </a>
+
+                <!-- Item 6 -->
+                <a href="#" class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group">
+                    <div class="mt-0.5 text-[var(--text-muted)] font-mono text-xs font-bold w-4 text-center">06</div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Support Vector Machines</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">30 MIN</span>
+                    </div>
+                </a>
+
+                <div class="h-10"></div> <!-- Bottom Spacer -->
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Smart Mobile Bottom Navigation -->
+    <div id="bottom-bar" class="fixed bottom-0 left-0 w-full z-50 border-t border-[var(--border)] bg-[var(--bottom-nav)] backdrop-blur-lg md:hidden smart-bar transition-transform duration-300">
+        <div class="flex items-center justify-between px-6 py-4">
+            <button class="p-2 rounded-full hover:bg-[var(--card-hover)] text-[var(--text-muted)] disabled:opacity-50" aria-label="Previous Note">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            
+            <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--active-item-bg)] border border-blue-500/20 text-sm font-bold text-blue-500" onclick="toggleMobileSidebar()">
+                <i data-lucide="list" class="w-4 h-4"></i>
+                Contents
+            </button>
+            
+            <button class="p-2 rounded-full hover:bg-[var(--card-hover)] text-[var(--text-muted)]" aria-label="Next Note">
+                <i data-lucide="chevron-right" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar Overlay Backdrop -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 hidden lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <script>
+        lucide.createIcons();
+
+        // Smart Bar Logic
+        const mainContent = document.getElementById('main-content');
+        const navbar = document.getElementById('navbar');
+        const bottomBar = document.getElementById('bottom-bar');
+        const sidebar = document.getElementById('playlist-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        let lastScrollTop = 0;
+
+        mainContent.addEventListener('scroll', () => {
+            const scrollTop = mainContent.scrollTop;
+            
+            // Reading Progress Bar
+            const scrollHeight = mainContent.scrollHeight - mainContent.clientHeight;
+            const scrolled = (scrollTop / scrollHeight) * 100;
+            const progressBar = document.getElementById('reading-progress');
+            if(progressBar) progressBar.style.width = scrolled + '%';
+
+            // Smart Hide/Show Logic
+            if (Math.abs(scrollTop - lastScrollTop) > 20) {
+                if (scrollTop > lastScrollTop && scrollTop > 60) {
+                    navbar.classList.add('nav-hidden');
+                    if(bottomBar) bottomBar.classList.add('bottom-hidden');
+                } else {
+                    navbar.classList.remove('nav-hidden');
+                    if(bottomBar) bottomBar.classList.remove('bottom-hidden');
+                }
+                lastScrollTop = scrollTop;
+            }
+        });
+
+        // Mobile Sidebar Toggle
+        function toggleMobileSidebar() {
+            sidebar.classList.toggle('translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        // Desktop Sidebar Toggle (Optional Collapse)
+        function toggleDesktopSidebar() {
+            if (window.innerWidth >= 1024) {
+                sidebar.classList.toggle('lg:hidden'); // Simple collapse for desktop
+                // For a smoother animation, you'd toggle a width class or margin
+            }
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            let next = 'dark';
+            if (current === 'dark') next = 'light';
+            else if (current === 'light') next = 'aurora';
+            else next = 'dark';
+
+            document.body.setAttribute('data-theme', next);
+            
+            if (next === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+            localStorage.setItem('theme', next);
+        }
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+    </script>
+</body>
+</html>

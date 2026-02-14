@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // DATA SCIENCE & GAME DEV</title>
+    
+    <!-- Design System Fonts: Option B "Brutalist Tech" -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gravity: {
+                            base: '#09090B',       /* Zinc 950 - "Deep Nebula" Base */
+                            surface: '#18181B',    /* Zinc 900 */
+                            border: '#27272A',     /* Zinc 800 */
+                            text: '#E4E4E7',       /* Zinc 200 */
+                            muted: '#A1A1AA',      /* Zinc 400 */
+                            accent: '#D4FF00',     /* Neon Lime - "Antigravity" Pop */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        heading: ['Space Grotesk', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    animation: {
+                        'marquee': 'marquee 30s linear infinite',
+                        'blink': 'blink 1s step-end infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        },
+                        blink: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    },
+                    backgroundImage: {
+                        'grid-tech': "linear-gradient(to right, #27272A 1px, transparent 1px), linear-gradient(to bottom, #27272A 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #09090B;
+            color: #E4E4E7;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Typography Overrides */
+        h1, h2, h3, h4, h5, .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        code, pre, .font-mono {
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Custom Selection Color */
+        ::selection {
+            background-color: #D4FF00;
+            color: #000000;
+        }
+
+        /* Technical Grid Background */
+        .bg-tech-grid {
+            background-size: 4rem 4rem;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+        }
+
+        /* Staggered Animation Delays */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+
+        /* Crosshair Markers */
+        .marker-plus::before {
+            content: '+';
+            position: absolute;
+            color: #52525B;
+            font-family: 'Space Mono', monospace;
+            font-weight: 300;
+            z-index: 10;
+        }
+        .marker-tl::before { top: -10px; left: -5px; }
+        .marker-tr::before { top: -10px; right: -5px; }
+        .marker-bl::before { bottom: -10px; left: -5px; }
+        .marker-br::before { bottom: -10px; right: -5px; }
+
+        /* Magnetic Button Effect (Basic CSS lift) */
+        .magnetic-btn {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .magnetic-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 left-0 border-b border-gravity-border bg-gravity-base/90 backdrop-blur-md">
+        <div class="max-w-[1600px] mx-auto px-6 h-20 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center gap-3 group cursor-pointer">
+                <div class="w-2 h-8 bg-gravity-accent group-hover:animate-pulse"></div>
+                <div class="flex flex-col leading-none">
+                    <span class="font-heading font-bold text-xl tracking-tight text-white">ARYAN.DS</span>
+                    <span class="font-mono text-[10px] text-gravity-muted tracking-widest">PORTFOLIO_V2.0</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-12 font-mono text-xs tracking-widest font-bold">
+                <a href="#notes" class="hover:text-gravity-accent transition-colors flex items-center gap-2 group">
+                    <span class="text-gravity-border group-hover:text-gravity-accent/50 transition-colors">01</span> NOTES
+                </a>
+                <a href="#solutions" class="hover:text-gravity-accent transition-colors flex items-center gap-2 group">
+                    <span class="text-gravity-border group-hover:text-gravity-accent/50 transition-colors">02</span> SOLUTIONS
+                </a>
+                <a href="#devlogs" class="hover:text-gravity-accent transition-colors flex items-center gap-2 group">
+                    <span class="text-gravity-border group-hover:text-gravity-accent/50 transition-colors">03</span> DEV_LOGS
+                </a>
+                <a href="https://github.com" target="_blank" class="magnetic-btn px-6 py-2.5 border border-gravity-border hover:border-gravity-accent hover:bg-gravity-accent hover:text-black transition-all flex items-center gap-2">
+                    GITHUB <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
+                </a>
+            </div>
+            
+            <!-- Mobile Toggle -->
+            <button onclick="toggleMenu()" class="md:hidden p-2 text-gravity-muted hover:text-white">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-gravity-base transform translate-x-full transition-transform duration-300 md:hidden flex flex-col pt-24 px-8 border-l border-gravity-border">
+        <div class="flex flex-col gap-8 font-heading text-2xl font-bold">
+            <a href="#notes" onclick="toggleMenu()" class="border-b border-gravity-border pb-4 hover:text-gravity-accent group">
+                <span class="font-mono text-xs text-gravity-muted block mb-1 group-hover:text-gravity-accent">01 // ACADEMICS</span>
+                Study Notes
+            </a>
+            <a href="#solutions" onclick="toggleMenu()" class="border-b border-gravity-border pb-4 hover:text-gravity-accent group">
+                <span class="font-mono text-xs text-gravity-muted block mb-1 group-hover:text-gravity-accent">02 // RESOURCES</span>
+                Solutions
+            </a>
+            <a href="#devlogs" onclick="toggleMenu()" class="border-b border-gravity-border pb-4 hover:text-gravity-accent group">
+                <span class="font-mono text-xs text-gravity-muted block mb-1 group-hover:text-gravity-accent">03 // PROJECTS</span>
+                Dev Logs
+            </a>
+            <a href="#" onclick="toggleMenu()" class="text-gravity-accent mt-4 flex items-center gap-2 font-mono text-sm">
+                DOWNLOAD_RESUME.PDF <i data-lucide="download" class="w-4 h-4"></i>
+            </a>
+        </div>
+        <button onclick="toggleMenu()" class="absolute top-6 right-6 p-2 text-gravity-muted hover:text-white">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex flex-col justify-center pt-20 border-b border-gravity-border overflow-hidden">
+        <!-- Tech Grid Background -->
+        <div class="absolute inset-0 bg-grid-tech bg-tech-grid opacity-20 pointer-events-none"></div>
+        
+        <div class="max-w-[1600px] mx-auto px-6 w-full relative z-10 flex flex-col md:flex-row gap-16 items-end">
+            
+            <!-- Left: Typography & Intro -->
+            <div class="flex-1">
+                <!-- Status Badge -->
+                <div class="font-mono text-xs text-gravity-accent mb-8 flex items-center gap-3 opacity-0 animate-fade-in-up">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gravity-accent opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-gravity-accent"></span>
+                    </span>
+                    SYSTEM_STATUS: ONLINE // IIT MADRAS
+                </div>
+
+                <!-- Headline -->
+                <h1 class="text-[12vw] md:text-[7vw] leading-[0.9] font-bold tracking-tighter mb-8 opacity-0 animate-fade-in-up delay-100">
+                    DATA<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-700">SCIENCE</span><br>
+                    <span class="text-[4vw] font-light text-gravity-muted block mt-1 font-sans">&& GAME ENGINEERING</span>
+                </h1>
+
+                <!-- Typewriter Container -->
+                <div class="h-12 opacity-0 animate-fade-in-up delay-200">
+                    <p class="font-mono text-sm md:text-base text-gravity-muted flex items-center gap-2">
+                        <span class="text-gravity-accent">></span> 
+                        <span id="hero-typewriter"></span><span class="animate-blink w-2 h-4 bg-gravity-accent inline-block align-middle ml-1"></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Stats / Actions -->
+            <div class="w-full md:w-auto md:min-w-[400px] border-l-2 border-gravity-border pl-8 py-2 mb-8 opacity-0 animate-fade-in-up delay-300">
+                <div class="grid grid-cols-2 gap-8 mb-10">
+                    <div>
+                        <div class="text-4xl font-heading font-bold text-white">4.0</div>
+                        <div class="text-[10px] font-mono text-gravity-muted tracking-widest uppercase mt-1">GPA / 4.0</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-heading font-bold text-white">12+</div>
+                        <div class="text-[10px] font-mono text-gravity-muted tracking-widest uppercase mt-1">Shipped Projects</div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col gap-3">
+                    <button class="magnetic-btn w-full bg-white text-black font-mono font-bold px-6 py-4 text-xs tracking-widest uppercase hover:bg-gravity-accent transition-colors shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none translate-x-0 translate-y-0 hover:translate-x-[2px] hover:translate-y-[2px]">
+                        Explore Knowledge Base
+                    </button>
+                    <button class="magnetic-btn w-full border border-gravity-border text-white font-mono font-bold px-6 py-4 text-xs tracking-widest uppercase hover:bg-white/5 transition-colors flex justify-between items-center group">
+                        Download Resume 
+                        <i data-lucide="arrow-down" class="w-4 h-4 group-hover:translate-y-1 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infinite Marquee -->
+        <div class="mt-auto border-t border-gravity-border bg-gravity-surface py-4 overflow-hidden relative opacity-0 animate-fade-in-up delay-300">
+            <div class="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-gravity-base to-transparent z-10"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-gravity-base to-transparent z-10"></div>
+            
+            <div class="inline-flex animate-marquee whitespace-nowrap font-mono text-xs font-bold text-gravity-muted uppercase tracking-[0.2em] gap-16">
+                <!-- Content duplicated for seamless loop -->
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Python</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Statistics</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Game Physics</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Unity C#</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Machine Learning</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Data Viz</span>
+                
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Python</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Statistics</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Game Physics</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Unity C#</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Machine Learning</span>
+                <span class="flex items-center gap-3"><i data-lucide="zap" class="w-3 h-3 text-gravity-accent"></i> Data Viz</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Section -->
+    <section id="notes" class="py-32 bg-gravity-base relative">
+        <div class="max-w-[1400px] mx-auto px-6">
+            
+            <!-- Section Header -->
+            <div class="flex items-end justify-between mb-16 border-b border-gravity-border pb-6">
+                <div>
+                    <div class="font-mono text-xs text-gravity-accent mb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-gravity-accent rounded-full"></span>
+                        INDEX: 001-A
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-heading font-bold tracking-tight uppercase text-white">Knowledge<br>Modules</h2>
+                </div>
+                <div class="hidden md:block text-right opacity-50">
+                     <i data-lucide="layout-grid" class="w-8 h-8 text-gravity-border"></i>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                
+                <!-- Card 1: Academic Notes (Large) -->
+                <div class="md:col-span-8 bg-gravity-surface p-8 md:p-12 relative group border border-gravity-border hover:border-gravity-accent transition-all duration-300 hover:-translate-y-1 marker-tl marker-tr marker-bl marker-br">
+                    <div class="absolute top-6 right-6 p-2 bg-gravity-base rounded-full border border-gravity-border opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <i data-lucide="arrow-up-right" class="w-5 h-5 text-gravity-accent"></i>
+                    </div>
+
+                    <div class="font-mono text-xs text-gravity-accent mb-6 bg-gravity-accent/10 w-fit px-2 py-1 rounded">[01] ACADEMIC_RESOURCES</div>
+                    <h3 class="text-3xl font-heading font-bold mb-4 uppercase text-white">Lecture Notes &<br>Summaries</h3>
+                    <p class="text-gravity-muted font-sans text-base max-w-lg mb-10 leading-relaxed">
+                        Comprehensive breakdowns of IITM BS Degree curriculum. Includes Statistics, Mathematics for Data Science, and Python methodologies.
+                    </p>
+                    
+                    <!-- Code Snippet Mockup -->
+                    <div class="w-full bg-black border border-gravity-border p-6 rounded-md font-mono text-xs overflow-hidden shadow-2xl relative">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gravity-accent to-transparent"></div>
+                        <div class="flex gap-2 mb-4 border-b border-gravity-border pb-2 text-gravity-muted">
+                            <span>stats_week1.py</span>
+                        </div>
+                        <div class="text-gray-400 leading-6">
+                            <span class="text-purple-400">import</span> pandas <span class="text-purple-400">as</span> pd<br>
+                            <span class="text-purple-400">import</span> scipy.stats <span class="text-purple-400">as</span> stats<br><br>
+                            <span class="text-gray-500">// Calculate Z-Score for dataset</span><br>
+                            <span class="text-blue-400">def</span> <span class="text-yellow-200">get_z_score</span>(value, mean, std):<br>
+                            &nbsp;&nbsp;<span class="text-purple-400">return</span> (value - mean) / std
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Solutions (Tall) -->
+                <div id="solutions" class="md:col-span-4 bg-gravity-surface p-8 relative group border border-gravity-border hover:border-gravity-accent transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between marker-tl marker-tr marker-bl marker-br">
+                    <div>
+                        <div class="font-mono text-xs text-gravity-accent mb-6 bg-gravity-accent/10 w-fit px-2 py-1 rounded">[02] GRADED_SOLUTIONS</div>
+                        <h3 class="text-2xl font-heading font-bold mb-3 uppercase text-white">Assignment<br>Walkthroughs</h3>
+                        <p class="text-gravity-muted font-sans text-sm mt-2 leading-relaxed">
+                            Step-by-step logic for weekly graded assignments and quizzes.
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center justify-center py-12">
+                        <div class="relative w-32 h-32 flex items-center justify-center">
+                            <!-- Spinning dashed border -->
+                            <div class="absolute inset-0 border border-dashed border-gravity-muted rounded-full animate-[spin_12s_linear_infinite] group-hover:border-gravity-accent transition-colors"></div>
+                            <!-- Static inner ring -->
+                            <div class="absolute inset-4 border border-gravity-border rounded-full"></div>
+                            <i data-lucide="check-circle-2" class="w-10 h-10 text-white relative z-10"></i>
+                        </div>
+                    </div>
+
+                    <button class="magnetic-btn w-full border border-gravity-border py-4 font-mono text-xs uppercase hover:bg-white hover:text-black transition-colors font-bold tracking-widest bg-gravity-base">
+                        View Archive
+                    </button>
+                </div>
+
+                <!-- Card 3: Dev Logs (Full Width) -->
+                <div id="devlogs" class="md:col-span-12 bg-gravity-surface p-8 md:p-12 relative group border border-gravity-border hover:border-gravity-accent transition-all duration-300 hover:-translate-y-1 flex flex-col md:flex-row gap-12 items-center marker-tl marker-tr marker-bl marker-br">
+                    <div class="flex-1">
+                        <div class="font-mono text-xs text-gravity-accent mb-6 bg-gravity-accent/10 w-fit px-2 py-1 rounded">[03] DEV_LOGS // UNITY</div>
+                        <h3 class="text-3xl font-heading font-bold mb-4 uppercase text-white">Building Worlds<br>From Scratch</h3>
+                        <p class="text-gravity-muted font-sans text-base max-w-xl mb-8 leading-relaxed">
+                            Weekly updates on my indie game projects. Exploring 2D physics engines, procedural generation algorithms, and custom shader graph experiments.
+                        </p>
+                        <a href="#" class="inline-flex items-center gap-3 text-white border-b border-gravity-accent pb-1 hover:text-gravity-accent transition-colors font-mono text-xs tracking-widest uppercase">
+                            Read Latest Log <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Tech Stack Visual -->
+                    <div class="grid grid-cols-2 gap-px bg-gravity-border w-full max-w-sm border border-gravity-border">
+                        <div class="bg-gravity-surface p-8 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors group/item">
+                            <i data-lucide="gamepad-2" class="w-8 h-8 text-gravity-muted group-hover/item:text-white transition-colors"></i>
+                            <span class="font-mono text-[10px] tracking-widest text-gravity-muted">UNITY</span>
+                        </div>
+                        <div class="bg-gravity-surface p-8 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors group/item">
+                            <i data-lucide="box" class="w-8 h-8 text-gravity-muted group-hover/item:text-white transition-colors"></i>
+                            <span class="font-mono text-[10px] tracking-widest text-gravity-muted">BLENDER</span>
+                        </div>
+                        <div class="bg-gravity-surface p-8 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors group/item">
+                            <i data-lucide="code-2" class="w-8 h-8 text-gravity-muted group-hover/item:text-white transition-colors"></i>
+                            <span class="font-mono text-[10px] tracking-widest text-gravity-muted">C#</span>
+                        </div>
+                        <div class="bg-gravity-surface p-8 flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-colors group/item">
+                            <i data-lucide="layers" class="w-8 h-8 text-gravity-muted group-hover/item:text-white transition-colors"></i>
+                            <span class="font-mono text-[10px] tracking-widest text-gravity-muted">HLSL</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-gravity-border py-24">
+        <div class="max-w-[1400px] mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-12">
+                <div>
+                    <h2 class="text-lg font-heading font-bold uppercase tracking-tight mb-2 text-white">Ready to Collaborate?</h2>
+                    <p class="text-gravity-muted font-mono text-xs mb-8">INITIATE_COMMUNICATION_PROTOCOL</p>
+                    <a href="mailto:contact@aryan.ds" class="text-3xl md:text-5xl font-mono text-gravity-muted hover:text-gravity-accent transition-colors break-all">
+                        hello@aryan.ds<span class="animate-blink text-gravity-accent">_</span>
+                    </a>
+                </div>
+                
+                <div class="font-mono text-xs text-gravity-muted space-y-4 md:text-right">
+                    <p>DESIGNED IN INDIA.</p>
+                    <p>BUILT WITH TAILWIND + VANILLA JS.</p>
+                    <p class="text-gravity-accent">© 2026 ARYAN.DS // ALL SYSTEMS NOMINAL</p>
+                    
+                    <div class="flex md:justify-end gap-8 mt-10 font-bold">
+                        <a href="#" class="hover:text-white transition-colors">GITHUB</a>
+                        <a href="#" class="hover:text-white transition-colors">LINKEDIN</a>
+                        <a href="#" class="hover:text-white transition-colors">TWITTER</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const isOpen = !menu.classList.contains('translate-x-full');
+            
+            if (isOpen) {
+                menu.classList.add('translate-x-full');
+                document.body.style.overflow = 'auto';
+            } else {
+                menu.classList.remove('translate-x-full');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Typewriter Effect
+        const typeWriterElement = document.getElementById('hero-typewriter');
+        const textToType = "Documenting the intersection of statistical analysis, python development, and interactive media.";
+        let charIndex = 0;
+
+        function typeWriter() {
+            if (charIndex < textToType.length) {
+                typeWriterElement.innerHTML += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 35); 
+            }
+        }
+
+        // Start animations when page loads
+        window.onload = () => {
+            setTimeout(typeWriter, 800);
+        };
+    </script>
+</body>
+</html>

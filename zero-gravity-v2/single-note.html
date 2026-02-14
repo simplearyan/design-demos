@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // READING: BAYESIAN INFERENCE</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#F97316',
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Base Transitions */
+        body { transition: background-color 0.5s ease, color 0.5s ease; }
+
+        /* THEME ENGINE */
+        body[data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-main: #18181b;
+            --text-muted: #71717a;
+            --border: #e4e4e7;
+            --card-bg: #f4f4f5;
+            --card-hover: #ffffff;
+            --active-item: #eff6ff;
+            --playlist-bg: #f8fafc;
+        }
+
+        body[data-theme="dark"] {
+            --bg-color: #09090b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --card-bg: #18181b;
+            --card-hover: #27272a;
+            --active-item: #1e293b;
+            --playlist-bg: #09090b;
+        }
+
+        body[data-theme="aurora"] {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-hover: rgba(255, 255, 255, 0.08);
+            --active-item: rgba(59, 130, 246, 0.1);
+            --playlist-bg: rgba(0,0,0,0.5);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Layout Utilities */
+        .adaptive-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .code-window {
+            background-color: #0d0d0d; /* Always dark for code contrast */
+            border: 1px solid var(--border);
+        }
+
+        /* Typography */
+        body.font-outfit { font-family: 'Outfit', sans-serif; }
+        body.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Article Typography */
+        .prose p { margin-bottom: 1.5rem; color: var(--text-muted); line-height: 1.8; font-size: 1.125rem; }
+        .prose h2 { color: var(--text-main); font-weight: 700; font-size: 1.75rem; margin-top: 3rem; margin-bottom: 1rem; letter-spacing: -0.02em; }
+        .prose ul { margin-bottom: 1.5rem; list-style-type: none; padding-left: 0; }
+        .prose li { position: relative; padding-left: 1.5rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .prose li::before { content: "•"; position: absolute; left: 0; color: #3B82F6; font-weight: bold; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+    </style>
+</head>
+<body class="font-jakarta min-h-screen flex flex-col relative selection:bg-blue-500/30" data-theme="dark">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 border-b border-[var(--border)] bg-[var(--bg-color)]/95 backdrop-blur-md">
+        <div class="w-full px-6 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:scale-105 transition-transform">A</div>
+                </a>
+                <div class="h-6 w-px bg-[var(--border)]"></div>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-blue-500 tracking-wider uppercase">Statistics II</span>
+                    <span class="text-xs text-[var(--text-muted)]">Course Collection</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Toggle Sidebar (Mobile) -->
+                <button class="lg:hidden p-2 rounded-full hover:bg-[var(--card-hover)]" onclick="togglePlaylist()">
+                    <i data-lucide="list" class="w-5 h-5"></i>
+                </button>
+                
+                <a href="course-collection.html" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] hover:bg-[var(--card-hover)] transition-colors text-xs font-bold">
+                    <i data-lucide="grid" class="w-4 h-4"></i> View Index
+                </a>
+                
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="flex flex-col lg:flex-row flex-grow pt-16 h-screen overflow-hidden">
+        
+        <!-- Left: Reading Area (Scrollable) -->
+        <main class="flex-1 overflow-y-auto h-full relative" id="main-content">
+            
+            <div class="max-w-4xl mx-auto px-6 py-12">
+                
+                <!-- Video Player / Cover Metaphor -->
+                <div class="aspect-video rounded-2xl bg-gradient-to-br from-blue-900 to-slate-900 relative overflow-hidden mb-10 border border-[var(--border)] shadow-2xl flex items-center justify-center group">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                    
+                    <div class="text-center z-10 p-6">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-xs font-mono mb-4">
+                            MODULE 02 &bull; PART 1
+                        </div>
+                        <h1 class="text-3xl md:text-5xl font-bold text-white mb-4">Bayesian Inference</h1>
+                        <p class="text-blue-200/60 max-w-lg mx-auto">Understanding the mathematical framework for updating beliefs with new evidence.</p>
+                    </div>
+
+                    <!-- "Play" Button Effect -->
+                    <div class="absolute bottom-6 right-6">
+                        <button class="p-3 rounded-full bg-blue-600 text-white shadow-lg hover:scale-110 transition-transform">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-12 border-b border-[var(--border)] pb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-700 to-gray-900 flex items-center justify-center text-xs font-bold border border-[var(--border)]">AS</div>
+                        <div>
+                            <div class="font-bold text-sm">Aryan S.</div>
+                            <div class="text-xs text-[var(--text-muted)]">Posted 2 days ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <button class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-[var(--card-hover)] transition-colors text-xs font-bold border border-transparent hover:border-[var(--border)]">
+                            <i data-lucide="thumbs-up" class="w-4 h-4"></i> Helpful
+                        </button>
+                        <button class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-[var(--card-hover)] transition-colors text-xs font-bold border border-transparent hover:border-[var(--border)]">
+                            <i data-lucide="share-2" class="w-4 h-4"></i> Share
+                        </button>
+                        <button class="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-[var(--card-hover)] transition-colors text-xs font-bold border border-transparent hover:border-[var(--border)]">
+                            <i data-lucide="download" class="w-4 h-4"></i> PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <article class="prose max-w-none animate-fade-in">
+                    
+                    <p class="lead text-xl text-[var(--text-main)] font-light mb-8">
+                        Bayesian inference is a method of statistical inference in which Bayes' theorem is used to update the probability for a hypothesis as more evidence or information becomes available.
+                    </p>
+
+                    <h2>The Core Equation</h2>
+                    <p>
+                        The fundamental equation involves the <strong>Posterior</strong>, <strong>Likelihood</strong>, <strong>Prior</strong>, and <strong>Marginal Likelihood</strong>.
+                    </p>
+
+                    <!-- Math Block -->
+                    <div class="my-10 p-8 rounded-xl adaptive-card flex justify-center items-center overflow-x-auto">
+                        <div class="text-2xl md:text-3xl font-serif italic text-[var(--text-main)] whitespace-nowrap">
+                            P(A|B) = <span class="inline-flex flex-col items-center align-middle mx-3"><span class="border-b border-[var(--text-muted)] pb-2 mb-1">P(B|A) &cdot; P(A)</span><span>P(B)</span></span>
+                        </div>
+                    </div>
+
+                    <ul>
+                        <li><strong>P(A)</strong>: The Prior probability (what we believe before seeing data).</li>
+                        <li><strong>P(B|A)</strong>: The Likelihood (how probable is the data given our hypothesis).</li>
+                        <li><strong>P(A|B)</strong>: The Posterior (our updated belief).</li>
+                    </ul>
+
+                    <h2>Python Implementation</h2>
+                    <p>
+                        Let's simulate a simple coin flip scenario to update our belief about the fairness of a coin.
+                    </p>
+
+                    <!-- Code Block -->
+                    <div class="code-window rounded-xl overflow-hidden my-8 relative group shadow-xl">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-white/5">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500/20"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500/20"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500/20"></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-xs font-mono text-gray-500">bayes.py</span>
+                                <button class="text-gray-500 hover:text-white"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                            </div>
+                        </div>
+                        <div class="p-6 overflow-x-auto bg-[#0d0d0d]">
+                            <pre class="font-mono text-sm leading-relaxed text-gray-300"><code class="language-python"><span class="text-purple-400">import</span> numpy <span class="text-purple-400">as</span> np
+
+<span class="text-gray-500"># Define prior: Uniform distribution (any bias is equally likely)</span>
+prior = np.ones(100) / 100
+p_grid = np.linspace(0, 1, 100)
+
+<span class="text-purple-400">def</span> <span class="text-blue-400">update</span>(prior, heads, total):
+    likelihood = p_grid**heads * (1 - p_grid)**(total - heads)
+    posterior = likelihood * prior
+    posterior /= posterior.sum() <span class="text-gray-500"># Normalize</span>
+    <span class="text-purple-400">return</span> posterior</code></pre>
+                        </div>
+                    </div>
+
+                    <h2>Conclusion</h2>
+                    <p>
+                        Unlike frequentist methods, Bayesian approaches give us a distribution of probabilities rather than a single point estimate, allowing for richer uncertainty quantification.
+                    </p>
+
+                </article>
+
+                <!-- Navigation Controls -->
+                <div class="grid grid-cols-2 gap-4 mt-20 pt-10 border-t border-[var(--border)]">
+                    <a href="#" class="adaptive-card p-4 rounded-xl group hover:border-blue-500/50 transition-all text-left">
+                        <div class="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Previous Note</div>
+                        <div class="text-sm font-bold truncate group-hover:text-blue-500 transition-colors">Introduction to Probability</div>
+                    </a>
+                    <a href="#" class="adaptive-card p-4 rounded-xl group hover:border-blue-500/50 transition-all text-right">
+                        <div class="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1">Next Note</div>
+                        <div class="text-sm font-bold truncate group-hover:text-blue-500 transition-colors">Hypothesis Testing</div>
+                    </a>
+                </div>
+
+                <!-- Spacer for mobile -->
+                <div class="h-20 lg:hidden"></div>
+            </div>
+        </main>
+
+        <!-- Right: Playlist Sidebar (Sticky/Scrollable) -->
+        <aside id="playlist-sidebar" class="w-full lg:w-96 bg-[var(--playlist-bg)] border-l border-[var(--border)] flex flex-col h-full absolute lg:relative z-40 transform lg:transform-none translate-x-full transition-transform duration-300">
+            
+            <!-- Playlist Header -->
+            <div class="p-6 border-b border-[var(--border)] bg-[var(--bg-color)]/95 backdrop-blur lg:bg-transparent">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="font-bold text-lg">Course Content</h2>
+                    <button class="lg:hidden p-1" onclick="togglePlaylist()"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="flex items-center justify-between text-xs text-[var(--text-muted)]">
+                    <span>Statistics II: Inference</span>
+                    <span>2 / 12</span>
+                </div>
+                <!-- Progress Bar -->
+                <div class="h-1 w-full bg-[var(--border)] rounded-full mt-3 overflow-hidden">
+                    <div class="h-full w-[16%] bg-blue-500 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Playlist Items -->
+            <div class="flex-1 overflow-y-auto p-2 space-y-1">
+                
+                <!-- Item 1 (Completed) -->
+                <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group opacity-60 hover:opacity-100">
+                    <div class="mt-1">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Introduction to Probability</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">10 MIN</span>
+                    </div>
+                </a>
+
+                <!-- Item 2 (Active/Current) -->
+                <a href="#" class="flex gap-3 p-3 rounded-xl bg-[var(--active-item)] border border-blue-500/20 transition-colors group relative overflow-hidden">
+                    <!-- Active Indicator Strip -->
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-l"></div>
+                    <div class="mt-1 ml-2">
+                        <i data-lucide="play" class="w-4 h-4 text-blue-500 fill-blue-500"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 text-blue-500">Bayesian Inference</h4>
+                        <span class="text-xs text-blue-400/80 font-mono">READING NOW</span>
+                    </div>
+                </a>
+
+                <!-- Item 3 -->
+                <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group">
+                    <div class="mt-1 text-[var(--text-muted)] font-mono text-xs font-bold w-4 text-center">03</div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Hypothesis Testing</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">20 MIN</span>
+                    </div>
+                </a>
+
+                <!-- Item 4 -->
+                <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group">
+                    <div class="mt-1 text-[var(--text-muted)] font-mono text-xs font-bold w-4 text-center">04</div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Linear Regression</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">18 MIN</span>
+                    </div>
+                </a>
+
+                <!-- Divider -->
+                <div class="px-3 py-2 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mt-4 mb-1">
+                    Module 2: Advanced
+                </div>
+
+                <!-- Item 5 -->
+                <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group">
+                    <div class="mt-1 text-[var(--text-muted)] font-mono text-xs font-bold w-4 text-center">05</div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Logistic Regression</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">22 MIN</span>
+                    </div>
+                </a>
+
+                <!-- Item 6 -->
+                <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-[var(--card-hover)] transition-colors group">
+                    <div class="mt-1 text-[var(--text-muted)] font-mono text-xs font-bold w-4 text-center">06</div>
+                    <div>
+                        <h4 class="text-sm font-bold leading-tight mb-1 group-hover:text-blue-500 transition-colors">Support Vector Machines</h4>
+                        <span class="text-xs text-[var(--text-muted)] font-mono">30 MIN</span>
+                    </div>
+                </a>
+
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Mobile Playlist Toggle
+        function togglePlaylist() {
+            const sidebar = document.getElementById('playlist-sidebar');
+            sidebar.classList.toggle('translate-x-full');
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', next);
+            
+            if (next === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+            localStorage.setItem('theme', next);
+        }
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+    </script>
+</body>
+</html>
