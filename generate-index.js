@@ -72,6 +72,7 @@ function generateHTML(demos) {
             text-align: center;
             padding-bottom: 2rem;
             border-bottom: 1px solid var(--border);
+            position: relative;
         }
 
         h1 {
@@ -184,6 +185,36 @@ function generateHTML(demos) {
             transform: translateX(0);
         }
 
+        .view-toggle {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .view-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .view-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -205,6 +236,11 @@ function generateHTML(demos) {
     <header>
         <h1>Design Concepts</h1>
         <p class="subtitle">Index of all experimental pages and prototypes</p>
+        
+        <div class="view-toggle">
+            <a href="index.html" class="view-btn active">List View</a>
+            <a href="index-preview.html" class="view-btn">Grid Preview</a>
+        </div>
     </header>
 
     <main>
