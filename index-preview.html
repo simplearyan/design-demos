@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Demos Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-hover: #1f1f1f;
+            --border: #333;
+            --accent: #d4f238;
+            --text: #ededed;
+            --text-muted: #888;
+            --font-main: 'Outfit', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            padding: 2rem;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            max-width: 1400px;
+            margin: 0 auto 3rem auto;
+            text-align: center;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .view-toggle {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .view-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .view-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            gap: 4rem;
+        }
+
+        section {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            opacity: 0.5;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            group;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: var(--surface-hover);
+            object-fit: cover;
+            border-bottom: 1px solid var(--border);
+            transition: opacity 0.3s ease;
+        }
+        
+        .card-image.placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .card:hover .card-image {
+            opacity: 0.9;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+            text-transform: capitalize;
+        }
+
+        .card-path {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: monospace;
+            opacity: 0.7;
+            margin-bottom: 1rem;
+        }
+        
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .try-btn {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        
+        .card:hover .try-btn {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Design Concepts</h1>
+        <p class="subtitle">Visual preview of experimental pages and prototypes</p>
+        
+        <div class="view-toggle">
+            <a href="index.html" class="view-btn">List View</a>
+            <a href="index-preview.html" class="view-btn active">Grid Preview</a>
+        </div>
+    </header>
+
+    <main>
+        
+            <section style="animation-delay: 0s">
+                <div class="section-title">brutalism</div>
+                <div class="grid">
+                    
+                        <a href="brutalism/Aryan_DS_game_Dev.html" class="card">
+                            <img src="screenshots/brutalism/Aryan_DS_game_Dev.png" alt="Aryan DS game Dev" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Aryan DS game Dev</div>
+                                <div class="card-path">brutalism/Aryan_DS_game_Dev.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="brutalism/Aryan_DS_kinetic_landing_page.html" class="card">
+                            <img src="screenshots/brutalism/Aryan_DS_kinetic_landing_page.png" alt="Aryan DS kinetic landing page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Aryan DS kinetic landing page</div>
+                                <div class="card-path">brutalism/Aryan_DS_kinetic_landing_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="brutalism/Aryan_DS_notes_page.html" class="card">
+                            <img src="screenshots/brutalism/Aryan_DS_notes_page.png" alt="Aryan DS notes page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Aryan DS notes page</div>
+                                <div class="card-path">brutalism/Aryan_DS_notes_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="brutalism/Aryan_DS_solutions_page.html" class="card">
+                            <img src="screenshots/brutalism/Aryan_DS_solutions_page.png" alt="Aryan DS solutions page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Aryan DS solutions page</div>
+                                <div class="card-path">brutalism/Aryan_DS_solutions_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                </div>
+            </section>
+        
+            <section style="animation-delay: 0.1s">
+                <div class="section-title">landing-pages</div>
+                <div class="grid">
+                    
+                        <a href="landing-pages/ARYAN_DS.html" class="card">
+                            <img src="screenshots/landing-pages/ARYAN_DS.png" alt="ARYAN DS" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">ARYAN DS</div>
+                                <div class="card-path">landing-pages/ARYAN_DS.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="landing-pages/Aryan_DS_monochrom.html" class="card">
+                            <img src="screenshots/landing-pages/Aryan_DS_monochrom.png" alt="Aryan DS monochrom" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Aryan DS monochrom</div>
+                                <div class="card-path">landing-pages/Aryan_DS_monochrom.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="landing-pages/GEMINI_NOTES.html" class="card">
+                            <img src="screenshots/landing-pages/GEMINI_NOTES.png" alt="GEMINI NOTES" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">GEMINI NOTES</div>
+                                <div class="card-path">landing-pages/GEMINI_NOTES.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                </div>
+            </section>
+        
+            <section style="animation-delay: 0.2s">
+                <div class="section-title">zero-gravity</div>
+                <div class="grid">
+                    
+                        <a href="zero-gravity/Aryan_Zero_gravity.html" class="card">
+                            <img src="screenshots/zero-gravity/Aryan_Zero_gravity.png" alt="Aryan Zero gravity" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Aryan Zero gravity</div>
+                                <div class="card-path">zero-gravity/Aryan_Zero_gravity.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity/Zero_gravity_devlog_page.html" class="card">
+                            <img src="screenshots/zero-gravity/Zero_gravity_devlog_page.png" alt="Zero gravity devlog page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Zero gravity devlog page</div>
+                                <div class="card-path">zero-gravity/Zero_gravity_devlog_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity/Zero_gravity_dynamic_landing_page.html" class="card">
+                            <img src="screenshots/zero-gravity/Zero_gravity_dynamic_landing_page.png" alt="Zero gravity dynamic landing page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Zero gravity dynamic landing page</div>
+                                <div class="card-path">zero-gravity/Zero_gravity_dynamic_landing_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity/Zero_gravity_notes_page.html" class="card">
+                            <img src="screenshots/zero-gravity/Zero_gravity_notes_page.png" alt="Zero gravity notes page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Zero gravity notes page</div>
+                                <div class="card-path">zero-gravity/Zero_gravity_notes_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity/Zero_gravity_sinble_solution_page.html" class="card">
+                            <img src="screenshots/zero-gravity/Zero_gravity_sinble_solution_page.png" alt="Zero gravity sinble solution page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Zero gravity sinble solution page</div>
+                                <div class="card-path">zero-gravity/Zero_gravity_sinble_solution_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity/Zero_gravity_single_devLog_page.html" class="card">
+                            <img src="screenshots/zero-gravity/Zero_gravity_single_devLog_page.png" alt="Zero gravity single devLog page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Zero gravity single devLog page</div>
+                                <div class="card-path">zero-gravity/Zero_gravity_single_devLog_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity/Zero_gravity_single_notes_page.html" class="card">
+                            <img src="screenshots/zero-gravity/Zero_gravity_single_notes_page.png" alt="Zero gravity single notes page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Zero gravity single notes page</div>
+                                <div class="card-path">zero-gravity/Zero_gravity_single_notes_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity/Zero_gravity_solutions_page.html" class="card">
+                            <img src="screenshots/zero-gravity/Zero_gravity_solutions_page.png" alt="Zero gravity solutions page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Zero gravity solutions page</div>
+                                <div class="card-path">zero-gravity/Zero_gravity_solutions_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity/Zero_grvity_dynamic_devlog_page.html" class="card">
+                            <img src="screenshots/zero-gravity/Zero_grvity_dynamic_devlog_page.png" alt="Zero grvity dynamic devlog page" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">Zero grvity dynamic devlog page</div>
+                                <div class="card-path">zero-gravity/Zero_grvity_dynamic_devlog_page.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                </div>
+            </section>
+        
+            <section style="animation-delay: 0.30000000000000004s">
+                <div class="section-title">zero-gravity-v2</div>
+                <div class="grid">
+                    
+                        <a href="zero-gravity-v2/course-collection.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/course-collection.png" alt="course collection" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">course collection</div>
+                                <div class="card-path">zero-gravity-v2/course-collection.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity-v2/course-read-2.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/course-read-2.png" alt="course read 2" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">course read 2</div>
+                                <div class="card-path">zero-gravity-v2/course-read-2.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity-v2/course-read-3.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/course-read-3.png" alt="course read 3" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">course read 3</div>
+                                <div class="card-path">zero-gravity-v2/course-read-3.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity-v2/course-read.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/course-read.png" alt="course read" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">course read</div>
+                                <div class="card-path">zero-gravity-v2/course-read.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity-v2/home.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/home.png" alt="home" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">home</div>
+                                <div class="card-path">zero-gravity-v2/home.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity-v2/notes-collections-single.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/notes-collections-single.png" alt="notes collections single" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">notes collections single</div>
+                                <div class="card-path">zero-gravity-v2/notes-collections-single.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity-v2/notes.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/notes.png" alt="notes" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">notes</div>
+                                <div class="card-path">zero-gravity-v2/notes.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity-v2/single-note-2.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/single-note-2.png" alt="single note 2" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">single note 2</div>
+                                <div class="card-path">zero-gravity-v2/single-note-2.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                        <a href="zero-gravity-v2/single-note.html" class="card">
+                            <img src="screenshots/zero-gravity-v2/single-note.png" alt="single note" class="card-image" loading="lazy">
+                            <div class="card-content">
+                                <div class="card-title">single note</div>
+                                <div class="card-path">zero-gravity-v2/single-note.html</div>
+                                <div class="card-actions">
+                                    <span class="try-btn">
+                                        View Demo 
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><arrow-right/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    
+                </div>
+            </section>
+        
+    </main>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+    "name": "design-demos",
+    "version": "1.0.0",
+    "description": "Experimental design concepts and prototypes",
+    "main": "generate-index.js",
+    "scripts": {
+        "generate": "node generate-index.js",
+        "preview": "node generate-preview.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "puppeteer": "^24.2.1"
+    }
+}
