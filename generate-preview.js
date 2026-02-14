@@ -62,7 +62,7 @@ async function captureScreenshots(demos) {
         }
 
         const screenshotPath = path.join(demoScreenshotDir, demo.name.replace('.html', '.png'));
-        const relativeScreenshotPath = `screenshots/${demo.folder}/${demo.name.replace('.html', '.png')}`;
+        const relativeScreenshotPath = `./screenshots/${demo.folder}/${encodeURIComponent(demo.name.replace('.html', '.png'))}`;
         
         // Check if screenshot already exists to skip (optional, but good for speed)
         // For now we'll overwrite to ensure fresh state
