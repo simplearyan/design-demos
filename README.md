@@ -1,41 +1,87 @@
-# Design Demos
+# Design Demos — Aryan's UI Lab
 
-A collection of experimental design concepts, prototypes, and landing pages.
+A curated collection of **61+ UI design prototypes** across 10 project domains — video editors, LMS readers, portfolios, data viz tools, and more. Powered by an auto-generating portal with screenshot previews.
 
-## Live Demo
+## 🌐 Live Site
 
-[View the Live Index](https://simplearyan.github.io/design-demos/)  
+**[simplearyan.github.io/design-demos](https://simplearyan.github.io/design-demos/)**
 
-## Structure
+---
 
-The project is organized into several categories:
-- **brutalism**: Raw, bold, and experimental layouts.
-- **landing-pages**: High-conversion landing page concepts.
-- **zero-gravity**: Floating, ethereal, and gravity-defying designs.
-- **zero-gravity-v2**: The next evolution of the zero-gravity concept.
+## 📁 Project Structure
 
-## Development
-
-This repository includes a script to automatically generate the `index.html` dashboard.
-
-### Adding New Demos
-1. Create your HTML file in the appropriate subdirectory (or create a new one).
-2. Run the index generator script.
-
-### Generating the Index
-To update the main `index.html` file, run:
-
-```bash
-node generate-index.js
+```
+design-demos/
+├── _config.js                    ← Single source of truth for all project metadata
+├── generate-index.js             ← Generates index.html from config + screenshots
+├── generate-preview.js           ← Puppeteer screenshot capture (cached)
+├── index.html                    ← Auto-generated portal (Grid + List view + Search)
+├── screenshots/                  ← Auto-generated thumbnails (committed to repo)
+│
+├── brutalism/                    ← 💣 Raw, editorial brutalist UI
+├── capcut-clone-deisng/          ← 🎬 Pro video editor UI clones & variants
+├── flourish-design/              ← 📊 Data viz studio UI (Flourish-inspired)
+├── gemini-lms/                   ← 📚 Course reader & LMS UI iterations
+├── kenichi-animation-studio/     ← 🎨 Animation studio app design evolution
+├── landing-pages/                ← 🌐 Marketing & personal landing pages
+├── personal-notes-site/          ← 📝 Multi-page notes & portfolio site
+├── pol-math/                     ← 🔢 Math-focused educational tool iterations
+├── zero-gravity/                 ← 🌌 Personal portfolio v1 — space theme
+└── zero-gravity-v2/              ← ✨ Full redesign of Zero Gravity
 ```
 
-This script scans all subdirectories for `.html` files and rebuilds the dashboard with links to them.
+---
 
-## Deployment
+## 🛠 Development
 
-This repository is configured to automatically deploy to GitHub Pages on every push to the `master` branch. The workflow:
-1. Checks out the code.
-2. Runs `node generate-index.js` to ensure the index is fresh.
-3. Uploads the content to GitHub Pages.
+### Adding a New Project
 
-> **Important**: Ensure GitHub Pages is enabled in your repository settings (Settings > Pages), with "GitHub Actions" selected as the source.
+1. **Add your HTML file(s)** to an existing subdirectory, or create a new one.
+2. **Register it** in `_config.js` (only needed for new directories):
+    ```js
+    { id: 'my-new-project', label: 'My New Project', icon: '🚀', desc: 'Short description' }
+    ```
+3. **Run the build** — see commands below.
+
+### npm Scripts
+
+| Command | What it does |
+| :--- | :--- |
+| `npm run index` | Fast — regenerates `index.html` only (no browser needed) |
+| `npm run preview` | Captures screenshots for **new** files only, then regenerates index |
+| `npm run preview:force` | Re-captures **all** screenshots, then regenerates index |
+| `npm run build` | Runs both `index` and `preview` |
+
+```bash
+# After adding new HTML files:
+npm run preview         # takes screenshots of new files, rebuilds index
+
+# To refresh all thumbnails:
+npm run preview:force
+```
+
+> **Local note:** `npm run preview` uses your system-installed Chrome on Windows/macOS.  
+> No need to run `npx puppeteer browsers install` locally.
+
+---
+
+## 🚀 Deployment
+
+Pushes to `main` automatically deploy to GitHub Pages via GitHub Actions:
+
+1. Checkout code
+2. `npm install`
+3. `npx puppeteer browsers install chrome` — installs browser for CI
+4. `npm run preview` — captures any new screenshots, regenerates `index.html`
+5. Upload & deploy to GitHub Pages
+
+> **Setup:** Go to **Settings → Pages** and set the source to **"GitHub Actions"**.
+
+---
+
+## 🎨 Design Systems
+
+| File | Theme | Used In |
+| :--- | :--- | :--- |
+| `Capcut_Palette.md` | Dark Studio (`#0a0a0a` + neon cyan) | CapCut Clone, Chart Studio |
+| `Flourish_Palette.md` | Light Data-Viz (white + ocean teal) | Flourish Design, Chart Studio |
