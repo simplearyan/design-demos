@@ -66,6 +66,13 @@ async function captureScreenshots(demos) {
 
     const browser = await puppeteer.launch({
         headless: 'new',
+        // Use installed system Chrome — avoids needing to download Puppeteer's bundled browser
+        executablePath:
+            process.platform === 'win32'
+                ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+                : process.platform === 'darwin'
+                    ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+                    : '/usr/bin/google-chrome',
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
     const page = await browser.newPage();
