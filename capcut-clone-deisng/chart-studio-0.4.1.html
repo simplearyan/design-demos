@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cc: {
+                            bg: 'var(--cc-bg)',
+                            panel: 'var(--cc-panel)',
+                            hover: 'var(--cc-hover)',
+                            border: 'var(--cc-border)',
+                            cyan: 'var(--cc-cyan)',
+                            cyanHover: 'var(--cc-cyanHover)',
+                            clip: 'var(--cc-clip)',
+                            textMain: 'var(--cc-textMain)',
+                            textMuted: 'var(--cc-textMuted)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                    },
+                    fontSize: {
+                        'xxs': '0.65rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            /* Light Theme - Flat & Professional */
+            --cc-bg: #f1f5f9;       /* Recessed workspace background */
+            --cc-panel: #ffffff;    /* Unified tool panels */
+            --cc-border: #e2e8f0;   /* Clean, flat borders */
+            --cc-hover: #f8fafc;
+            --cc-cyan: #0e828a;
+            --cc-cyanHover: #0b6b72;
+            --cc-clip: #f0fdfa;     /* Light teal for selected state */
+            --cc-textMain: #0f172a;
+            --cc-textMuted: #64748b;
+        }
+
+        .dark {
+            /* Dark Theme - Flat & Professional */
+            --cc-bg: #09090b;       /* Recessed workspace background */
+            --cc-panel: #18181b;    /* Unified tool panels */
+            --cc-border: #27272a;   /* Clean, flat borders */
+            --cc-hover: #27272a;
+            --cc-cyan: #00f0d1;
+            --cc-cyanHover: #00d6b9;
+            --cc-clip: #042f2e;     /* Dark teal for selected state */
+            --cc-textMain: #f8fafc;
+            --cc-textMuted: #a1a1aa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+
+        /* Sleek Flat Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--cc-border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cc-textMuted);
+        }
+
+        /* Details Accordion */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        /* Custom Range Slider for Timeline */
+        .timeline-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        .timeline-slider:focus {
+            outline: none;
+        }
+        .timeline-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: var(--cc-border);
+            border-radius: 2px;
+        }
+        .timeline-slider::-webkit-slider-thumb {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: var(--cc-cyan);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -4px;
+            transition: transform 0.1s;
+        }
+        .timeline-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        /* Segmented Control Hidden Radios */
+        .segmented-radio:checked + label {
+            background-color: var(--cc-clip);
+            color: var(--cc-cyan);
+            border-color: var(--cc-cyan);
+            box-shadow: none;
+        }
+        
+        .pill-radio:checked + label {
+            background-color: var(--cc-cyan);
+            color: #ffffff;
+            font-weight: 600;
+            border-color: var(--cc-cyan);
+            box-shadow: none;
+        }
+        .dark .pill-radio:checked + label {
+            color: #000000;
+        }
+
+        .card-radio:checked + label {
+            border-color: var(--cc-cyan);
+            background-color: var(--cc-clip);
+            box-shadow: 0 0 0 1px var(--cc-cyan);
+        }
+    </style>
+</head>
+<body class="bg-cc-bg text-cc-textMain h-screen w-screen flex flex-col overflow-hidden antialiased selection:bg-cc-cyan selection:text-white dark:selection:text-black dark">
+
+    <!-- Header (Unified Panel Color) -->
+    <header class="h-[60px] border-b border-cc-border flex items-center justify-between px-6 shrink-0 bg-cc-panel z-20 relative">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer group">
+            <i class="ph-bold ph-chart-bar text-cc-cyan text-2xl transition-transform"></i>
+            <h1 class="font-bold text-lg tracking-tight">Chart Studio</h1>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="flex items-center gap-3">
+            <button id="theme-toggle" class="w-8 h-8 flex items-center justify-center rounded text-cc-textMuted hover:bg-cc-hover hover:text-cc-textMain transition-colors mr-2">
+                <i class="ph-bold ph-moon text-lg dark:hidden"></i>
+                <i class="ph-bold ph-sun text-lg hidden dark:block"></i>
+            </button>
+            <button class="flex items-center gap-2 bg-cc-bg hover:bg-cc-hover text-cc-textMain border border-cc-border px-4 py-2 rounded text-xs font-semibold transition-colors">
+                <i class="ph-bold ph-image"></i> Image
+            </button>
+            <button class="flex items-center gap-2 bg-cc-cyan hover:bg-cc-cyanHover text-white dark:text-black px-4 py-2 rounded text-xs font-bold transition-colors">
+                <i class="ph-bold ph-export"></i> Export Video
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- Center Workspace (Canvas + Timeline) -->
+        <section class="flex-1 flex flex-col bg-cc-bg relative overflow-hidden">
+            
+            <!-- Canvas Container -->
+            <div class="flex-1 flex items-center justify-center p-4 lg:p-12 relative overflow-hidden" id="canvas-wrapper">
+                <!-- Flat border, no shadow -->
+                <div class="relative w-full max-w-5xl aspect-video bg-white dark:bg-black rounded border border-cc-border overflow-hidden group">
+                    <canvas id="stage" class="w-full h-full block"></canvas>
+                    
+                    <!-- Overlay Play button on hover -->
+                    <div id="big-play-btn" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hidden">
+                        <div class="w-16 h-16 rounded-full bg-cc-cyan flex items-center justify-center">
+                            <i class="ph-fill ph-play text-2xl text-white dark:text-black ml-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Timeline (Unified Panel Color) -->
+            <div class="h-[60px] bg-cc-panel border-t border-cc-border flex items-center px-6 gap-6 shrink-0 z-10">
+                <button id="play-pause-btn" class="w-8 h-8 rounded-full bg-cc-cyan hover:bg-cc-cyanHover text-white dark:text-black flex items-center justify-center shrink-0 transition-colors">
+                    <i class="ph-fill ph-play text-sm ml-0.5" id="play-icon"></i>
+                </button>
+                
+                <div class="flex-1 relative flex items-center">
+                    <!-- Custom progress fill behind the thumb -->
+                    <div class="absolute left-0 h-1 bg-cc-cyan pointer-events-none rounded-l-full" id="timeline-progress" style="width: 68%;"></div>
+                    <input type="range" id="timeline" min="0" max="5" step="0.01" value="3.4" class="timeline-slider relative z-10">
+                </div>
+
+                <div class="text-xs font-mono text-cc-textMuted w-24 text-right tracking-widest shrink-0">
+                    <span id="time-current" class="text-cc-textMain">3.4s</span> / 5.0s
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Sidebar (Properties - Unified Panel Color) -->
+        <aside class="w-[340px] bg-cc-panel border-l border-cc-border flex flex-col shrink-0 z-20">
+            <div class="flex-1 overflow-y-auto custom-scrollbar">
+                
+                <!-- Section 1: DATA STRUCTURE -->
+                <details class="group border-b border-cc-border" open>
+                    <summary class="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-cc-hover transition-colors select-none">
+                        <div class="flex items-center gap-3 text-xs font-bold text-cc-textMuted group-open:text-cc-textMain uppercase tracking-widest transition-colors">
+                            <i class="ph ph-chat-centered-text text-base"></i> DATA STRUCTURE
+                        </div>
+                        <i class="ph-bold ph-caret-down text-cc-textMuted group-open:-rotate-180 transition-transform duration-300"></i>
+                    </summary>
+                    <div class="px-5 pb-5 space-y-5">
+                        
+                        <!-- Chart Mode Segmented -->
+                        <div>
+                            <label class="block text-xs font-medium text-cc-textMuted mb-2">Chart Mode</label>
+                            <div class="flex flex-col gap-2">
+                                <div class="relative">
+                                    <input type="radio" name="chart_mode" id="mode_bar" value="bar" class="segmented-radio hidden" checked>
+                                    <label for="mode_bar" class="flex items-center gap-2 px-3 py-2 bg-cc-bg border border-cc-border rounded-md text-sm text-cc-textMain cursor-pointer hover:border-cc-textMuted transition-colors">
+                                        <i class="ph-bold ph-chart-bar"></i> Bar
+                                    </label>
+                                </div>
+                                <div class="relative">
+                                    <input type="radio" name="chart_mode" id="mode_line" value="line" class="segmented-radio hidden">
+                                    <label for="mode_line" class="flex items-center gap-2 px-3 py-2 bg-cc-bg border border-cc-border rounded-md text-sm text-cc-textMain cursor-pointer hover:border-cc-textMuted transition-colors">
+                                        <i class="ph-bold ph-chart-line"></i> Line
+                                    </label>
+                                </div>
+                                <div class="relative opacity-50">
+                                    <input type="radio" name="chart_mode" id="mode_race" value="race" class="segmented-radio hidden" disabled>
+                                    <label for="mode_race" class="flex items-center gap-2 px-3 py-2 bg-cc-bg border border-cc-border rounded-md text-sm text-cc-textMain cursor-not-allowed">
+                                        <i class="ph-bold ph-flag-checkered"></i> Race (Pro)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- JSON Source -->
+                        <div>
+                            <label class="block text-xs font-medium text-cc-textMuted mb-2">JSON Source</label>
+                            <textarea id="json-editor" rows="7" class="w-full bg-cc-bg border border-cc-border rounded-md p-3 text-xs font-mono text-cc-textMain focus:outline-none focus:ring-1 focus:ring-cc-cyan focus:border-cc-cyan transition-all resize-none leading-relaxed" spellcheck="false">[
+  {"label": "Apple 🍎", "val": 9},
+  {"label": "Banana 🍌", "val": 17},
+  {"label": "Cat 🐱", "val": 39},
+  {"label": "Dog 🐶", "val": 26}
+]</textarea>
+                            <button id="compile-btn" class="w-full mt-2 bg-cc-hover border border-cc-border hover:border-cc-textMuted text-cc-textMain py-2 rounded-md text-xs font-semibold transition-colors">Compile JSON</button>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section 2: PROJECT SETTINGS -->
+                <details class="group border-b border-cc-border">
+                    <summary class="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-cc-hover transition-colors select-none">
+                        <div class="flex items-center gap-3 text-xs font-bold text-cc-textMuted group-open:text-cc-textMain uppercase tracking-widest transition-colors">
+                            <i class="ph ph-plus-square text-base"></i> PROJECT SETTINGS
+                        </div>
+                        <i class="ph-bold ph-caret-down text-cc-textMuted group-open:-rotate-180 transition-transform duration-300"></i>
+                    </summary>
+                    <div class="px-5 pb-5 space-y-5">
+                        <!-- Theme Palette -->
+                        <div>
+                            <label class="block text-xs font-medium text-cc-textMuted mb-2">Theme Palette</label>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#8b5cf6] to-[#c084fc] ring-2 ring-cc-cyan ring-offset-2 ring-offset-cc-panel cursor-pointer"></div>
+                                <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#ec4899] to-[#f472b6] cursor-pointer hover:scale-110 transition-transform"></div>
+                                <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#0ea5e9] to-[#38bdf8] cursor-pointer hover:scale-110 transition-transform"></div>
+                            </div>
+                        </div>
+
+                        <!-- Duration -->
+                        <div>
+                            <label class="block text-xs font-medium text-cc-textMuted mb-2">Duration Offset (s)</label>
+                            <input type="number" value="5" class="w-full bg-cc-bg border border-cc-border rounded-md px-3 py-2 text-sm text-cc-textMain focus:outline-none focus:ring-1 focus:ring-cc-cyan focus:border-cc-cyan transition-all">
+                        </div>
+
+                        <!-- Easing -->
+                        <div>
+                            <label class="block text-xs font-medium text-cc-textMuted mb-2">Engine Easing</label>
+                            <div class="relative">
+                                <select class="w-full bg-cc-bg border border-cc-border rounded-md px-3 py-2 text-sm text-cc-textMain focus:outline-none focus:ring-1 focus:ring-cc-cyan focus:border-cc-cyan transition-all appearance-none cursor-pointer">
+                                    <option>Ease In Out</option>
+                                    <option>Ease Out Exp</option>
+                                    <option>Linear</option>
+                                    <option>Spring</option>
+                                </select>
+                                <i class="ph-bold ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-cc-textMuted pointer-events-none"></i>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section 3: OUTPUT PROTOCOL -->
+                <details class="group border-b border-cc-border" open>
+                    <summary class="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-cc-hover transition-colors select-none">
+                        <div class="flex items-center gap-3 text-xs font-bold text-cc-textMuted group-open:text-cc-textMain uppercase tracking-widest transition-colors">
+                            <i class="ph ph-download-simple text-base"></i> OUTPUT PROTOCOL
+                        </div>
+                        <i class="ph-bold ph-caret-down text-cc-textMuted group-open:-rotate-180 transition-transform duration-300"></i>
+                    </summary>
+                    <div class="px-5 pb-5 space-y-5">
+                        
+                        <!-- Container Format -->
+                        <div>
+                            <label class="block text-xs font-medium text-cc-textMuted mb-2 uppercase">Container Format</label>
+                            <div class="flex gap-2 text-xs">
+                                <div class="flex-1">
+                                    <input type="radio" name="format" id="fmt_mp4" class="pill-radio hidden" checked>
+                                    <label for="fmt_mp4" class="block w-full text-center py-1.5 bg-cc-bg border border-cc-border rounded-md text-cc-textMuted cursor-pointer hover:text-cc-textMain transition-colors">MP4</label>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="radio" name="format" id="fmt_webm" class="pill-radio hidden">
+                                    <label for="fmt_webm" class="block w-full text-center py-1.5 bg-cc-bg border border-cc-border rounded-md text-cc-textMuted cursor-pointer hover:text-cc-textMain transition-colors">WEBM</label>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="radio" name="format" id="fmt_mov" class="pill-radio hidden">
+                                    <label for="fmt_mov" class="block w-full text-center py-1.5 bg-cc-bg border border-cc-border rounded-md text-cc-textMuted cursor-pointer hover:text-cc-textMain transition-colors">MOV</label>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="radio" name="format" id="fmt_png" class="pill-radio hidden">
+                                    <label for="fmt_png" class="block w-full text-center py-1.5 bg-cc-bg border border-cc-border rounded-md text-cc-textMuted cursor-pointer hover:text-cc-textMain transition-colors">PNG SEQ</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Worker Pipeline -->
+                        <div>
+                            <label class="block text-xs font-medium text-cc-textMuted mb-2 uppercase">Worker Pipeline</label>
+                            <div class="space-y-2">
+                                <div>
+                                    <input type="radio" name="pipeline" id="pipe_render" class="card-radio hidden" checked>
+                                    <label for="pipe_render" class="block w-full p-3 bg-cc-bg border border-cc-border rounded-md cursor-pointer hover:border-cc-textMuted transition-all relative overflow-hidden">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <div class="flex items-center gap-2 text-sm font-bold text-cc-textMain">
+                                                <i class="ph ph-desktop"></i> Render Layer
+                                            </div>
+                                            <i class="ph-bold ph-check text-cc-cyan text-sm"></i>
+                                        </div>
+                                        <div class="text-[10px] text-cc-textMuted ml-6">High Quality - All Formats</div>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="pipeline" id="pipe_live" class="card-radio hidden">
+                                    <label for="pipe_live" class="block w-full p-3 bg-cc-bg border border-cc-border rounded-md cursor-pointer hover:border-cc-textMuted transition-all relative">
+                                        <div class="flex items-center gap-2 mb-1 text-sm font-bold text-cc-textMuted">
+                                            <i class="ph ph-device-mobile"></i> Live Native
+                                        </div>
+                                        <div class="text-[10px] text-cc-textMuted ml-6">Realtime - MP4/WEBM Only</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Capture Rate -->
+                        <div>
+                            <label class="block text-xs font-medium text-cc-textMuted mb-2 uppercase">Capture Rate (FPS)</label>
+                            <div class="flex gap-2 text-xs">
+                                <div class="flex-1">
+                                    <input type="radio" name="fps" id="fps_12" class="pill-radio hidden">
+                                    <label for="fps_12" class="block w-full text-center py-1.5 bg-cc-bg border border-cc-border rounded-md text-cc-textMuted cursor-pointer hover:text-cc-textMain transition-colors">12</label>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="radio" name="fps" id="fps_24" class="pill-radio hidden">
+                                    <label for="fps_24" class="block w-full text-center py-1.5 bg-cc-bg border border-cc-border rounded-md text-cc-textMuted cursor-pointer hover:text-cc-textMain transition-colors">24</label>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="radio" name="fps" id="fps_30" class="pill-radio hidden">
+                                    <label for="fps_30" class="block w-full text-center py-1.5 bg-cc-bg border border-cc-border rounded-md text-cc-textMuted cursor-pointer hover:text-cc-textMain transition-colors">30</label>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="radio" name="fps" id="fps_60" class="pill-radio hidden" checked>
+                                    <label for="fps_60" class="block w-full text-center py-1.5 bg-cc-bg border border-cc-border rounded-md text-cc-textMuted cursor-pointer hover:text-cc-textMain transition-colors">60</label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </details>
+
+                <!-- Section 4: CANVAS SETTINGS -->
+                <details class="group border-b border-cc-border">
+                    <summary class="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-cc-hover transition-colors select-none">
+                        <div class="flex items-center gap-3 text-xs font-bold text-cc-textMuted group-open:text-cc-textMain uppercase tracking-widest transition-colors">
+                            <i class="ph ph-gear text-base"></i> CANVAS SETTINGS
+                        </div>
+                        <i class="ph-bold ph-caret-down text-cc-textMuted group-open:-rotate-180 transition-transform duration-300"></i>
+                    </summary>
+                    <div class="px-5 pb-5 text-sm text-cc-textMuted italic">
+                        Resolution and background settings will appear here.
+                    </div>
+                </details>
+
+            </div>
+        </aside>
+    </main>
+
+    <!-- Canvas Animation & App Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- State ---
+            let chartData = [];
+            let chartMode = 'bar'; // 'bar' or 'line'
+            let duration = 5.0; // Seconds
+            let currentTime = 3.4; // Starting at 3.4s as in screenshot
+            let isPlaying = false;
+            let animationFrameId = null;
+            let lastTimestamp = 0;
+            let isDarkTheme = true;
+
+            // --- DOM Elements ---
+            const canvas = document.getElementById('stage');
+            const ctx = canvas.getContext('2d');
+            const timeline = document.getElementById('timeline');
+            const timeCurrentDisplay = document.getElementById('time-current');
+            const progressFill = document.getElementById('timeline-progress');
+            const playBtn = document.getElementById('play-pause-btn');
+            const playIcon = document.getElementById('play-icon');
+            const jsonEditor = document.getElementById('json-editor');
+            const compileBtn = document.getElementById('compile-btn');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            
+            // Radios
+            const modeBar = document.getElementById('mode_bar');
+            const modeLine = document.getElementById('mode_line');
+
+            // --- Initialization ---
+            function init() {
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+                parseJSON();
+                updateTimelineUI();
+                drawChart();
+            }
+
+            function resizeCanvas() {
+                // Ensure crisp rendering on high DPI displays
+                const wrapper = canvas.parentElement;
+                const rect = wrapper.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+                
+                if(!isPlaying) drawChart();
+            }
+
+            function parseJSON() {
+                try {
+                    chartData = JSON.parse(jsonEditor.value);
+                    if(!isPlaying) drawChart();
+                    compileBtn.innerHTML = '<i class="ph-bold ph-check text-green-500 mr-2"></i> Compiled';
+                    setTimeout(() => compileBtn.innerText = 'Compile JSON', 2000);
+                } catch (e) {
+                    compileBtn.innerHTML = '<i class="ph-bold ph-warning text-red-500 mr-2"></i> JSON Error';
+                    setTimeout(() => compileBtn.innerText = 'Compile JSON', 2000);
+                }
+            }
+
+            // --- Drawing Logic ---
+            function drawChart() {
+                if(!ctx || chartData.length === 0) return;
+                
+                const w = canvas.width / (window.devicePixelRatio || 1);
+                const h = canvas.height / (window.devicePixelRatio || 1);
+                
+                // Clear Background 
+                ctx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
+                ctx.fillRect(0, 0, w, h);
+
+                // Calculate animation progress (0.0 to 1.0)
+                // We map the 5s timeline to a 2s entrance animation
+                const animDuration = 2.0; 
+                let progress = Math.min(currentTime / animDuration, 1.0);
+                
+                // Ease Out Expo
+                const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+
+                if (chartMode === 'bar') {
+                    drawBarChart(w, h, ease);
+                } else if (chartMode === 'line') {
+                    drawLineChart(w, h, ease);
+                }
+            }
+
+            function drawBarChart(w, h, ease) {
+                const maxVal = Math.max(...chartData.map(d => d.val)) * 1.2; // 20% headroom
+                const padding = { top: 100, bottom: 80, left: 100, right: 100 };
+                const drawW = w - padding.left - padding.right;
+                const drawH = h - padding.top - padding.bottom;
+                
+                const barSpacing = 20;
+                const totalSpacing = barSpacing * (chartData.length - 1);
+                const barWidth = (drawW - totalSpacing) / chartData.length;
+
+                chartData.forEach((d, i) => {
+                    // Stagger the animation slightly based on index
+                    const delay = i * 0.1;
+                    let localEase = Math.max(0, Math.min(1, (currentTime - delay) / 1.5));
+                    localEase = localEase === 1 ? 1 : 1 - Math.pow(2, -10 * localEase);
+
+                    const currentVal = d.val * localEase;
+                    const barHeight = (currentVal / maxVal) * drawH;
+                    const x = padding.left + i * (barWidth + barSpacing);
+                    const y = h - padding.bottom - barHeight;
+
+                    // Gradient Fill (Matching screenshot: purple to light purple)
+                    const gradient = ctx.createLinearGradient(x, y + barHeight, x, y);
+                    gradient.addColorStop(0, '#8b5cf6'); // Base purple
+                    gradient.addColorStop(1, '#c084fc'); // Light purple top
+
+                    ctx.fillStyle = gradient;
+                    
+                    // Rounded top corners rect
+                    const radius = 8;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + barHeight);
+                    ctx.lineTo(x, y + radius);
+                    ctx.arcTo(x, y, x + radius, y, radius);
+                    ctx.arcTo(x + barWidth, y, x + barWidth, y + radius, radius);
+                    ctx.lineTo(x + barWidth, y + barHeight);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Value Text (Top)
+                    if (barHeight > 10) {
+                        ctx.fillStyle = isDarkTheme ? '#ffffff' : '#0f172a';
+                        ctx.font = 'bold 24px "Inter", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(Math.round(currentVal), x + barWidth / 2, y - 15);
+                    }
+
+                    // Label Text (Bottom)
+                    ctx.fillStyle = isDarkTheme ? '#f3f4f6' : '#334155';
+                    ctx.font = '500 20px "Inter", sans-serif';
+                    ctx.textAlign = 'center';
+                    // The emojis in JSON render natively!
+                    ctx.fillText(d.label, x + barWidth / 2, h - padding.bottom + 30);
+                });
+            }
+
+            function drawLineChart(w, h, ease) {
+                const maxVal = Math.max(...chartData.map(d => d.val)) * 1.2;
+                const padding = { top: 100, bottom: 80, left: 100, right: 100 };
+                const drawW = w - padding.left - padding.right;
+                const drawH = h - padding.top - padding.bottom;
+                
+                const stepX = drawW / (chartData.length - 1);
+
+                // Calculate points with easing
+                const points = chartData.map((d, i) => {
+                    const delay = i * 0.15; // slightly longer stagger for line
+                    let localEase = Math.max(0, Math.min(1, (currentTime - delay) / 1.5));
+                    localEase = localEase === 1 ? 1 : 1 - Math.pow(2, -10 * localEase);
+                    
+                    return {
+                        x: padding.left + i * stepX,
+                        y: h - padding.bottom - ((d.val * localEase) / maxVal) * drawH,
+                        val: d.val * localEase,
+                        label: d.label,
+                        ease: localEase
+                    };
+                });
+
+                // Draw Line
+                if (points.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(points[0].x, points[0].y);
+                    for(let i = 1; i < points.length; i++) {
+                        ctx.lineTo(points[i].x, points[i].y);
+                    }
+                    ctx.strokeStyle = '#a855f7'; // Purple line
+                    ctx.lineWidth = 6;
+                    ctx.lineJoin = 'round';
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
+
+                // Draw Dots and Text
+                points.forEach(p => {
+                    if (p.ease > 0) {
+                        // Dot
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+                        ctx.fillStyle = isDarkTheme ? '#000000' : '#ffffff';
+                        ctx.fill();
+                        ctx.strokeStyle = '#a855f7';
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+
+                        // Value
+                        ctx.fillStyle = isDarkTheme ? '#ffffff' : '#0f172a';
+                        ctx.font = 'bold 24px "Inter", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(Math.round(p.val), p.x, p.y - 25);
+
+                        // Label
+                        ctx.fillStyle = isDarkTheme ? '#f3f4f6' : '#334155';
+                        ctx.font = '500 20px "Inter", sans-serif';
+                        ctx.fillText(p.label, p.x, h - padding.bottom + 40);
+                    }
+                });
+            }
+
+            // --- Playback Engine ---
+            function loop(timestamp) {
+                if (!isPlaying) return;
+                
+                if (!lastTimestamp) lastTimestamp = timestamp;
+                const delta = (timestamp - lastTimestamp) / 1000;
+                lastTimestamp = timestamp;
+
+                currentTime += delta;
+                
+                // Loop back to start if finished
+                if (currentTime >= duration) {
+                    currentTime = 0;
+                }
+
+                updateTimelineUI();
+                drawChart();
+
+                animationFrameId = requestAnimationFrame(loop);
+            }
+
+            function togglePlay() {
+                isPlaying = !isPlaying;
+                if (isPlaying) {
+                    // Reset if at the end
+                    if(currentTime >= duration) currentTime = 0;
+                    
+                    playIcon.classList.remove('ph-play');
+                    playIcon.classList.add('ph-pause');
+                    playIcon.classList.remove('ml-0.5'); // Adjust centering for pause icon
+                    lastTimestamp = 0;
+                    animationFrameId = requestAnimationFrame(loop);
+                } else {
+                    playIcon.classList.add('ph-play');
+                    playIcon.classList.remove('ph-pause');
+                    playIcon.classList.add('ml-0.5');
+                    cancelAnimationFrame(animationFrameId);
+                }
+            }
+
+            function updateTimelineUI() {
+                // Update input value (without triggering event)
+                timeline.value = currentTime;
+                // Update text
+                timeCurrentDisplay.innerText = currentTime.toFixed(1) + 's';
+                // Update custom progress bar fill
+                const percent = (currentTime / duration) * 100;
+                progressFill.style.width = `${percent}%`;
+            }
+
+            // --- Event Listeners ---
+            playBtn.addEventListener('click', togglePlay);
+
+            timeline.addEventListener('input', (e) => {
+                currentTime = parseFloat(e.target.value);
+                updateTimelineUI();
+                drawChart();
+                // Pause if scrubbing
+                if(isPlaying) togglePlay();
+            });
+
+            compileBtn.addEventListener('click', parseJSON);
+
+            modeBar.addEventListener('change', (e) => {
+                if(e.target.checked) {
+                    chartMode = 'bar';
+                    drawChart();
+                }
+            });
+
+            modeLine.addEventListener('change', (e) => {
+                if(e.target.checked) {
+                    chartMode = 'line';
+                    drawChart();
+                }
+            });
+
+            themeToggleBtn.addEventListener('click', () => {
+                isDarkTheme = !isDarkTheme;
+                if (isDarkTheme) {
+                    document.body.classList.add('dark');
+                } else {
+                    document.body.classList.remove('dark');
+                }
+                drawChart();
+            });
+
+            // Start
+            init();
+        });
+    </script>
+</body>
+</html>
