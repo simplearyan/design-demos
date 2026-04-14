@@ -1,11 +1,10 @@
-name: Generate Design Previews
+name: Generate Design Previews (Manual)
+
+# This workflow is kept as a MANUAL trigger only.
+# Automatic preview generation is now handled inside deploy.yml.
+# Use this if you want to regenerate screenshots WITHOUT triggering a full deploy.
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '**'
   workflow_dispatch:
 
 permissions:
@@ -33,10 +32,10 @@ jobs:
       - name: Generate previews
         run: node generate-preview.js
 
-      - name: Commit and push changes
+      - name: Commit screenshots back to main (for local reference)
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add -f screenshots/ index-preview.html
-          git commit -m "chore: update design previews [skip ci]" || echo "No changes to commit"
+          git diff --staged --quiet || git commit -m "chore: regenerate design previews [skip ci]"
           git push
