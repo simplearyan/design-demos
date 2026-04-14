@@ -3,7 +3,13 @@ const path = require('path');
 
 const targetDirs = [
     'brutalism', 
-    'landing-pages', 
+    'capcut-clone-deisng',
+    'flourish-design',
+    'gemini-lms',
+    'kenichi-animation-studio',
+    'landing-pages',
+    'personal-notes-site',
+    'pol-math',
     'zero-gravity', 
     'zero-gravity-v2'
 ];
