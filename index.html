@@ -3,831 +3,1790 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design Demos Index</title>
+    <title>Design Demos — Aryan's UI Lab</title>
+    <meta name="description" content="A curated index of 59 UI design prototypes across 10 projects.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0a;
-            --surface: #141414;
-            --surface-hover: #1f1f1f;
-            --border: #333;
-            --accent: #d4f238; /* Acid green/yellow for a modern pop */
-            --text: #ededed;
-            --text-muted: #888;
-            --font-main: 'Outfit', sans-serif;
+            --bg:           #0a0a0a;
+            --surface:      #141414;
+            --surface-2:    #1a1a1a;
+            --surface-h:    #222222;
+            --border:       #2a2a2a;
+            --border-h:     #444;
+            --accent:       #d4f238;
+            --accent-dim:   rgba(212,242,56,0.1);
+            --text:         #ededed;
+            --text-2:       #aaa;
+            --text-3:       #666;
+            --radius:       14px;
+            --radius-sm:    8px;
+            --font:         'Outfit', system-ui, sans-serif;
+            --mono:         'JetBrains Mono', 'Fira Code', monospace;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background-color: var(--bg);
+            background: var(--bg);
             color: var(--text);
-            font-family: var(--font-main);
+            font-family: var(--font);
             min-height: 100vh;
-            padding: 2rem;
             -webkit-font-smoothing: antialiased;
         }
 
-        header {
-            max-width: 1200px;
-            margin: 0 auto 3rem auto;
-            text-align: center;
-            padding-bottom: 2rem;
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        /* ── Layout ── */
+        .wrapper { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+
+        /* ── Header ── */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10,10,10,0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
-            position: relative;
         }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(to right, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p.subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-
-        main {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            gap: 3rem;
-        }
-
-        section {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
+        .header-inner {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.875rem;
-            font-weight: 600;
+            gap: 1.5rem;
+            padding: 1rem 0;
         }
-        
-        .section-title::after {
-            content: '';
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 40%, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+        .header-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-3);
+        }
+        .stat-pill {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 0.25rem 0.75rem;
+            color: var(--text-2);
+        }
+        .search-wrap {
             flex: 1;
-            height: 1px;
-            background: var(--border);
-            opacity: 0.5;
+            max-width: 380px;
+            position: relative;
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-3);
+            pointer-events: none;
+        }
+        #search {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #search::placeholder { color: var(--text-3); }
+        #search:focus { border-color: var(--accent); }
+
+        .view-btns {
+            display: flex;
+            gap: 0.375rem;
+            margin-left: auto;
+        }
+        .view-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-3);
+            padding: 0.4rem 0.7rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+        }
+        .view-btn:hover { color: var(--text); border-color: var(--border-h); }
+        .view-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+        /* ── Hero ── */
+        .hero {
+            padding: 4rem 0 3rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            background: linear-gradient(to bottom, #fff 40%, #555);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            color: var(--text-2);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .build-date {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-3);
+            font-family: var(--mono);
         }
 
+        /* ── Sections ── */
+        .sections { padding-bottom: 6rem; display: grid; gap: 4rem; }
+        .section { animation: fadeUp 0.4s ease-out both; }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-title-group { display: flex; align-items: center; gap: 0.875rem; }
+        .section-icon { font-size: 1.5rem; }
+        .section-title { font-size: 1.1rem; font-weight: 600; }
+        .section-desc { font-size: 0.8rem; color: var(--text-3); margin-top: 0.15rem; }
+        .section-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-3);
+            border-radius: 999px;
+            padding: 0.2rem 0.6rem;
+        }
+
+        /* ── Grid View ── */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
         }
-
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: var(--radius);
+            overflow: hidden;
             text-decoration: none;
             color: inherit;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
+            transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.2s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent);
+            box-shadow: 0 16px 40px -10px rgba(0,0,0,0.6), 0 0 0 1px var(--accent-dim);
+        }
+        .card-thumb {
             position: relative;
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: var(--surface-2);
             overflow: hidden;
         }
-
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent);
-            background: var(--surface-hover);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        .card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease, opacity 0.3s;
         }
-
-        .card-content {
-            z-index: 1;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            line-height: 1.3;
-            margin-bottom: 0.5rem;
-            text-transform: capitalize;
-        }
-
-        .card-path {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-family: monospace;
-            opacity: 0.7;
-        }
-
-        .card-icon {
-            margin-top: 1.5rem;
+        .card:hover .card-thumb img { transform: scale(1.04); }
+        .card-thumb-placeholder {
+            width: 100%;
+            height: 100%;
             display: flex;
-            justify-content: flex-end;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.3s ease;
-            color: var(--accent);
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--surface-2),
+                var(--surface-2) 10px,
+                var(--surface) 10px,
+                var(--surface) 20px
+            );
         }
-
-        .card:hover .card-icon {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .view-toggle {
+        .card-thumb-overlay {
             position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(4px);
             display: flex;
-            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .card:hover .card-thumb-overlay { opacity: 1; }
+        .card-body { padding: 1rem 1.125rem; }
+        .card-name {
+            font-size: 0.925rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-path {
+            font-size: 0.68rem;
+            color: var(--text-3);
+            font-family: var(--mono);
         }
 
-        .view-btn {
+        /* ── List View ── */
+        .list { display: flex; flex-direction: column; gap: 0.375rem; }
+        .row-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
             background: var(--surface);
             border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             text-decoration: none;
-            font-size: 0.875rem;
-            transition: all 0.2s;
+            color: inherit;
+            transition: background 0.15s, border-color 0.15s, transform 0.15s;
         }
-
-        .view-btn.active {
-            color: var(--accent);
+        .row-item:hover {
+            background: var(--surface-h);
             border-color: var(--accent);
+            transform: translateX(4px);
+        }
+        .row-icon { font-size: 1rem; flex-shrink: 0; }
+        .row-info { flex: 1; min-width: 0; }
+        .row-name { font-size: 0.875rem; font-weight: 500; display: block; }
+        .row-path { font-size: 0.68rem; color: var(--text-3); font-family: var(--mono); }
+        .row-arrow { color: var(--text-3); flex-shrink: 0; transition: color 0.15s, transform 0.15s; }
+        .row-item:hover .row-arrow { color: var(--accent); transform: translateX(3px); }
+
+        /* ── Empty search state ── */
+        .no-results {
+            text-align: center;
+            padding: 4rem 0;
+            color: var(--text-3);
+            display: none;
+        }
+        .no-results.visible { display: block; }
+
+        /* ── Utilities ── */
+        .hidden { display: none !important; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .view-btn:hover {
-            background: var(--surface-hover);
-            color: var(--text);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .wrapper { padding: 0 1rem; }
+            .header-stats { display: none; }
+            .search-wrap { max-width: none; flex: 1; }
+            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Design Concepts</h1>
-        <p class="subtitle">Index of all experimental pages and prototypes</p>
-        
-        <div class="view-toggle">
-            <a href="index.html" class="view-btn active">List View</a>
-            <a href="index-preview.html" class="view-btn">Grid Preview</a>
+
+    <!-- Sticky Header -->
+    <header class="site-header">
+        <div class="wrapper header-inner">
+            <span class="logo">UI Lab</span>
+            <div class="header-stats">
+                <span class="stat-pill">59 demos</span>
+                <span class="stat-pill">10 projects</span>
+            </div>
+            <div class="search-wrap">
+                <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="search" id="search" placeholder="Search demos…" autocomplete="off">
+            </div>
+            <div class="view-btns">
+                <button class="view-btn active" id="btn-grid" title="Grid view" aria-label="Grid view">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                </button>
+                <button class="view-btn" id="btn-list" title="List view" aria-label="List view">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </button>
+            </div>
         </div>
     </header>
 
-    <main>
-        
-            <section style="animation-delay: 0s">
-                <div class="section-title">brutalism</div>
-                <div class="grid">
-                    
-                        <a href="brutalism/Aryan_DS_game_Dev.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Aryan DS game Dev</div>
-                                <div class="card-path">brutalism/Aryan_DS_game_Dev.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="brutalism/Aryan_DS_kinetic_landing_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Aryan DS kinetic landing page</div>
-                                <div class="card-path">brutalism/Aryan_DS_kinetic_landing_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="brutalism/Aryan_DS_notes_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Aryan DS notes page</div>
-                                <div class="card-path">brutalism/Aryan_DS_notes_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="brutalism/Aryan_DS_solutions_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Aryan DS solutions page</div>
-                                <div class="card-path">brutalism/Aryan_DS_solutions_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+    <!-- Hero -->
+    <div class="wrapper">
+        <div class="hero">
+            <h1>Design Concepts</h1>
+            <p>Experimental UI prototypes — video editors, LMS readers, portfolios, and more.</p>
+            <p class="build-date">Generated April 14, 2026 · 59 files across 10 projects</p>
+        </div>
+
+        <!-- Sections -->
+        <div class="sections" id="sections">
+            
+        <section class="section" style="animation-delay: 0s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">💣</span>
+                    <div>
+                        <h2 class="section-title">Brutalism</h2>
+                        <p class="section-desc">Raw, editorial brutalist UI experiments</p>
+                    </div>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.1s">
-                <div class="section-title">capcut-clone-deisng</div>
-                <div class="grid">
-                    
-                        <a href="capcut-clone-deisng/capcut-clone.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">capcut clone</div>
-                                <div class="card-path">capcut-clone-deisng/capcut-clone.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="capcut-clone-deisng/chart-studio.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">chart studio</div>
-                                <div class="card-path">capcut-clone-deisng/chart-studio.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="capcut-clone-deisng/minimal.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">minimal</div>
-                                <div class="card-path">capcut-clone-deisng/minimal.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+                <span class="section-badge">4</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="brutalism/Aryan_DS_game_Dev.html" class="card" data-name="aryan ds game dev brutalism" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/brutalism/Aryan_DS_game_Dev.png" alt="Aryan DS Game Dev" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.2s">
-                <div class="section-title">flourish-design</div>
-                <div class="grid">
-                    
-                        <a href="flourish-design/different-font.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">different font</div>
-                                <div class="card-path">flourish-design/different-font.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="flourish-design/flourish-clone.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">flourish clone</div>
-                                <div class="card-path">flourish-design/flourish-clone.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+                <div class="card-body">
+                    <div class="card-name">Aryan DS Game Dev</div>
+                    <code class="card-path">brutalism/Aryan_DS_game_Dev.html</code>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.30000000000000004s">
-                <div class="section-title">gemini-lms</div>
-                <div class="grid">
-                    
-                        <a href="gemini-lms/course-reaad-v2.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course reaad v2</div>
-                                <div class="card-path">gemini-lms/course-reaad-v2.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/course-reac-v2.2.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course reac v2.2</div>
-                                <div class="card-path">gemini-lms/course-reac-v2.2.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/course-read-2.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read 2</div>
-                                <div class="card-path">gemini-lms/course-read-2.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/course-read-3.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read 3</div>
-                                <div class="card-path">gemini-lms/course-read-3.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/course-read-discrod-version-2.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read discrod version 2</div>
-                                <div class="card-path">gemini-lms/course-read-discrod-version-2.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/course-read-discrod-version.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read discrod version</div>
-                                <div class="card-path">gemini-lms/course-read-discrod-version.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/course-read-pro-gray.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read pro gray</div>
-                                <div class="card-path">gemini-lms/course-read-pro-gray.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/course-read-v2.1.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read v2.1</div>
-                                <div class="card-path">gemini-lms/course-read-v2.1.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/course-read.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read</div>
-                                <div class="card-path">gemini-lms/course-read.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/index.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">index</div>
-                                <div class="card-path">gemini-lms/index.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="gemini-lms/stats-course.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">stats course</div>
-                                <div class="card-path">gemini-lms/stats-course.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+            </a>
+            <a href="brutalism/Aryan_DS_kinetic_landing_page.html" class="card" data-name="aryan ds kinetic landing page brutalism" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/brutalism/Aryan_DS_kinetic_landing_page.png" alt="Aryan DS Kinetic Landing Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.4s">
-                <div class="section-title">kenichi-animation-studio</div>
-                <div class="grid">
-                    
-                        <a href="kenichi-animation-studio/v0.1.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">v0.1</div>
-                                <div class="card-path">kenichi-animation-studio/v0.1.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="kenichi-animation-studio/v0.2-home-page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">v0.2 home page</div>
-                                <div class="card-path">kenichi-animation-studio/v0.2-home-page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="kenichi-animation-studio/v0.3-responsive-bottom-bar.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">v0.3 responsive bottom bar</div>
-                                <div class="card-path">kenichi-animation-studio/v0.3-responsive-bottom-bar.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+                <div class="card-body">
+                    <div class="card-name">Aryan DS Kinetic Landing Page</div>
+                    <code class="card-path">brutalism/Aryan_DS_kinetic_landing_page.html</code>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.5s">
-                <div class="section-title">landing-pages</div>
-                <div class="grid">
-                    
-                        <a href="landing-pages/ARYAN_DS.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">ARYAN DS</div>
-                                <div class="card-path">landing-pages/ARYAN_DS.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="landing-pages/Aryan_DS_monochrom.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Aryan DS monochrom</div>
-                                <div class="card-path">landing-pages/Aryan_DS_monochrom.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="landing-pages/GEMINI_NOTES.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">GEMINI NOTES</div>
-                                <div class="card-path">landing-pages/GEMINI_NOTES.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+            </a>
+            <a href="brutalism/Aryan_DS_notes_page.html" class="card" data-name="aryan ds notes page brutalism" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/brutalism/Aryan_DS_notes_page.png" alt="Aryan DS Notes Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.6000000000000001s">
-                <div class="section-title">personal-notes-site</div>
-                <div class="grid">
-                    
-                        <a href="personal-notes-site/about.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">about</div>
-                                <div class="card-path">personal-notes-site/about.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="personal-notes-site/course-collection.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course collection</div>
-                                <div class="card-path">personal-notes-site/course-collection.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="personal-notes-site/course-read.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read</div>
-                                <div class="card-path">personal-notes-site/course-read.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="personal-notes-site/index.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">index</div>
-                                <div class="card-path">personal-notes-site/index.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="personal-notes-site/notes.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">notes</div>
-                                <div class="card-path">personal-notes-site/notes.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="personal-notes-site/solutions.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">solutions</div>
-                                <div class="card-path">personal-notes-site/solutions.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+                <div class="card-body">
+                    <div class="card-name">Aryan DS Notes Page</div>
+                    <code class="card-path">brutalism/Aryan_DS_notes_page.html</code>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.7000000000000001s">
-                <div class="section-title">pol-math</div>
-                <div class="grid">
-                    
-                        <a href="pol-math/index.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">index</div>
-                                <div class="card-path">pol-math/index.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="pol-math/v2.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">v2</div>
-                                <div class="card-path">pol-math/v2.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="pol-math/v3.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">v3</div>
-                                <div class="card-path">pol-math/v3.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="pol-math/v4.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">v4</div>
-                                <div class="card-path">pol-math/v4.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="pol-math/v5.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">v5</div>
-                                <div class="card-path">pol-math/v5.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="pol-math/v6.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">v6</div>
-                                <div class="card-path">pol-math/v6.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+            </a>
+            <a href="brutalism/Aryan_DS_solutions_page.html" class="card" data-name="aryan ds solutions page brutalism" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/brutalism/Aryan_DS_solutions_page.png" alt="Aryan DS Solutions Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.8s">
-                <div class="section-title">zero-gravity</div>
-                <div class="grid">
-                    
-                        <a href="zero-gravity/Aryan_Zero_gravity.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Aryan Zero gravity</div>
-                                <div class="card-path">zero-gravity/Aryan_Zero_gravity.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity/Zero_gravity_devlog_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Zero gravity devlog page</div>
-                                <div class="card-path">zero-gravity/Zero_gravity_devlog_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity/Zero_gravity_dynamic_landing_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Zero gravity dynamic landing page</div>
-                                <div class="card-path">zero-gravity/Zero_gravity_dynamic_landing_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity/Zero_gravity_notes_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Zero gravity notes page</div>
-                                <div class="card-path">zero-gravity/Zero_gravity_notes_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity/Zero_gravity_sinble_solution_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Zero gravity sinble solution page</div>
-                                <div class="card-path">zero-gravity/Zero_gravity_sinble_solution_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity/Zero_gravity_single_devLog_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Zero gravity single devLog page</div>
-                                <div class="card-path">zero-gravity/Zero_gravity_single_devLog_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity/Zero_gravity_single_notes_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Zero gravity single notes page</div>
-                                <div class="card-path">zero-gravity/Zero_gravity_single_notes_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity/Zero_gravity_solutions_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Zero gravity solutions page</div>
-                                <div class="card-path">zero-gravity/Zero_gravity_solutions_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity/Zero_grvity_dynamic_devlog_page.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">Zero grvity dynamic devlog page</div>
-                                <div class="card-path">zero-gravity/Zero_grvity_dynamic_devlog_page.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+                <div class="card-body">
+                    <div class="card-name">Aryan DS Solutions Page</div>
+                    <code class="card-path">brutalism/Aryan_DS_solutions_page.html</code>
                 </div>
-            </section>
-        
-            <section style="animation-delay: 0.9s">
-                <div class="section-title">zero-gravity-v2</div>
-                <div class="grid">
-                    
-                        <a href="zero-gravity-v2/course-collection.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course collection</div>
-                                <div class="card-path">zero-gravity-v2/course-collection.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity-v2/course-read-2.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read 2</div>
-                                <div class="card-path">zero-gravity-v2/course-read-2.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity-v2/course-read-3.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read 3</div>
-                                <div class="card-path">zero-gravity-v2/course-read-3.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity-v2/course-read.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">course read</div>
-                                <div class="card-path">zero-gravity-v2/course-read.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity-v2/home.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">home</div>
-                                <div class="card-path">zero-gravity-v2/home.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity-v2/notes-collections-single.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">notes collections single</div>
-                                <div class="card-path">zero-gravity-v2/notes-collections-single.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity-v2/notes.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">notes</div>
-                                <div class="card-path">zero-gravity-v2/notes.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity-v2/single-note-2.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">single note 2</div>
-                                <div class="card-path">zero-gravity-v2/single-note-2.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
-                        <a href="zero-gravity-v2/single-note.html" class="card">
-                            <div class="card-content">
-                                <div class="card-title">single note</div>
-                                <div class="card-path">zero-gravity-v2/single-note.html</div>
-                            </div>
-                            <div class="card-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </div>
-                        </a>
-                    
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="brutalism/Aryan_DS_game_Dev.html" class="row-item" data-name="aryan ds game dev brutalism" target="_blank">
+                <div class="row-icon">💣</div>
+                <div class="row-info">
+                    <span class="row-name">Aryan DS Game Dev</span>
+                    <code class="row-path">brutalism/Aryan_DS_game_Dev.html</code>
                 </div>
-            </section>
-        
-    </main>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="brutalism/Aryan_DS_kinetic_landing_page.html" class="row-item" data-name="aryan ds kinetic landing page brutalism" target="_blank">
+                <div class="row-icon">💣</div>
+                <div class="row-info">
+                    <span class="row-name">Aryan DS Kinetic Landing Page</span>
+                    <code class="row-path">brutalism/Aryan_DS_kinetic_landing_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="brutalism/Aryan_DS_notes_page.html" class="row-item" data-name="aryan ds notes page brutalism" target="_blank">
+                <div class="row-icon">💣</div>
+                <div class="row-info">
+                    <span class="row-name">Aryan DS Notes Page</span>
+                    <code class="row-path">brutalism/Aryan_DS_notes_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="brutalism/Aryan_DS_solutions_page.html" class="row-item" data-name="aryan ds solutions page brutalism" target="_blank">
+                <div class="row-icon">💣</div>
+                <div class="row-info">
+                    <span class="row-name">Aryan DS Solutions Page</span>
+                    <code class="row-path">brutalism/Aryan_DS_solutions_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.06s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">🎬</span>
+                    <div>
+                        <h2 class="section-title">CapCut Clone</h2>
+                        <p class="section-desc">Pro video editor UI clones & variants</p>
+                    </div>
+                </div>
+                <span class="section-badge">6</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="capcut-clone-deisng/capcut-clone.html" class="card" data-name="capcut clone capcut clone" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎬</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Capcut Clone</div>
+                    <code class="card-path">capcut-clone-deisng/capcut-clone.html</code>
+                </div>
+            </a>
+            <a href="capcut-clone-deisng/chart-studio-0.1.html" class="card" data-name="chart studio 0 1 capcut clone" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎬</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Chart Studio 0 1</div>
+                    <code class="card-path">capcut-clone-deisng/chart-studio-0.1.html</code>
+                </div>
+            </a>
+            <a href="capcut-clone-deisng/chart-studio-0.2-light-mode.html" class="card" data-name="chart studio 0 2 light mode capcut clone" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎬</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Chart Studio 0 2 Light Mode</div>
+                    <code class="card-path">capcut-clone-deisng/chart-studio-0.2-light-mode.html</code>
+                </div>
+            </a>
+            <a href="capcut-clone-deisng/chart-studio-0.3-clean-design-clean-code.html" class="card" data-name="chart studio 0 3 clean design clean code capcut clone" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎬</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Chart Studio 0 3 Clean Design Clean Code</div>
+                    <code class="card-path">capcut-clone-deisng/chart-studio-0.3-clean-design-clean-code.html</code>
+                </div>
+            </a>
+            <a href="capcut-clone-deisng/chart-studio-0.4-accorian-color-depth.html" class="card" data-name="chart studio 0 4 accorian color depth capcut clone" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎬</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Chart Studio 0 4 Accorian Color Depth</div>
+                    <code class="card-path">capcut-clone-deisng/chart-studio-0.4-accorian-color-depth.html</code>
+                </div>
+            </a>
+            <a href="capcut-clone-deisng/minimal.html" class="card" data-name="minimal capcut clone" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎬</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Minimal</div>
+                    <code class="card-path">capcut-clone-deisng/minimal.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="capcut-clone-deisng/capcut-clone.html" class="row-item" data-name="capcut clone capcut clone" target="_blank">
+                <div class="row-icon">🎬</div>
+                <div class="row-info">
+                    <span class="row-name">Capcut Clone</span>
+                    <code class="row-path">capcut-clone-deisng/capcut-clone.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="capcut-clone-deisng/chart-studio-0.1.html" class="row-item" data-name="chart studio 0 1 capcut clone" target="_blank">
+                <div class="row-icon">🎬</div>
+                <div class="row-info">
+                    <span class="row-name">Chart Studio 0 1</span>
+                    <code class="row-path">capcut-clone-deisng/chart-studio-0.1.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="capcut-clone-deisng/chart-studio-0.2-light-mode.html" class="row-item" data-name="chart studio 0 2 light mode capcut clone" target="_blank">
+                <div class="row-icon">🎬</div>
+                <div class="row-info">
+                    <span class="row-name">Chart Studio 0 2 Light Mode</span>
+                    <code class="row-path">capcut-clone-deisng/chart-studio-0.2-light-mode.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="capcut-clone-deisng/chart-studio-0.3-clean-design-clean-code.html" class="row-item" data-name="chart studio 0 3 clean design clean code capcut clone" target="_blank">
+                <div class="row-icon">🎬</div>
+                <div class="row-info">
+                    <span class="row-name">Chart Studio 0 3 Clean Design Clean Code</span>
+                    <code class="row-path">capcut-clone-deisng/chart-studio-0.3-clean-design-clean-code.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="capcut-clone-deisng/chart-studio-0.4-accorian-color-depth.html" class="row-item" data-name="chart studio 0 4 accorian color depth capcut clone" target="_blank">
+                <div class="row-icon">🎬</div>
+                <div class="row-info">
+                    <span class="row-name">Chart Studio 0 4 Accorian Color Depth</span>
+                    <code class="row-path">capcut-clone-deisng/chart-studio-0.4-accorian-color-depth.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="capcut-clone-deisng/minimal.html" class="row-item" data-name="minimal capcut clone" target="_blank">
+                <div class="row-icon">🎬</div>
+                <div class="row-info">
+                    <span class="row-name">Minimal</span>
+                    <code class="row-path">capcut-clone-deisng/minimal.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.12s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">📊</span>
+                    <div>
+                        <h2 class="section-title">Flourish Design</h2>
+                        <p class="section-desc">Data viz studio UI inspired by Flourish</p>
+                    </div>
+                </div>
+                <span class="section-badge">2</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="flourish-design/different-font.html" class="card" data-name="different font flourish design" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📊</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Different Font</div>
+                    <code class="card-path">flourish-design/different-font.html</code>
+                </div>
+            </a>
+            <a href="flourish-design/flourish-clone.html" class="card" data-name="flourish clone flourish design" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📊</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Flourish Clone</div>
+                    <code class="card-path">flourish-design/flourish-clone.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="flourish-design/different-font.html" class="row-item" data-name="different font flourish design" target="_blank">
+                <div class="row-icon">📊</div>
+                <div class="row-info">
+                    <span class="row-name">Different Font</span>
+                    <code class="row-path">flourish-design/different-font.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="flourish-design/flourish-clone.html" class="row-item" data-name="flourish clone flourish design" target="_blank">
+                <div class="row-icon">📊</div>
+                <div class="row-info">
+                    <span class="row-name">Flourish Clone</span>
+                    <code class="row-path">flourish-design/flourish-clone.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.18s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">📚</span>
+                    <div>
+                        <h2 class="section-title">Gemini LMS</h2>
+                        <p class="section-desc">Course reader & LMS UI iterations</p>
+                    </div>
+                </div>
+                <span class="section-badge">11</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="gemini-lms/course-reaad-v2.html" class="card" data-name="course reaad v2 gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Reaad V2</div>
+                    <code class="card-path">gemini-lms/course-reaad-v2.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/course-reac-v2.2.html" class="card" data-name="course reac v2 2 gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Reac V2 2</div>
+                    <code class="card-path">gemini-lms/course-reac-v2.2.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/course-read-2.html" class="card" data-name="course read 2 gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read 2</div>
+                    <code class="card-path">gemini-lms/course-read-2.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/course-read-3.html" class="card" data-name="course read 3 gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read 3</div>
+                    <code class="card-path">gemini-lms/course-read-3.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/course-read-discrod-version-2.html" class="card" data-name="course read discrod version 2 gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read Discrod Version 2</div>
+                    <code class="card-path">gemini-lms/course-read-discrod-version-2.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/course-read-discrod-version.html" class="card" data-name="course read discrod version gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read Discrod Version</div>
+                    <code class="card-path">gemini-lms/course-read-discrod-version.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/course-read-pro-gray.html" class="card" data-name="course read pro gray gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read Pro Gray</div>
+                    <code class="card-path">gemini-lms/course-read-pro-gray.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/course-read-v2.1.html" class="card" data-name="course read v2 1 gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read V2 1</div>
+                    <code class="card-path">gemini-lms/course-read-v2.1.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/course-read.html" class="card" data-name="course read gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read</div>
+                    <code class="card-path">gemini-lms/course-read.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/index.html" class="card" data-name="index gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Index</div>
+                    <code class="card-path">gemini-lms/index.html</code>
+                </div>
+            </a>
+            <a href="gemini-lms/stats-course.html" class="card" data-name="stats course gemini lms" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📚</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Stats Course</div>
+                    <code class="card-path">gemini-lms/stats-course.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="gemini-lms/course-reaad-v2.html" class="row-item" data-name="course reaad v2 gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Reaad V2</span>
+                    <code class="row-path">gemini-lms/course-reaad-v2.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/course-reac-v2.2.html" class="row-item" data-name="course reac v2 2 gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Reac V2 2</span>
+                    <code class="row-path">gemini-lms/course-reac-v2.2.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/course-read-2.html" class="row-item" data-name="course read 2 gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read 2</span>
+                    <code class="row-path">gemini-lms/course-read-2.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/course-read-3.html" class="row-item" data-name="course read 3 gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read 3</span>
+                    <code class="row-path">gemini-lms/course-read-3.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/course-read-discrod-version-2.html" class="row-item" data-name="course read discrod version 2 gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read Discrod Version 2</span>
+                    <code class="row-path">gemini-lms/course-read-discrod-version-2.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/course-read-discrod-version.html" class="row-item" data-name="course read discrod version gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read Discrod Version</span>
+                    <code class="row-path">gemini-lms/course-read-discrod-version.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/course-read-pro-gray.html" class="row-item" data-name="course read pro gray gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read Pro Gray</span>
+                    <code class="row-path">gemini-lms/course-read-pro-gray.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/course-read-v2.1.html" class="row-item" data-name="course read v2 1 gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read V2 1</span>
+                    <code class="row-path">gemini-lms/course-read-v2.1.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/course-read.html" class="row-item" data-name="course read gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read</span>
+                    <code class="row-path">gemini-lms/course-read.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/index.html" class="row-item" data-name="index gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Index</span>
+                    <code class="row-path">gemini-lms/index.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gemini-lms/stats-course.html" class="row-item" data-name="stats course gemini lms" target="_blank">
+                <div class="row-icon">📚</div>
+                <div class="row-info">
+                    <span class="row-name">Stats Course</span>
+                    <code class="row-path">gemini-lms/stats-course.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.24s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">🎨</span>
+                    <div>
+                        <h2 class="section-title">Kenichi Studio</h2>
+                        <p class="section-desc">Animation studio app design evolution</p>
+                    </div>
+                </div>
+                <span class="section-badge">3</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="kenichi-animation-studio/v0.1.html" class="card" data-name="v0 1 kenichi studio" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎨</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">V0 1</div>
+                    <code class="card-path">kenichi-animation-studio/v0.1.html</code>
+                </div>
+            </a>
+            <a href="kenichi-animation-studio/v0.2-home-page.html" class="card" data-name="v0 2 home page kenichi studio" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎨</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">V0 2 Home Page</div>
+                    <code class="card-path">kenichi-animation-studio/v0.2-home-page.html</code>
+                </div>
+            </a>
+            <a href="kenichi-animation-studio/v0.3-responsive-bottom-bar.html" class="card" data-name="v0 3 responsive bottom bar kenichi studio" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🎨</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">V0 3 Responsive Bottom Bar</div>
+                    <code class="card-path">kenichi-animation-studio/v0.3-responsive-bottom-bar.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="kenichi-animation-studio/v0.1.html" class="row-item" data-name="v0 1 kenichi studio" target="_blank">
+                <div class="row-icon">🎨</div>
+                <div class="row-info">
+                    <span class="row-name">V0 1</span>
+                    <code class="row-path">kenichi-animation-studio/v0.1.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="kenichi-animation-studio/v0.2-home-page.html" class="row-item" data-name="v0 2 home page kenichi studio" target="_blank">
+                <div class="row-icon">🎨</div>
+                <div class="row-info">
+                    <span class="row-name">V0 2 Home Page</span>
+                    <code class="row-path">kenichi-animation-studio/v0.2-home-page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="kenichi-animation-studio/v0.3-responsive-bottom-bar.html" class="row-item" data-name="v0 3 responsive bottom bar kenichi studio" target="_blank">
+                <div class="row-icon">🎨</div>
+                <div class="row-info">
+                    <span class="row-name">V0 3 Responsive Bottom Bar</span>
+                    <code class="row-path">kenichi-animation-studio/v0.3-responsive-bottom-bar.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.3s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">🌐</span>
+                    <div>
+                        <h2 class="section-title">Landing Pages</h2>
+                        <p class="section-desc">General marketing & personal landing pages</p>
+                    </div>
+                </div>
+                <span class="section-badge">3</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="landing-pages/ARYAN_DS.html" class="card" data-name="aryan ds landing pages" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/landing-pages/ARYAN_DS.png" alt="ARYAN DS" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">ARYAN DS</div>
+                    <code class="card-path">landing-pages/ARYAN_DS.html</code>
+                </div>
+            </a>
+            <a href="landing-pages/Aryan_DS_monochrom.html" class="card" data-name="aryan ds monochrom landing pages" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/landing-pages/Aryan_DS_monochrom.png" alt="Aryan DS Monochrom" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Aryan DS Monochrom</div>
+                    <code class="card-path">landing-pages/Aryan_DS_monochrom.html</code>
+                </div>
+            </a>
+            <a href="landing-pages/GEMINI_NOTES.html" class="card" data-name="gemini notes landing pages" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/landing-pages/GEMINI_NOTES.png" alt="GEMINI NOTES" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">GEMINI NOTES</div>
+                    <code class="card-path">landing-pages/GEMINI_NOTES.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="landing-pages/ARYAN_DS.html" class="row-item" data-name="aryan ds landing pages" target="_blank">
+                <div class="row-icon">🌐</div>
+                <div class="row-info">
+                    <span class="row-name">ARYAN DS</span>
+                    <code class="row-path">landing-pages/ARYAN_DS.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="landing-pages/Aryan_DS_monochrom.html" class="row-item" data-name="aryan ds monochrom landing pages" target="_blank">
+                <div class="row-icon">🌐</div>
+                <div class="row-info">
+                    <span class="row-name">Aryan DS Monochrom</span>
+                    <code class="row-path">landing-pages/Aryan_DS_monochrom.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="landing-pages/GEMINI_NOTES.html" class="row-item" data-name="gemini notes landing pages" target="_blank">
+                <div class="row-icon">🌐</div>
+                <div class="row-info">
+                    <span class="row-name">GEMINI NOTES</span>
+                    <code class="row-path">landing-pages/GEMINI_NOTES.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.36s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">📝</span>
+                    <div>
+                        <h2 class="section-title">Personal Notes</h2>
+                        <p class="section-desc">Multi-page personal notes & portfolio site</p>
+                    </div>
+                </div>
+                <span class="section-badge">6</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="personal-notes-site/about.html" class="card" data-name="about personal notes" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📝</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">About</div>
+                    <code class="card-path">personal-notes-site/about.html</code>
+                </div>
+            </a>
+            <a href="personal-notes-site/course-collection.html" class="card" data-name="course collection personal notes" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📝</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Collection</div>
+                    <code class="card-path">personal-notes-site/course-collection.html</code>
+                </div>
+            </a>
+            <a href="personal-notes-site/course-read.html" class="card" data-name="course read personal notes" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📝</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read</div>
+                    <code class="card-path">personal-notes-site/course-read.html</code>
+                </div>
+            </a>
+            <a href="personal-notes-site/index.html" class="card" data-name="index personal notes" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📝</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Index</div>
+                    <code class="card-path">personal-notes-site/index.html</code>
+                </div>
+            </a>
+            <a href="personal-notes-site/notes.html" class="card" data-name="notes personal notes" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📝</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Notes</div>
+                    <code class="card-path">personal-notes-site/notes.html</code>
+                </div>
+            </a>
+            <a href="personal-notes-site/solutions.html" class="card" data-name="solutions personal notes" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>📝</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Solutions</div>
+                    <code class="card-path">personal-notes-site/solutions.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="personal-notes-site/about.html" class="row-item" data-name="about personal notes" target="_blank">
+                <div class="row-icon">📝</div>
+                <div class="row-info">
+                    <span class="row-name">About</span>
+                    <code class="row-path">personal-notes-site/about.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="personal-notes-site/course-collection.html" class="row-item" data-name="course collection personal notes" target="_blank">
+                <div class="row-icon">📝</div>
+                <div class="row-info">
+                    <span class="row-name">Course Collection</span>
+                    <code class="row-path">personal-notes-site/course-collection.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="personal-notes-site/course-read.html" class="row-item" data-name="course read personal notes" target="_blank">
+                <div class="row-icon">📝</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read</span>
+                    <code class="row-path">personal-notes-site/course-read.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="personal-notes-site/index.html" class="row-item" data-name="index personal notes" target="_blank">
+                <div class="row-icon">📝</div>
+                <div class="row-info">
+                    <span class="row-name">Index</span>
+                    <code class="row-path">personal-notes-site/index.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="personal-notes-site/notes.html" class="row-item" data-name="notes personal notes" target="_blank">
+                <div class="row-icon">📝</div>
+                <div class="row-info">
+                    <span class="row-name">Notes</span>
+                    <code class="row-path">personal-notes-site/notes.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="personal-notes-site/solutions.html" class="row-item" data-name="solutions personal notes" target="_blank">
+                <div class="row-icon">📝</div>
+                <div class="row-info">
+                    <span class="row-name">Solutions</span>
+                    <code class="row-path">personal-notes-site/solutions.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.42s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">🔢</span>
+                    <div>
+                        <h2 class="section-title">Pol-Math</h2>
+                        <p class="section-desc">Math-focused educational tool iterations</p>
+                    </div>
+                </div>
+                <span class="section-badge">6</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="pol-math/index.html" class="card" data-name="index pol-math" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🔢</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Index</div>
+                    <code class="card-path">pol-math/index.html</code>
+                </div>
+            </a>
+            <a href="pol-math/v2.html" class="card" data-name="v2 pol-math" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🔢</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">V2</div>
+                    <code class="card-path">pol-math/v2.html</code>
+                </div>
+            </a>
+            <a href="pol-math/v3.html" class="card" data-name="v3 pol-math" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🔢</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">V3</div>
+                    <code class="card-path">pol-math/v3.html</code>
+                </div>
+            </a>
+            <a href="pol-math/v4.html" class="card" data-name="v4 pol-math" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🔢</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">V4</div>
+                    <code class="card-path">pol-math/v4.html</code>
+                </div>
+            </a>
+            <a href="pol-math/v5.html" class="card" data-name="v5 pol-math" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🔢</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">V5</div>
+                    <code class="card-path">pol-math/v5.html</code>
+                </div>
+            </a>
+            <a href="pol-math/v6.html" class="card" data-name="v6 pol-math" target="_blank">
+                <div class="card-thumb">
+                    <div class="card-thumb-placeholder"><span>🔢</span></div>
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">V6</div>
+                    <code class="card-path">pol-math/v6.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="pol-math/index.html" class="row-item" data-name="index pol-math" target="_blank">
+                <div class="row-icon">🔢</div>
+                <div class="row-info">
+                    <span class="row-name">Index</span>
+                    <code class="row-path">pol-math/index.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="pol-math/v2.html" class="row-item" data-name="v2 pol-math" target="_blank">
+                <div class="row-icon">🔢</div>
+                <div class="row-info">
+                    <span class="row-name">V2</span>
+                    <code class="row-path">pol-math/v2.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="pol-math/v3.html" class="row-item" data-name="v3 pol-math" target="_blank">
+                <div class="row-icon">🔢</div>
+                <div class="row-info">
+                    <span class="row-name">V3</span>
+                    <code class="row-path">pol-math/v3.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="pol-math/v4.html" class="row-item" data-name="v4 pol-math" target="_blank">
+                <div class="row-icon">🔢</div>
+                <div class="row-info">
+                    <span class="row-name">V4</span>
+                    <code class="row-path">pol-math/v4.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="pol-math/v5.html" class="row-item" data-name="v5 pol-math" target="_blank">
+                <div class="row-icon">🔢</div>
+                <div class="row-info">
+                    <span class="row-name">V5</span>
+                    <code class="row-path">pol-math/v5.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="pol-math/v6.html" class="row-item" data-name="v6 pol-math" target="_blank">
+                <div class="row-icon">🔢</div>
+                <div class="row-info">
+                    <span class="row-name">V6</span>
+                    <code class="row-path">pol-math/v6.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.48s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">🌌</span>
+                    <div>
+                        <h2 class="section-title">Zero Gravity</h2>
+                        <p class="section-desc">Personal portfolio v1 — space theme</p>
+                    </div>
+                </div>
+                <span class="section-badge">9</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="zero-gravity/Aryan_Zero_gravity.html" class="card" data-name="aryan zero gravity zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Aryan_Zero_gravity.png" alt="Aryan Zero Gravity" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Aryan Zero Gravity</div>
+                    <code class="card-path">zero-gravity/Aryan_Zero_gravity.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity/Zero_gravity_devlog_page.html" class="card" data-name="zero gravity devlog page zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Zero_gravity_devlog_page.png" alt="Zero Gravity Devlog Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Zero Gravity Devlog Page</div>
+                    <code class="card-path">zero-gravity/Zero_gravity_devlog_page.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity/Zero_gravity_dynamic_landing_page.html" class="card" data-name="zero gravity dynamic landing page zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Zero_gravity_dynamic_landing_page.png" alt="Zero Gravity Dynamic Landing Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Zero Gravity Dynamic Landing Page</div>
+                    <code class="card-path">zero-gravity/Zero_gravity_dynamic_landing_page.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity/Zero_gravity_notes_page.html" class="card" data-name="zero gravity notes page zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Zero_gravity_notes_page.png" alt="Zero Gravity Notes Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Zero Gravity Notes Page</div>
+                    <code class="card-path">zero-gravity/Zero_gravity_notes_page.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity/Zero_gravity_sinble_solution_page.html" class="card" data-name="zero gravity sinble solution page zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Zero_gravity_sinble_solution_page.png" alt="Zero Gravity Sinble Solution Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Zero Gravity Sinble Solution Page</div>
+                    <code class="card-path">zero-gravity/Zero_gravity_sinble_solution_page.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity/Zero_gravity_single_devLog_page.html" class="card" data-name="zero gravity single devlog page zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Zero_gravity_single_devLog_page.png" alt="Zero Gravity Single DevLog Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Zero Gravity Single DevLog Page</div>
+                    <code class="card-path">zero-gravity/Zero_gravity_single_devLog_page.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity/Zero_gravity_single_notes_page.html" class="card" data-name="zero gravity single notes page zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Zero_gravity_single_notes_page.png" alt="Zero Gravity Single Notes Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Zero Gravity Single Notes Page</div>
+                    <code class="card-path">zero-gravity/Zero_gravity_single_notes_page.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity/Zero_gravity_solutions_page.html" class="card" data-name="zero gravity solutions page zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Zero_gravity_solutions_page.png" alt="Zero Gravity Solutions Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Zero Gravity Solutions Page</div>
+                    <code class="card-path">zero-gravity/Zero_gravity_solutions_page.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity/Zero_grvity_dynamic_devlog_page.html" class="card" data-name="zero grvity dynamic devlog page zero gravity" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity/Zero_grvity_dynamic_devlog_page.png" alt="Zero Grvity Dynamic Devlog Page" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Zero Grvity Dynamic Devlog Page</div>
+                    <code class="card-path">zero-gravity/Zero_grvity_dynamic_devlog_page.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="zero-gravity/Aryan_Zero_gravity.html" class="row-item" data-name="aryan zero gravity zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Aryan Zero Gravity</span>
+                    <code class="row-path">zero-gravity/Aryan_Zero_gravity.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity/Zero_gravity_devlog_page.html" class="row-item" data-name="zero gravity devlog page zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Zero Gravity Devlog Page</span>
+                    <code class="row-path">zero-gravity/Zero_gravity_devlog_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity/Zero_gravity_dynamic_landing_page.html" class="row-item" data-name="zero gravity dynamic landing page zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Zero Gravity Dynamic Landing Page</span>
+                    <code class="row-path">zero-gravity/Zero_gravity_dynamic_landing_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity/Zero_gravity_notes_page.html" class="row-item" data-name="zero gravity notes page zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Zero Gravity Notes Page</span>
+                    <code class="row-path">zero-gravity/Zero_gravity_notes_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity/Zero_gravity_sinble_solution_page.html" class="row-item" data-name="zero gravity sinble solution page zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Zero Gravity Sinble Solution Page</span>
+                    <code class="row-path">zero-gravity/Zero_gravity_sinble_solution_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity/Zero_gravity_single_devLog_page.html" class="row-item" data-name="zero gravity single devlog page zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Zero Gravity Single DevLog Page</span>
+                    <code class="row-path">zero-gravity/Zero_gravity_single_devLog_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity/Zero_gravity_single_notes_page.html" class="row-item" data-name="zero gravity single notes page zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Zero Gravity Single Notes Page</span>
+                    <code class="row-path">zero-gravity/Zero_gravity_single_notes_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity/Zero_gravity_solutions_page.html" class="row-item" data-name="zero gravity solutions page zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Zero Gravity Solutions Page</span>
+                    <code class="row-path">zero-gravity/Zero_gravity_solutions_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity/Zero_grvity_dynamic_devlog_page.html" class="row-item" data-name="zero grvity dynamic devlog page zero gravity" target="_blank">
+                <div class="row-icon">🌌</div>
+                <div class="row-info">
+                    <span class="row-name">Zero Grvity Dynamic Devlog Page</span>
+                    <code class="row-path">zero-gravity/Zero_grvity_dynamic_devlog_page.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        <section class="section" style="animation-delay: 0.54s">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <span class="section-icon">✨</span>
+                    <div>
+                        <h2 class="section-title">Zero Gravity V2</h2>
+                        <p class="section-desc">Full redesign iteration of Zero Gravity</p>
+                    </div>
+                </div>
+                <span class="section-badge">9</span>
+            </div>
+            <div class="grid view-grid">
+            <a href="zero-gravity-v2/course-collection.html" class="card" data-name="course collection zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/course-collection.png" alt="Course Collection" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Collection</div>
+                    <code class="card-path">zero-gravity-v2/course-collection.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity-v2/course-read-2.html" class="card" data-name="course read 2 zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/course-read-2.png" alt="Course Read 2" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read 2</div>
+                    <code class="card-path">zero-gravity-v2/course-read-2.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity-v2/course-read-3.html" class="card" data-name="course read 3 zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/course-read-3.png" alt="Course Read 3" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read 3</div>
+                    <code class="card-path">zero-gravity-v2/course-read-3.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity-v2/course-read.html" class="card" data-name="course read zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/course-read.png" alt="Course Read" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Course Read</div>
+                    <code class="card-path">zero-gravity-v2/course-read.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity-v2/home.html" class="card" data-name="home zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/home.png" alt="Home" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Home</div>
+                    <code class="card-path">zero-gravity-v2/home.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity-v2/notes-collections-single.html" class="card" data-name="notes collections single zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/notes-collections-single.png" alt="Notes Collections Single" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Notes Collections Single</div>
+                    <code class="card-path">zero-gravity-v2/notes-collections-single.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity-v2/notes.html" class="card" data-name="notes zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/notes.png" alt="Notes" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Notes</div>
+                    <code class="card-path">zero-gravity-v2/notes.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity-v2/single-note-2.html" class="card" data-name="single note 2 zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/single-note-2.png" alt="Single Note 2" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Single Note 2</div>
+                    <code class="card-path">zero-gravity-v2/single-note-2.html</code>
+                </div>
+            </a>
+            <a href="zero-gravity-v2/single-note.html" class="card" data-name="single note zero gravity v2" target="_blank">
+                <div class="card-thumb">
+                    <img src="./screenshots/zero-gravity-v2/single-note.png" alt="Single Note" loading="lazy">
+                    <div class="card-thumb-overlay">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Open Demo
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">Single Note</div>
+                    <code class="card-path">zero-gravity-v2/single-note.html</code>
+                </div>
+            </a></div>
+            <div class="list view-list hidden">
+            <a href="zero-gravity-v2/course-collection.html" class="row-item" data-name="course collection zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Course Collection</span>
+                    <code class="row-path">zero-gravity-v2/course-collection.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity-v2/course-read-2.html" class="row-item" data-name="course read 2 zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read 2</span>
+                    <code class="row-path">zero-gravity-v2/course-read-2.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity-v2/course-read-3.html" class="row-item" data-name="course read 3 zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read 3</span>
+                    <code class="row-path">zero-gravity-v2/course-read-3.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity-v2/course-read.html" class="row-item" data-name="course read zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Course Read</span>
+                    <code class="row-path">zero-gravity-v2/course-read.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity-v2/home.html" class="row-item" data-name="home zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Home</span>
+                    <code class="row-path">zero-gravity-v2/home.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity-v2/notes-collections-single.html" class="row-item" data-name="notes collections single zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Notes Collections Single</span>
+                    <code class="row-path">zero-gravity-v2/notes-collections-single.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity-v2/notes.html" class="row-item" data-name="notes zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Notes</span>
+                    <code class="row-path">zero-gravity-v2/notes.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity-v2/single-note-2.html" class="row-item" data-name="single note 2 zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Single Note 2</span>
+                    <code class="row-path">zero-gravity-v2/single-note-2.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="zero-gravity-v2/single-note.html" class="row-item" data-name="single note zero gravity v2" target="_blank">
+                <div class="row-icon">✨</div>
+                <div class="row-info">
+                    <span class="row-name">Single Note</span>
+                    <code class="row-path">zero-gravity-v2/single-note.html</code>
+                </div>
+                <svg class="row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a></div>
+        </section>
+        </div>
+
+        <div class="no-results" id="no-results">
+            <p style="font-size:2rem;margin-bottom:0.5rem">🔍</p>
+            <p>No demos match your search.</p>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'design-demos-view';
+        const btnGrid   = document.getElementById('btn-grid');
+        const btnList   = document.getElementById('btn-list');
+        const search    = document.getElementById('search');
+        const noResults = document.getElementById('no-results');
+
+        // ── View toggle ──────────────────────────────────────────────────────
+        function setView(mode) {
+            const isGrid = mode === 'grid';
+            btnGrid.classList.toggle('active', isGrid);
+            btnList.classList.toggle('active', !isGrid);
+            document.querySelectorAll('.view-grid').forEach(el => el.classList.toggle('hidden', !isGrid));
+            document.querySelectorAll('.view-list').forEach(el => el.classList.toggle('hidden', isGrid));
+            localStorage.setItem(STORAGE_KEY, mode);
+        }
+
+        btnGrid.addEventListener('click', () => setView('grid'));
+        btnList.addEventListener('click', () => setView('list'));
+
+        // Restore saved preference
+        setView(localStorage.getItem(STORAGE_KEY) || 'grid');
+
+        // ── Search / filter ───────────────────────────────────────────────────
+        search.addEventListener('input', () => {
+            const q = search.value.trim().toLowerCase();
+            let totalVisible = 0;
+
+            document.querySelectorAll('.section').forEach(section => {
+                const cards = section.querySelectorAll('.card, .row-item');
+                let sectionVisible = 0;
+
+                cards.forEach(card => {
+                    const match = !q || card.dataset.name.includes(q);
+                    card.style.display = match ? '' : 'none';
+                    if (match) sectionVisible++;
+                });
+
+                section.style.display = sectionVisible === 0 ? 'none' : '';
+                totalVisible += sectionVisible;
+            });
+
+            noResults.classList.toggle('visible', totalVisible === 0);
+        });
+    </script>
 </body>
 </html>

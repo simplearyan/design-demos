@@ -4,8 +4,10 @@
     "description": "Experimental design concepts and prototypes",
     "main": "generate-index.js",
     "scripts": {
-        "generate": "node generate-index.js",
-        "preview": "node generate-preview.js"
+        "index":          "node generate-index.js",
+        "preview":        "node generate-preview.js",
+        "preview:force":  "node generate-preview.js --force",
+        "build":          "node generate-index.js && node generate-preview.js"
     },
     "keywords": [],
     "author": "",

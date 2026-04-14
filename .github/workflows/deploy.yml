@@ -36,7 +36,7 @@ jobs:
         run: npm install
 
       - name: Generate Index Page
-        run: node generate-index.js
+        run: npm run index
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
