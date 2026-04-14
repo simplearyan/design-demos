@@ -64,15 +64,19 @@ async function captureScreenshots(demos) {
 
     console.log(`📸 Capturing ${toCapture.length} screenshot(s)${FORCE ? ' (forced)' : ' (new only)'}…`);
 
+    const isCI = !!process.env.CI;
+
     const browser = await puppeteer.launch({
         headless: 'new',
-        // Use installed system Chrome — avoids needing to download Puppeteer's bundled browser
-        executablePath:
+        // In CI (GitHub Actions): let Puppeteer use its installed browser.
+        // Locally on Windows: use system Chrome to avoid needing a download.
+        executablePath: isCI ? undefined : (
             process.platform === 'win32'
                 ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
                 : process.platform === 'darwin'
                     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-                    : '/usr/bin/google-chrome',
+                    : '/usr/bin/google-chrome'
+        ),
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
     const page = await browser.newPage();

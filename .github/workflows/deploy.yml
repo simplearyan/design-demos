@@ -35,8 +35,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Generate Index Page
-        run: npm run index
+      - name: Install Puppeteer browser (for screenshots)
+        run: npx puppeteer browsers install chrome
+
+      - name: Generate Screenshots & Index Page
+        run: npm run preview
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
