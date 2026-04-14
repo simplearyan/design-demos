@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // KNOWLEDGE BASE</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#F97316',
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Base Transitions */
+        body { transition: background-color 0.5s ease, color 0.5s ease; }
+
+        /* THEME ENGINE */
+        body[data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-main: #18181b;
+            --text-muted: #71717a;
+            --border: #e4e4e7;
+            --card-bg: #f4f4f5;
+            --card-hover: #e4e4e7;
+            --blob-opacity: 0;
+            --overlay-bg: rgba(0,0,0,0.05);
+        }
+
+        body[data-theme="dark"] {
+            --bg-color: #09090b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --card-bg: #18181b;
+            --card-hover: #27272a;
+            --blob-opacity: 0;
+            --overlay-bg: rgba(255,255,255,0.05);
+        }
+
+        body[data-theme="aurora"] {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-hover: rgba(255, 255, 255, 0.08);
+            --blob-opacity: 0.4;
+            --overlay-bg: rgba(255,255,255,0.05);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Playlist Stack Effect */
+        .playlist-stack {
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+        .playlist-stack::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            height: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            z-index: -1;
+            transition: transform 0.3s ease;
+        }
+        .playlist-stack::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            z-index: -2;
+            opacity: 0.6;
+            transition: transform 0.3s ease;
+        }
+        .group:hover .playlist-stack { transform: translateY(-4px); }
+        .group:hover .playlist-stack::before { transform: translateX(-50%) translateY(-2px); }
+        .group:hover .playlist-stack::after { transform: translateX(-50%) translateY(-4px); }
+
+        /* Adaptive Components */
+        .adaptive-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .adaptive-card:hover {
+            background-color: var(--card-hover);
+            transform: translateY(-4px);
+        }
+
+        /* Typography Toggles */
+        body.font-outfit { font-family: 'Outfit', sans-serif; }
+        body.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Aurora Elements */
+        .aurora-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: var(--blob-opacity);
+            transition: opacity 0.8s ease; overflow: hidden;
+        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
+        .blob-1 { top: -10%; left: 20%; width: 60vw; height: 60vw; background: #3B82F6; animation: blob 25s infinite alternate; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #8B5CF6; animation: blob 20s infinite alternate-reverse; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+    </style>
+</head>
+<body class="font-jakarta min-h-screen relative selection:bg-blue-500/30" data-theme="dark">
+
+    <!-- Aurora Background Layer -->
+    <div class="aurora-layer">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="absolute inset-0 opacity-[0.05] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 border-b border-[var(--border)] bg-[var(--bg-color)]/80 backdrop-blur-md transition-colors duration-500">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-105 transition-transform">
+                    A
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg tracking-tight leading-none">ARYAN.DS</span>
+                    <span class="text-[10px] font-mono opacity-50 tracking-widest">PORTFOLIO</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium opacity-80">
+                <a href="index.html" class="hover:text-blue-500 hover:opacity-100 transition-all">Home</a>
+                <a href="#" class="text-blue-500 font-bold">Notes</a>
+                <a href="solutions.html" class="hover:text-purple-500 hover:opacity-100 transition-all">Solutions</a>
+                <a href="devlogs.html" class="hover:text-orange-500 hover:opacity-100 transition-all">Dev Logs</a>
+            </div>
+
+            <!-- Settings / Actions -->
+            <div class="flex items-center gap-4">
+                <div class="relative group">
+                    <button class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors border border-transparent hover:border-[var(--border)]">
+                        <i data-lucide="settings-2" class="w-5 h-5 text-[var(--text-main)]"></i>
+                    </button>
+                    
+                    <div class="absolute right-0 top-full mt-2 w-64 p-4 rounded-2xl adaptive-card shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 z-50">
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-[10px] font-mono uppercase opacity-50 mb-2 tracking-wider text-[var(--text-main)]">Theme</p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="setTheme('light')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-[var(--text-main)]">
+                                        <i data-lucide="sun" class="w-4 h-4"></i> Light
+                                    </button>
+                                    <button onclick="setTheme('dark')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-[var(--text-main)]">
+                                        <i data-lucide="moon" class="w-4 h-4"></i> Dark
+                                    </button>
+                                    <button onclick="setTheme('aurora')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-purple-400">
+                                        <i data-lucide="sparkles" class="w-4 h-4"></i> Aurora
+                                    </button>
+                                </div>
+                            </div>
+                            <hr class="border-[var(--border)]">
+                            <div>
+                                <p class="text-[10px] font-mono uppercase opacity-50 mb-2 tracking-wider text-[var(--text-main)]">Typography</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="setFont('jakarta')" class="p-2 rounded-lg border border-[var(--border)] hover:border-blue-500 transition-colors text-xs font-jakarta text-[var(--text-main)]">Jakarta</button>
+                                    <button onclick="setFont('outfit')" class="p-2 rounded-lg border border-[var(--border)] hover:border-blue-500 transition-colors text-xs font-outfit text-[var(--text-main)]">Outfit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 px-6">
+        
+        <!-- Header -->
+        <section class="max-w-7xl mx-auto text-center py-10 animate-fade-in">
+            <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-4">
+                Knowledge <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">Base</span>
+            </h1>
+            <p class="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
+                Organized collections of academic notes, cheat sheets, and reference materials.
+            </p>
+        </section>
+
+        <!-- Course Collections (Playlists) -->
+        <section class="max-w-7xl mx-auto mb-20">
+            <div class="flex items-center gap-4 mb-8">
+                <h2 class="text-lg font-bold tracking-tight">Course Collections</h2>
+                <div class="h-px bg-[var(--border)] flex-grow"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                
+                <!-- Playlist 1 -->
+                <div class="group cursor-pointer">
+                    <!-- Thumbnail Stack -->
+                    <div class="playlist-stack relative aspect-video rounded-2xl overflow-hidden mb-4 border border-[var(--border)]">
+                        <!-- Cover Image -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 to-slate-900 flex items-center justify-center">
+                            <i data-lucide="bar-chart-2" class="w-16 h-16 text-blue-500 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
+                        </div>
+                        
+                        <!-- Overlay on Hover -->
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="text-white font-medium flex items-center gap-2 uppercase text-sm tracking-widest">
+                                <i data-lucide="play" class="w-4 h-4 fill-white"></i> Browse All
+                            </span>
+                        </div>
+
+                        <!-- Count Badge -->
+                        <div class="absolute bottom-2 right-2 bg-black/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded">
+                            12 NOTES
+                        </div>
+                    </div>
+                    
+                    <!-- Meta -->
+                    <div>
+                        <h3 class="text-lg font-bold mb-1 group-hover:text-blue-500 transition-colors">Statistics II: Inference</h3>
+                        <p class="text-xs text-[var(--text-muted)] mb-2">Updated 2 days ago</p>
+                        <p class="text-sm text-[var(--text-muted)] line-clamp-2">
+                            Comprehensive notes on Bayesian inference, hypothesis testing, and regression analysis using Python.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Playlist 2 -->
+                <div class="group cursor-pointer">
+                    <!-- Thumbnail Stack -->
+                    <div class="playlist-stack relative aspect-video rounded-2xl overflow-hidden mb-4 border border-[var(--border)]">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-900 to-slate-900 flex items-center justify-center">
+                            <i data-lucide="code-2" class="w-16 h-16 text-purple-500 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
+                        </div>
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="text-white font-medium flex items-center gap-2 uppercase text-sm tracking-widest">
+                                <i data-lucide="play" class="w-4 h-4 fill-white"></i> Browse All
+                            </span>
+                        </div>
+                        <div class="absolute bottom-2 right-2 bg-black/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded">
+                            8 NOTES
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-bold mb-1 group-hover:text-purple-500 transition-colors">Python OOP Design</h3>
+                        <p class="text-xs text-[var(--text-muted)] mb-2">Updated 5 days ago</p>
+                        <p class="text-sm text-[var(--text-muted)] line-clamp-2">
+                            Deep dive into classes, inheritance, dunder methods, and design patterns in Python 3.10+.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Playlist 3 -->
+                <div class="group cursor-pointer">
+                    <!-- Thumbnail Stack -->
+                    <div class="playlist-stack relative aspect-video rounded-2xl overflow-hidden mb-4 border border-[var(--border)]">
+                        <div class="absolute inset-0 bg-gradient-to-br from-orange-900 to-slate-900 flex items-center justify-center">
+                            <i data-lucide="gamepad-2" class="w-16 h-16 text-orange-500 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
+                        </div>
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="text-white font-medium flex items-center gap-2 uppercase text-sm tracking-widest">
+                                <i data-lucide="play" class="w-4 h-4 fill-white"></i> Browse All
+                            </span>
+                        </div>
+                        <div class="absolute bottom-2 right-2 bg-black/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded">
+                            15 LOGS
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-bold mb-1 group-hover:text-orange-500 transition-colors">Game Math & Physics</h3>
+                        <p class="text-xs text-[var(--text-muted)] mb-2">Updated 1 week ago</p>
+                        <p class="text-sm text-[var(--text-muted)] line-clamp-2">
+                            Vector mathematics, collision resolution strategies, and HLSL shader basics for Unity developers.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Recent Notes Grid -->
+        <section class="max-w-7xl mx-auto">
+            <div class="flex items-center gap-4 mb-8">
+                <h2 class="text-lg font-bold tracking-tight">Recent Notes</h2>
+                <div class="h-px bg-[var(--border)] flex-grow"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Note 1 -->
+                <a href="single-note.html" class="adaptive-card p-6 rounded-2xl group flex flex-col h-full hover:border-blue-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-[var(--text-muted)]">STATS_II</span>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2 group-hover:text-blue-500 transition-colors">Bayesian Inference</h3>
+                    <p class="text-sm text-[var(--text-muted)] line-clamp-3 mb-4 flex-grow">
+                        Introduction to priors, likelihoods, and posterior distributions with Python examples.
+                    </p>
+                    <div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)] pt-4 border-t border-[var(--border)]">
+                        <span>15 MIN READ</span>
+                    </div>
+                </a>
+
+                <!-- Note 2 -->
+                <a href="#" class="adaptive-card p-6 rounded-2xl group flex flex-col h-full hover:border-purple-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500">
+                            <i data-lucide="terminal" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-[var(--text-muted)]">PYTHON</span>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2 group-hover:text-purple-500 transition-colors">Magic Methods</h3>
+                    <p class="text-sm text-[var(--text-muted)] line-clamp-3 mb-4 flex-grow">
+                        Understanding __init__, __str__, and operator overloading for custom classes.
+                    </p>
+                    <div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)] pt-4 border-t border-[var(--border)]">
+                        <span>8 MIN READ</span>
+                    </div>
+                </a>
+
+                <!-- Note 3 -->
+                <a href="#" class="adaptive-card p-6 rounded-2xl group flex flex-col h-full hover:border-cyan-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-500">
+                            <i data-lucide="sigma" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-[var(--text-muted)]">MATH_II</span>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2 group-hover:text-cyan-500 transition-colors">Eigenvalues</h3>
+                    <p class="text-sm text-[var(--text-muted)] line-clamp-3 mb-4 flex-grow">
+                        Visualizing linear transformations and calculating determinants.
+                    </p>
+                    <div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)] pt-4 border-t border-[var(--border)]">
+                        <span>12 MIN READ</span>
+                    </div>
+                </a>
+
+                <!-- Note 4 -->
+                <a href="#" class="adaptive-card p-6 rounded-2xl group flex flex-col h-full hover:border-orange-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
+                            <i data-lucide="box" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-[var(--text-muted)]">GAME_DEV</span>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2 group-hover:text-orange-500 transition-colors">Raycasting 101</h3>
+                    <p class="text-sm text-[var(--text-muted)] line-clamp-3 mb-4 flex-grow">
+                        Implementing line-of-sight checks in Unity C# using Physics.Raycast.
+                    </p>
+                    <div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)] pt-4 border-t border-[var(--border)]">
+                        <span>10 MIN READ</span>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-[var(--border)] py-12">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-sm text-[var(--text-muted)]">
+                &copy; 2026 Aryan.DS
+            </div>
+            <div class="flex gap-6 text-sm font-medium">
+                <a href="#" class="hover:text-blue-500 transition-colors">GitHub</a>
+                <a href="#" class="hover:text-blue-500 transition-colors">LinkedIn</a>
+                <a href="#" class="hover:text-blue-500 transition-colors">Twitter</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Theme Logic
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            if (theme === 'light') { document.documentElement.classList.remove('dark'); } 
+            else { document.documentElement.classList.add('dark'); }
+            localStorage.setItem('theme', theme);
+        }
+
+        // Font Logic
+        function setFont(font) {
+            document.body.classList.remove('font-jakarta', 'font-outfit');
+            document.body.classList.add('font-' + font);
+            localStorage.setItem('font', font);
+        }
+
+        // Init State
+        window.addEventListener('load', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const savedFont = localStorage.getItem('font') || 'jakarta';
+            setTheme(savedTheme);
+            setFont(savedFont);
+        });
+    </script>
+</body>
+</html>

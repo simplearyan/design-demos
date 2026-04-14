@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aryan | Data Science & Dev Logs</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gemini: {
+                            dark: {
+                                bg: '#131314',
+                                surface: '#1E1F20',
+                                surfaceHover: '#2D2E30',
+                                text: '#E3E3E3',
+                                textMuted: '#9ca3af',
+                                border: '#444746'
+                            },
+                            light: {
+                                bg: '#FFFFFF',
+                                surface: '#F0F4F9',
+                                surfaceHover: '#E1E5EA',
+                                text: '#1F1F1F',
+                                textMuted: '#4b5563',
+                                border: '#E3E3E3'
+                            }
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'grid-dark': "linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)",
+                        'grid-light': "linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, button, .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444746;
+            border-radius: 4px;
+        }
+        .code-font {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+        
+        /* Grid Background Pattern */
+        .bg-grid {
+            background-size: 40px 40px;
+        }
+        .dark .bg-grid {
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+        html:not(.dark) .bg-grid {
+             background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="min-h-screen w-full transition-colors duration-300 selection:bg-blue-500/30 bg-gemini-light-bg text-gemini-light-text dark:bg-gemini-dark-bg dark:text-gemini-dark-text overflow-x-hidden bg-grid">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-40 transition-all duration-200 bg-gemini-light-bg/80 dark:bg-gemini-dark-bg/80 border-b border-transparent">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center gap-3 cursor-pointer group">
+                <div class="relative w-9 h-9 rounded-lg flex items-center justify-center bg-gemini-light-surface dark:bg-gemini-dark-surface border border-gemini-light-border dark:border-gemini-dark-border group-hover:border-blue-500 transition-colors">
+                    <i data-lucide="code-2" class="text-blue-600 dark:text-blue-400 w-5 h-5"></i>
+                </div>
+                <span class="font-display font-semibold text-xl tracking-tight">Aryan.DS</span>
+            </div>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#notes" class="text-sm font-medium transition-colors hover:text-blue-600 dark:hover:text-blue-400 text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Notes</a>
+                <a href="#solutions" class="text-sm font-medium transition-colors hover:text-blue-600 dark:hover:text-blue-400 text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Solutions</a>
+                <a href="#devlogs" class="text-sm font-medium transition-colors hover:text-blue-600 dark:hover:text-blue-400 text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Dev Logs</a>
+                
+                <!-- Theme Toggle Desktop -->
+                <button onclick="toggleTheme()" class="p-2 rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10 text-gemini-light-textMuted dark:text-gemini-dark-textMuted">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+
+                <button class="px-6 py-2.5 rounded-full font-medium text-sm transition-all bg-[#1F1F1F] text-white hover:bg-black dark:bg-[#E3E3E3] dark:text-black dark:hover:bg-white border border-transparent shadow-sm flex items-center gap-2">
+                    <i data-lucide="github" class="w-4 h-4"></i> GitHub
+                </button>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button onclick="toggleMenu()" class="md:hidden p-2 text-gemini-light-text dark:text-gemini-dark-text">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-drawer" class="fixed inset-0 z-50 md:hidden pointer-events-none transition-all duration-300">
+        <!-- Backdrop -->
+        <div id="drawer-backdrop" onclick="toggleMenu()" class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300"></div>
+        
+        <!-- Drawer Content -->
+        <div id="drawer-content" class="absolute top-0 left-0 h-full w-[85%] max-w-[320px] shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out bg-gemini-light-bg dark:bg-gemini-dark-surface flex flex-col border-r border-gemini-light-border dark:border-gemini-dark-border">
+            <div class="p-6 h-full flex flex-col">
+                <div class="flex justify-between items-center mb-8">
+                    <span class="font-display font-bold text-xl text-gemini-light-text dark:text-gemini-dark-text">Menu</span>
+                    <button onclick="toggleMenu()" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gemini-light-text dark:text-gemini-dark-text">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <a href="#notes" onclick="toggleMenu()" class="px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gemini-light-surface dark:hover:bg-gemini-dark-surfaceHover text-gemini-light-textMuted dark:text-gemini-dark-text">Notes</a>
+                    <a href="#solutions" onclick="toggleMenu()" class="px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gemini-light-surface dark:hover:bg-gemini-dark-surfaceHover text-gemini-light-textMuted dark:text-gemini-dark-text">Solutions</a>
+                    <a href="#devlogs" onclick="toggleMenu()" class="px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gemini-light-surface dark:hover:bg-gemini-dark-surfaceHover text-gemini-light-textMuted dark:text-gemini-dark-text">Dev Logs</a>
+                    <a href="#portfolio" onclick="toggleMenu()" class="px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gemini-light-surface dark:hover:bg-gemini-dark-surfaceHover text-gemini-light-textMuted dark:text-gemini-dark-text">Portfolio</a>
+                </div>
+
+                <div class="mt-auto pt-6 border-t border-gemini-light-border dark:border-gemini-dark-border">
+                   <button onclick="toggleTheme()" class="w-full flex items-center justify-between px-4 py-3 rounded-lg mb-4 bg-gemini-light-surface dark:bg-gemini-dark-surfaceHover text-gemini-light-text dark:text-gemini-dark-text">
+                      <span class="font-medium">Switch Theme</span>
+                      <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                      <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                   </button>
+                   <button class="w-full py-3.5 rounded-full font-bold bg-[#1F1F1F] text-white dark:bg-[#E3E3E3] dark:text-black shadow-lg flex items-center justify-center gap-2">
+                     <i data-lucide="github" class="w-4 h-4"></i> Visit GitHub
+                   </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 lg:pt-48 pb-20 px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto text-center relative z-10">
+            
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wide uppercase mb-8 border bg-gemini-light-surface border-gemini-light-border text-gemini-light-textMuted dark:bg-gemini-dark-surface dark:border-gemini-dark-border dark:text-gemini-dark-textMuted">
+                <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                <span>IIT Madras &bull; BS Data Science</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-display font-semibold tracking-tight mb-8 leading-[1.1] text-gemini-light-text dark:text-gemini-dark-text">
+                Decoding Data. <br/>
+                <span class="text-gray-400 dark:text-gray-500">
+                  Building Worlds.
+                </span>
+            </h1>
+
+            <p class="text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-light text-gemini-light-textMuted dark:text-gemini-dark-textMuted">
+                Hi, I'm Aryan. I document my journey through Mathematics, Python, and Game Development here.
+            </p>
+
+            <!-- Search Bar -->
+            <div class="max-w-2xl mx-auto rounded-full p-1.5 mb-16 border border-gemini-light-border dark:border-gemini-dark-border bg-white dark:bg-gemini-dark-surface shadow-lg hover:shadow-xl transition-shadow">
+                 <div class="flex items-center gap-3 px-2">
+                    <div class="p-2">
+                        <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                    </div>
+                    <input 
+                      type="text" 
+                      placeholder="Search for 'Statistics Week 1 Notes'..." 
+                      class="flex-1 bg-transparent outline-none text-lg placeholder:text-gray-400 text-black dark:text-white dark:placeholder:text-gray-600"
+                      readonly
+                    />
+                    <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                      <i data-lucide="arrow-right" class="w-5 h-5 text-gray-500 dark:text-gray-400"></i>
+                    </button>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Feature Dashboard Preview -->
+        <div class="max-w-6xl mx-auto mt-10">
+            <div class="rounded-xl border shadow-xl bg-white border-gemini-light-border dark:bg-[#181818] dark:border-gemini-dark-border overflow-hidden">
+                <!-- Window Header -->
+                <div class="h-12 border-b flex items-center px-4 gap-2 bg-[#F8F9FA] border-gemini-light-border dark:bg-[#1E1F20] dark:border-gemini-dark-border">
+                    <div class="flex gap-2">
+                        <div class="w-3 h-3 rounded-full bg-gemini-light-border dark:bg-[#3C4043]"></div>
+                        <div class="w-3 h-3 rounded-full bg-gemini-light-border dark:bg-[#3C4043]"></div>
+                        <div class="w-3 h-3 rounded-full bg-gemini-light-border dark:bg-[#3C4043]"></div>
+                    </div>
+                    <div class="ml-4 text-xs font-mono text-gemini-light-textMuted dark:text-gemini-dark-textMuted opacity-60">aryan_notebook.ipynb</div>
+                </div>
+                
+                <!-- Content Grid -->
+                <div class="p-8 grid md:grid-cols-12 gap-8">
+                    <!-- Sidebar -->
+                    <div class="hidden md:block col-span-3 space-y-2 border-r border-gemini-light-border dark:border-gemini-dark-border pr-4">
+                        <div class="flex items-center gap-3 p-2 rounded-lg bg-gemini-light-surface dark:bg-gemini-dark-surfaceHover font-medium text-sm dark:text-white">
+                            <i data-lucide="folder-open" class="w-4 h-4"></i> Statistics I
+                        </div>
+                         <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gemini-light-surface dark:hover:bg-gemini-dark-surfaceHover transition-colors cursor-pointer text-sm text-gray-500 dark:text-gray-400">
+                            <i data-lucide="folder" class="w-4 h-4"></i> Python OOP
+                        </div>
+                         <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gemini-light-surface dark:hover:bg-gemini-dark-surfaceHover transition-colors cursor-pointer text-sm text-gray-500 dark:text-gray-400">
+                            <i data-lucide="folder" class="w-4 h-4"></i> Calculus II
+                        </div>
+                    </div>
+                    <!-- Main Area -->
+                    <div class="col-span-12 md:col-span-9">
+                        <div class="space-y-6">
+                            <!-- Code Snippet -->
+                            <div class="rounded-lg p-6 bg-gray-50 dark:bg-[#0d1117] border border-gray-200 dark:border-gray-800 font-mono text-sm">
+                                <div class="flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+                                    <span class="text-xs font-bold text-gray-500">main.py</span>
+                                </div>
+                                <code class="block">
+                                    <span class="text-purple-600 dark:text-[#ff7b72]">def</span> <span class="text-blue-600 dark:text-[#d2a8ff]">calculate_probability</span>(events, total):<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-gray-500 dark:text-[#8b949e]"># Returns probability of event</span><br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-purple-600 dark:text-[#ff7b72]">return</span> events / total
+                                </code>
+                            </div>
+
+                            <!-- Math Note -->
+                            <div class="p-6 rounded-lg border bg-white border-gemini-light-border dark:bg-gemini-dark-surface dark:border-gemini-dark-border flex gap-4">
+                                <div class="p-2 rounded-md bg-blue-50 dark:bg-blue-900/20 h-fit">
+                                    <i data-lucide="sigma" class="text-blue-600 dark:text-blue-400 w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-semibold mb-1 text-gray-900 dark:text-gray-100">Normal Distribution</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                        Symmetric about the mean. 68% of data falls within one standard deviation (σ).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Content -->
+    <section id="notes" class="py-24 border-t border-gemini-light-border dark:border-gemini-dark-border bg-white dark:bg-[#131314]">
+        <div class="max-w-7xl mx-auto px-6">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-display font-semibold mb-4 text-gemini-light-text dark:text-gemini-dark-text">My Knowledge Base</h2>
+            <p class="text-lg text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Resources to help you ace your degree and learn new tech.</p>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-6">
+             <!-- Large Card: Academic Notes -->
+             <div class="md:col-span-2 p-8 rounded-2xl border bg-white border-gemini-light-border hover:border-gray-400 dark:bg-[#181818] dark:border-gemini-dark-border dark:hover:border-gray-600 transition-colors cursor-pointer group">
+                <div class="mb-6 w-12 h-12 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-[#252525]">
+                    <i data-lucide="book-open" class="text-gray-900 dark:text-white w-6 h-6"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2 font-display text-gemini-light-text dark:text-gemini-dark-text">Academic Notes</h3>
+                <p class="text-gemini-light-textMuted dark:text-gemini-dark-textMuted max-w-sm mb-4">Comprehensive notes for Statistics I & II, Mathematics for Data Science, and Computational Thinking.</p>
+                <div class="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Access Notes <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                </div>
+             </div>
+
+             <!-- Tall Card: Dev Logs -->
+             <div id="devlogs" class="md:row-span-2 p-8 rounded-2xl border bg-white border-gemini-light-border hover:border-gray-400 dark:bg-[#181818] dark:border-gemini-dark-border dark:hover:border-gray-600 transition-colors cursor-pointer group flex flex-col">
+                <div class="mb-6 w-12 h-12 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-[#252525]">
+                    <i data-lucide="gamepad-2" class="text-gray-900 dark:text-white w-6 h-6"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2 font-display text-gemini-light-text dark:text-gemini-dark-text">Dev Logs</h3>
+                <p class="text-gemini-light-textMuted dark:text-gemini-dark-textMuted mb-8">Follow my journey building indie games. From Unity basics to complex 2D physics engines.</p>
+                
+                <div class="mt-auto flex justify-center opacity-40 group-hover:opacity-60 transition-opacity">
+                    <i data-lucide="codesandbox" class="w-32 h-32 text-gray-400 dark:text-gray-600"></i>
+                </div>
+             </div>
+
+             <!-- Small Card 1: Solutions -->
+             <div id="solutions" class="p-8 rounded-2xl border bg-white border-gemini-light-border hover:border-gray-400 dark:bg-[#181818] dark:border-gemini-dark-border dark:hover:border-gray-600 transition-colors cursor-pointer group">
+                <div class="mb-6 w-12 h-12 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-[#252525]">
+                    <i data-lucide="check-circle-2" class="text-gray-900 dark:text-white w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2 font-display text-gemini-light-text dark:text-gemini-dark-text">Graded Solutions</h3>
+                <p class="text-sm text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Walkthroughs for assignments.</p>
+             </div>
+
+             <!-- Small Card 2: GitHub/Resume -->
+             <div class="p-8 rounded-2xl border bg-white border-gemini-light-border hover:border-gray-400 dark:bg-[#181818] dark:border-gemini-dark-border dark:hover:border-gray-600 transition-colors cursor-pointer group">
+                <div class="mb-6 w-12 h-12 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-[#252525]">
+                    <i data-lucide="github" class="text-gray-900 dark:text-white w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2 font-display text-gemini-light-text dark:text-gemini-dark-text">Open Source</h3>
+                <p class="text-sm text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Repos & Resume.</p>
+             </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-32 px-6 relative overflow-hidden border-t border-gemini-light-border dark:border-gemini-dark-border bg-gray-50 dark:bg-[#0E0E0E]">
+         <div class="max-w-5xl mx-auto relative z-10 text-center">
+            <h2 class="text-4xl md:text-5xl font-display font-semibold mb-8 tracking-tight text-gemini-light-text dark:text-gemini-dark-text">
+               Let's collaborate on <br/>
+               <span class="text-gray-400">something amazing.</span>
+            </h2>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+               <button class="px-8 py-4 rounded-full text-lg font-medium bg-[#1F1F1F] text-white hover:bg-black dark:bg-[#E3E3E3] dark:text-black dark:hover:bg-white transition-all shadow-sm">
+                  Download Resume
+               </button>
+               <button class="px-8 py-4 rounded-full text-lg font-medium border border-gray-300 hover:bg-white dark:border-gray-700 dark:hover:bg-[#1E1F20] dark:text-white flex items-center gap-2 justify-center transition-all">
+                  <i data-lucide="github" class="w-5 h-5"></i> View Projects
+               </button>
+            </div>
+         </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t bg-white border-gemini-light-border dark:bg-[#131314] dark:border-gemini-dark-border">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+           <div class="col-span-1">
+              <div class="flex items-center gap-2 mb-4">
+                 <i data-lucide="code-2" class="text-blue-600 dark:text-blue-400 w-5 h-5"></i>
+                 <span class="font-display font-bold text-lg text-gemini-light-text dark:text-gemini-dark-text">Aryan.DS</span>
+              </div>
+              <p class="text-sm text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Sharing the love for Data Science and Game Development.</p>
+           </div>
+           
+           <div>
+              <h4 class="font-bold mb-4 font-display text-gemini-light-text dark:text-gemini-dark-text">Academics</h4>
+              <ul class="space-y-2">
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Statistics</a></li>
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Mathematics</a></li>
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Python</a></li>
+              </ul>
+           </div>
+
+           <div>
+              <h4 class="font-bold mb-4 font-display text-gemini-light-text dark:text-gemini-dark-text">Projects</h4>
+              <ul class="space-y-2">
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Dev Logs</a></li>
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Game Demos</a></li>
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">GitHub</a></li>
+              </ul>
+           </div>
+
+           <div>
+              <h4 class="font-bold mb-4 font-display text-gemini-light-text dark:text-gemini-dark-text">Connect</h4>
+              <ul class="space-y-2">
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">LinkedIn</a></li>
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Twitter</a></li>
+                 <li><a href="#" class="text-sm hover:underline transition-colors text-gemini-light-textMuted dark:text-gemini-dark-textMuted">Email Me</a></li>
+              </ul>
+           </div>
+        </div>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // State Logic
+        let isDark = true;
+        let isMenuOpen = false;
+
+        const htmlEl = document.documentElement;
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        const drawerContent = document.getElementById('drawer-content');
+        const drawerBackdrop = document.getElementById('drawer-backdrop');
+        const navbar = document.getElementById('navbar');
+
+        // Theme Toggle Function
+        function toggleTheme() {
+            isDark = !isDark;
+            if (isDark) {
+                htmlEl.classList.add('dark');
+            } else {
+                htmlEl.classList.remove('dark');
+            }
+            // Re-render icons if necessary (usually not needed for SVG classes, but logic requires check)
+        }
+
+        // Mobile Menu Toggle Function
+        function toggleMenu() {
+            isMenuOpen = !isMenuOpen;
+            
+            if (isMenuOpen) {
+                // Enable Pointer Events
+                mobileDrawer.classList.remove('pointer-events-none');
+                
+                // Show Backdrop
+                drawerBackdrop.classList.remove('opacity-0');
+                
+                // Slide in Drawer
+                drawerContent.classList.remove('-translate-x-full');
+                drawerContent.classList.add('translate-x-0');
+                
+                // Lock Body Scroll
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Hide Backdrop
+                drawerBackdrop.classList.add('opacity-0');
+                
+                // Slide out Drawer
+                drawerContent.classList.remove('translate-x-0');
+                drawerContent.classList.add('-translate-x-full');
+                
+                // Disable Pointer Events after transition (handled via css logic usually, but here simple toggle)
+                setTimeout(() => {
+                    if(!isMenuOpen) mobileDrawer.classList.add('pointer-events-none');
+                }, 300);
+
+                // Unlock Body Scroll
+                document.body.style.overflow = 'unset';
+            }
+        }
+
+        // Scroll Effect (Subtle Border)
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                if (htmlEl.classList.contains('dark')) {
+                    navbar.classList.add('border-[#444746]');
+                    navbar.classList.remove('border-transparent');
+                } else {
+                    navbar.classList.add('border-[#E3E3E3]');
+                    navbar.classList.remove('border-transparent');
+                }
+            } else {
+                navbar.classList.remove('border-[#444746]', 'border-[#E3E3E3]');
+                navbar.classList.add('border-transparent');
+            }
+        });
+        
+        // Update Navbar on Theme Change if Scrolled
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if(mutation.attributeName === 'class' && window.scrollY > 20) {
+                     if (htmlEl.classList.contains('dark')) {
+                        navbar.classList.remove('border-[#E3E3E3]');
+                        navbar.classList.add('border-[#444746]');
+                    } else {
+                        navbar.classList.remove('border-[#444746]');
+                        navbar.classList.add('border-[#E3E3E3]');
+                    }
+                }
+            });
+        });
+        observer.observe(htmlEl, { attributes: true });
+
+    </script>
+</body>
+</html>

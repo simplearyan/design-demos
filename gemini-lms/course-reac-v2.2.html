@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Mode // Statistics II</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Chart.js for Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- KaTeX for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        page: 'var(--bg-page)',
+                        sidebar: 'var(--bg-sidebar)',
+                        surface: 'var(--bg-surface)',
+                        surfaceHover: 'var(--bg-surface-hover)',
+                        border: 'var(--border)',
+                        text: 'var(--text-main)',
+                        muted: 'var(--text-muted)',
+                        primary: 'var(--primary)',
+                        primaryDim: 'var(--primary-dim)',
+                        accent: 'var(--accent)',
+                        code: 'var(--code-bg)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'flip': 'flip 0.6s ease-in-out',
+                    },
+                    keyframes: {
+                        flip: {
+                            '0%': { transform: 'rotateY(0deg) scale(1)' },
+                            '50%': { transform: 'rotateY(180deg) scale(1.2)' },
+                            '100%': { transform: 'rotateY(360deg) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --primary-dim: #e0e7ff;
+            --accent: #0ea5e9;
+            --code-bg: #1e293b;
+        }
+
+        body[data-theme="dark"] {
+            --bg-page: #0f172a;
+            --bg-sidebar: #020617;
+            --bg-surface: #1e293b;
+            --bg-surface-hover: #334155;
+            --border: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #818cf8;
+            --primary-dim: rgba(99, 102, 241, 0.15);
+            --accent: #38bdf8;
+            --code-bg: #020617;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #sidebar-panel {
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .sidebar-shadow {
+            box-shadow: 4px 0 24px -4px rgba(0, 0, 0, 0.05);
+        }
+        body[data-theme="dark"] .sidebar-shadow {
+            box-shadow: 4px 0 24px -4px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-dim);
+            color: var(--primary);
+            position: relative;
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            background-color: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Typography */
+        .prose p { margin-bottom: 1.5rem; line-height: 1.8; color: var(--text-muted); font-size: 1.05rem; }
+        .prose h2 { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-main); }
+        .prose h3 { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1.25rem; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--text-main); }
+        .prose ul { margin-bottom: 1.5rem; }
+        .prose li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; color: var(--text-muted); }
+        .prose li::before { content: "•"; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+
+        /* Code Window */
+        .code-window {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .line-numbers {
+            user-select: none;
+            text-align: right;
+            color: var(--text-muted);
+            opacity: 0.3;
+            padding-right: 1rem;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            margin-right: 1rem;
+        }
+
+        /* Coin Animation */
+        .coin-container {
+            perspective: 1000px;
+        }
+        .coin {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 10px;
+            box-shadow: 0 0 10px rgba(217, 119, 6, 0.4);
+            transform-style: preserve-3d;
+        }
+        .coin.flip {
+            animation: flip 0.6s ease-in-out;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .quiz-card {
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .quiz-card.selected {
+            border-color: var(--primary);
+            background-color: var(--primary-dim);
+        }
+    </style>
+</head>
+<body class="font-sans h-screen flex overflow-hidden" data-theme="dark">
+
+    <!-- 1. COURSE SIDEBAR -->
+    <aside id="sidebar-panel" class="w-80 bg-sidebar border-r border-border flex flex-col z-20 flex-shrink-0 sidebar-shadow absolute lg:relative h-full transform -translate-x-full lg:translate-x-0">
+        <div class="h-16 flex items-center justify-between px-6 border-b border-border flex-shrink-0">
+            <div>
+                <h2 class="font-bold text-sm tracking-tight font-display text-text">Statistics II</h2>
+                <div class="flex items-center gap-2 text-xs text-muted mt-0.5">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span id="progress-text">16% Complete</span>
+                </div>
+            </div>
+            <button class="lg:hidden p-2 rounded-lg hover:bg-surfaceHover text-muted" onclick="toggleMobileSidebar()">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="p-4 border-b border-border">
+            <div class="relative">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted"></i>
+                <input type="text" placeholder="Filter topics..." class="w-full bg-surfaceHover rounded-lg py-2 pl-9 pr-4 text-xs focus:outline-none focus:ring-1 focus:ring-primary text-text transition-all">
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-2">
+            <div class="mb-2">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-muted uppercase hover:text-text transition-colors">
+                    <span>Module 1: Foundations</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                </button>
+            </div>
+
+            <div class="mb-2">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-primary uppercase bg-primaryDim/30 rounded-lg mb-1">
+                    <span>Module 2: Inference</span>
+                    <i data-lucide="chevron-up" class="w-3 h-3"></i>
+                </button>
+                <div class="space-y-0.5">
+                    <a href="#" class="nav-item active flex items-center gap-3 px-4 py-2.5 rounded-r-lg transition-all">
+                        <i data-lucide="play-circle" class="w-4 h-4 text-primary fill-current opacity-20"></i>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold">Bayesian Inference</span>
+                            <span class="text-[10px] opacity-70 font-mono">ACTIVE</span>
+                        </div>
+                    </a>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-surfaceHover transition-all text-muted hover:text-text">
+                        <div class="w-4 flex justify-center text-[10px] font-mono opacity-50">02</div>
+                        <span class="text-sm font-medium">Conjugate Priors</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-border flex items-center justify-between bg-sidebar">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-xs text-white font-bold">A</div>
+                <div class="text-xs">
+                    <div class="font-bold text-text">Aryan.DS</div>
+                    <div class="text-muted">Pro Plan</div>
+                </div>
+            </div>
+            <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-surfaceHover text-muted transition-colors">
+                <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- 2. MAIN READING AREA -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-page transition-colors">
+        
+        <header class="h-16 flex items-center justify-between px-6 md:px-10 border-b border-transparent hover:border-border transition-colors flex-shrink-0 z-10 bg-page/80 backdrop-blur-sm sticky top-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleDesktopSidebar()" class="hidden lg:flex p-2 rounded-lg hover:bg-surfaceHover text-muted transition-colors" title="Toggle Focus Mode">
+                    <i data-lucide="panel-left" class="w-5 h-5"></i>
+                </button>
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-surfaceHover text-text">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center gap-2 text-sm text-muted">
+                    <span class="hidden sm:inline">Module 2</span>
+                    <i data-lucide="chevron-right" class="w-3 h-3 opacity-50"></i>
+                    <span class="font-medium text-text">Lesson 1</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-surfaceHover text-muted text-xs font-medium transition-colors">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Save</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto scroll-smooth" id="scroll-container">
+            <div class="max-w-3xl mx-auto px-6 md:px-10 py-10 pb-24">
+                
+                <!-- Title Block -->
+                <div class="mb-12">
+                    <h1 class="text-3xl md:text-5xl font-display font-bold text-text mb-4 leading-tight">Bayesian Inference</h1>
+                    <p class="text-lg text-muted font-light leading-relaxed">Understanding priors, likelihoods, and posterior distributions through mathematical intuition and live simulation.</p>
+                </div>
+
+                <!-- Main Prose -->
+                <article class="prose max-w-none">
+                    <p>
+                        Bayesian inference is a method of statistical inference in which Bayes' theorem is used to update the probability for a hypothesis as more evidence or information becomes available.
+                    </p>
+
+                    <!-- LaTeX Feature Block -->
+                    <div class="my-10 p-8 rounded-2xl bg-surface border border-border flex flex-col items-center justify-center gap-4 group hover:shadow-lg transition-shadow duration-500">
+                        <div class="text-xs font-bold uppercase tracking-widest text-muted">Bayes' Theorem</div>
+                        <div class="text-2xl md:text-3xl text-text text-center font-display my-4">
+                            $$P(A|B) = \frac{P(B|A)P(A)}{P(B)}$$
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 w-full max-w-lg">
+                            <div class="text-center p-2 rounded-lg bg-surfaceHover border border-border">
+                                <div class="text-[10px] font-bold text-primary mb-1">POSTERIOR</div>
+                                <div class="text-xs text-text font-mono">$P(A|B)$</div>
+                            </div>
+                            <div class="text-center p-2 rounded-lg bg-surfaceHover border border-border">
+                                <div class="text-[10px] font-bold text-accent mb-1">LIKELIHOOD</div>
+                                <div class="text-xs text-text font-mono">$P(B|A)$</div>
+                            </div>
+                            <div class="text-center p-2 rounded-lg bg-surfaceHover border border-border">
+                                <div class="text-[10px] font-bold text-green-500 mb-1">PRIOR</div>
+                                <div class="text-xs text-text font-mono">$P(A)$</div>
+                            </div>
+                            <div class="text-center p-2 rounded-lg bg-surfaceHover border border-border">
+                                <div class="text-[10px] font-bold text-muted mb-1">EVIDENCE</div>
+                                <div class="text-xs text-text font-mono">$P(B)$</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2>1. The Interactive Simulation</h2>
+                    <p>
+                        Let's visualize how our beliefs about a "biased coin" update with every toss. Suppose we are trying to find the true probability $p$ that a coin lands heads. 
+                    </p>
+                    <p>
+                        <strong>Select your initial belief (Prior):</strong> Do you think the coin is fair, are you unsure, or are you a skeptic?
+                    </p>
+
+                    <!-- Interactive Simulation Canvas -->
+                    <div class="bg-surface border border-border rounded-xl p-6 my-8 shadow-sm">
+                        <!-- Controls -->
+                        <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-6">
+                            <div class="w-full md:w-auto">
+                                <label class="text-xs text-muted font-bold uppercase tracking-wider block mb-2">Starting Belief (Prior)</label>
+                                <select id="priorSelect" onchange="changePrior()" class="bg-surfaceHover text-text text-sm rounded-lg px-3 py-2 border border-border focus:outline-none focus:ring-2 focus:ring-primary w-full md:w-48">
+                                    <option value="uniform">Unsure (Uniform)</option>
+                                    <option value="fair">Weakly Fair (Gaussian)</option>
+                                    <option value="skewed">Skeptic (Biased Tails)</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <!-- Coin Animation Container -->
+                                <div class="coin-container w-8 h-8 flex items-center justify-center">
+                                    <div id="coinVisual" class="coin">?</div>
+                                </div>
+                                
+                                <div class="flex gap-2">
+                                    <button onclick="simulateToss('heads')" class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-primary/20">
+                                        <i data-lucide="arrow-up-circle" class="w-3 h-3"></i> Heads
+                                    </button>
+                                    <button onclick="simulateToss('tails')" class="px-4 py-2 bg-surfaceHover border border-border text-text text-xs font-bold rounded-lg hover:bg-border transition-all flex items-center gap-2">
+                                        <i data-lucide="arrow-down-circle" class="w-3 h-3"></i> Tails
+                                    </button>
+                                    <button onclick="resetSim()" class="p-2 text-muted hover:text-red-500 transition-colors border border-transparent hover:border-red-500/20 rounded-lg">
+                                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart -->
+                        <div class="h-64 w-full">
+                            <canvas id="bayesChart"></canvas>
+                        </div>
+                        
+                        <!-- Stats Bar -->
+                        <div class="mt-6 pt-4 border-t border-border flex justify-between items-center text-[10px] text-muted font-mono uppercase tracking-tighter">
+                            <div class="flex gap-4">
+                                <span>Total: <span id="stat-total" class="text-text font-bold">0</span></span>
+                                <span>Heads: <span id="stat-heads" class="text-text font-bold">0</span></span>
+                            </div>
+                            <div class="bg-primary/10 text-primary px-2 py-1 rounded">
+                                MAP Estimate: <span id="stat-map" class="font-bold">0.50</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2>2. Python Implementation</h2>
+                    <p>In computational Bayesian stats, we often use grid approximation to represent continuous distributions as discrete points. This allows us to perform integration by summation.</p>
+
+                    <div class="code-window my-8 shadow-2xl shadow-black/20">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-white/5">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="file-code" class="w-3 h-3 text-blue-400"></i>
+                                <span class="text-xs font-mono text-gray-400">inference_engine.py</span>
+                            </div>
+                            <div class="flex gap-1.5 opacity-50">
+                                <div class="w-2.5 h-2.5 rounded-full bg-white/20"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-white/20"></div>
+                            </div>
+                        </div>
+                        <div class="flex text-sm leading-relaxed overflow-x-auto">
+                            <!-- Line Numbers -->
+                            <div class="py-5 bg-black/10 text-right line-numbers font-mono text-xs">
+                                1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14
+                            </div>
+                            <!-- Code -->
+                            <div class="py-5 pr-5 flex-1 font-mono text-gray-300">
+<span class="text-purple-400">import</span> numpy <span class="text-purple-400">as</span> np
+
+<span class="text-blue-400">def</span> <span class="text-yellow-300">grid_update</span>(prior, heads, n_tosses):
+    <span class="text-gray-500">"""
+    Updates beliefs based on new evidence using grid approximation.
+    """</span>
+    <span class="text-gray-500"># 1. Define the grid of possibilities [0, 1]</span>
+    p_grid = np.linspace(<span class="text-orange-300">0</span>, <span class="text-orange-300">1</span>, len(prior))
+    
+    <span class="text-gray-500"># 2. Compute Likelihood (Binomial)</span>
+    likelihood = p_grid**heads * (<span class="text-orange-300">1</span> - p_grid)**(n_tosses - heads)
+    
+    <span class="text-gray-500"># 3. Update: Posterior ∝ Likelihood × Prior</span>
+    unnorm_posterior = likelihood * prior
+    
+    <span class="text-gray-500"># 4. Normalize to ensure sum is 1</span>
+    <span class="text-purple-400">return</span> unnorm_posterior / unnorm_posterior.sum()
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Knowledge Check -->
+                    <div id="quiz-container" class="mt-16 p-8 rounded-2xl bg-surface border border-border shadow-sm">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                <i data-lucide="brain-circuit" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-text !mt-0 !mb-0">Concept Check</h3>
+                                <p class="text-sm text-muted">Test your understanding of posterior convergence.</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <p class="text-sm font-medium mb-3 text-text">What happens to the Posterior distribution as the sample size approaches infinity?</p>
+                            <button onclick="checkAnswer(this, false)" class="quiz-card w-full text-left p-4 rounded-xl bg-surfaceHover border border-border text-sm hover:border-primary/50 transition-all flex justify-between items-center group">
+                                <span>It converges to the Prior distribution.</span>
+                                <i data-lucide="circle" class="w-4 h-4 text-muted group-hover:text-primary opacity-50"></i>
+                            </button>
+                            <button onclick="checkAnswer(this, true)" class="quiz-card w-full text-left p-4 rounded-xl bg-surfaceHover border border-border text-sm hover:border-primary/50 transition-all flex justify-between items-center group">
+                                <span>It converges to a spike at the true parameter value.</span>
+                                <i data-lucide="circle" class="w-4 h-4 text-muted group-hover:text-primary opacity-50"></i>
+                            </button>
+                            <button onclick="checkAnswer(this, false)" class="quiz-card w-full text-left p-4 rounded-xl bg-surfaceHover border border-border text-sm hover:border-primary/50 transition-all flex justify-between items-center group">
+                                <span>It flattens out to become Uniform.</span>
+                                <i data-lucide="circle" class="w-4 h-4 text-muted group-hover:text-primary opacity-50"></i>
+                            </button>
+                        </div>
+                        <div id="quiz-feedback" class="mt-4 h-6 text-sm font-medium hidden"></div>
+                    </div>
+                </article>
+
+                <!-- Navigation Footer -->
+                <div class="mt-16 pt-8 border-t border-border flex justify-between items-center">
+                    <button class="flex items-center gap-3 text-left group px-4 py-2 rounded-lg hover:bg-surfaceHover transition-colors">
+                        <i data-lucide="arrow-left" class="w-5 h-5 text-muted group-hover:text-primary transition-colors"></i>
+                        <div>
+                            <span class="text-xs text-muted block mb-0.5">Previous</span>
+                            <span class="text-sm font-bold text-text">Probability Recap</span>
+                        </div>
+                    </button>
+                    <button class="flex items-center gap-3 text-right group px-4 py-2 rounded-lg hover:bg-surfaceHover transition-colors">
+                        <div>
+                            <span class="text-xs text-muted block mb-0.5">Next</span>
+                            <span class="text-sm font-bold text-text">Conjugate Priors</span>
+                        </div>
+                        <i data-lucide="arrow-right" class="w-5 h-5 text-muted group-hover:text-primary transition-colors"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="backdrop" class="fixed inset-0 bg-black/60 z-10 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0" onclick="toggleMobileSidebar()"></div>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Sidebar Logic
+        const sidebar = document.getElementById('sidebar-panel');
+        const backdrop = document.getElementById('backdrop');
+
+        function toggleMobileSidebar() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        function toggleDesktopSidebar() {
+            if (window.innerWidth >= 1024) {
+                if (sidebar.classList.contains('lg:w-0')) {
+                    sidebar.classList.remove('lg:w-0', 'lg:border-r-0', 'overflow-hidden');
+                    sidebar.classList.add('lg:w-80', 'border-r');
+                } else {
+                    sidebar.classList.remove('lg:w-80', 'border-r');
+                    sidebar.classList.add('lg:w-0', 'lg:border-r-0', 'overflow-hidden');
+                }
+            }
+        }
+
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateChartTheme();
+        }
+
+        // 2. Simulation Logic (Bayesian Update)
+        let nPoints = 100;
+        let pGrid = Array.from({length: nPoints}, (_, i) => i / (nPoints - 1));
+        
+        // Define Priors
+        const priors = {
+            uniform: Array(nPoints).fill(1 / nPoints),
+            fair: pGrid.map(p => Math.exp(-Math.pow(p - 0.5, 2) / 0.04)), // Gaussian centered at 0.5
+            skewed: pGrid.map(p => Math.max(0, 1 - 2*p)) // Linear decrease
+        };
+        // Normalize priors
+        Object.keys(priors).forEach(k => {
+            const sum = priors[k].reduce((a,b) => a+b, 0);
+            priors[k] = priors[k].map(v => v/sum);
+        });
+
+        let currentPriorType = 'uniform';
+        let prior = [...priors.uniform];
+        let posterior = [...prior];
+        let heads = 0;
+        let total = 0;
+        let chart;
+
+        function initChart() {
+            const ctx = document.getElementById('bayesChart').getContext('2d');
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            const color = isDark ? '#818cf8' : '#4f46e5';
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: pGrid.map(p => p.toFixed(2)),
+                    datasets: [
+                        {
+                            label: 'Posterior',
+                            data: posterior,
+                            borderColor: color,
+                            borderWidth: 3,
+                            fill: true,
+                            backgroundColor: color + '22',
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Prior',
+                            data: prior,
+                            borderColor: isDark ? '#475569' : '#cbd5e1',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(4);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { display: true, ticks: { maxTicksLimit: 10, color: '#94a3b8' }, grid: { display: false } },
+                        y: { display: false, beginAtZero: true }
+                    },
+                    animation: { duration: 400 }
+                }
+            });
+        }
+
+        function updateChartTheme() {
+            if (!chart) return;
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            const color = isDark ? '#818cf8' : '#4f46e5';
+            chart.data.datasets[0].borderColor = color;
+            chart.data.datasets[0].backgroundColor = color + '22';
+            chart.data.datasets[1].borderColor = isDark ? '#475569' : '#cbd5e1';
+            chart.update();
+        }
+
+        function changePrior() {
+            const select = document.getElementById('priorSelect');
+            currentPriorType = select.value;
+            resetSim();
+        }
+
+        function triggerCoinAnimation(type) {
+            const coin = document.getElementById('coinVisual');
+            coin.classList.remove('flip');
+            void coin.offsetWidth; // trigger reflow
+            
+            // Visual update
+            if(type === 'heads') {
+                coin.style.background = 'linear-gradient(135deg, #fbbf24, #d97706)';
+                coin.innerText = 'H';
+            } else {
+                coin.style.background = 'linear-gradient(135deg, #94a3b8, #475569)';
+                coin.innerText = 'T';
+            }
+            
+            coin.classList.add('flip');
+        }
+
+        function simulateToss(type) {
+            triggerCoinAnimation(type);
+
+            // Delay stats update slightly to match animation
+            setTimeout(() => {
+                total++;
+                if (type === 'heads') heads++;
+                
+                // Calculate Likelihood
+                let likelihood = pGrid.map(p => Math.pow(p, heads) * Math.pow(1 - p, total - heads));
+                
+                // Update Posterior
+                let unnorm = likelihood.map((l, i) => l * priors[currentPriorType][i]); // Always mult by ORIGINAL prior for this simple demo logic (or iterative update)
+                // Actually for iterative update: posterior = likelihood_of_this_toss * previous_posterior. 
+                // BUT, to keep numerics stable and "reset" easy, let's recalculate from scratch using total heads/tails and original prior.
+                
+                let sum = unnorm.reduce((a, b) => a + b, 0);
+                posterior = unnorm.map(v => v / sum);
+
+                chart.data.datasets[0].data = posterior;
+                chart.update();
+
+                // Stats update
+                document.getElementById('stat-total').innerText = total;
+                document.getElementById('stat-heads').innerText = heads;
+                
+                let maxIdx = posterior.indexOf(Math.max(...posterior));
+                document.getElementById('stat-map').innerText = pGrid[maxIdx].toFixed(2);
+            }, 300);
+        }
+
+        function resetSim() {
+            total = 0; heads = 0;
+            // Reset to current chosen prior
+            prior = [...priors[currentPriorType]];
+            posterior = [...prior];
+            
+            chart.data.datasets[0].data = posterior;
+            chart.data.datasets[1].data = prior; // Update dashed line too
+            chart.update();
+            
+            document.getElementById('stat-total').innerText = "0";
+            document.getElementById('stat-heads').innerText = "0";
+            document.getElementById('stat-map').innerText = "---";
+            
+            const coin = document.getElementById('coinVisual');
+            coin.innerText = "?";
+            coin.style.background = 'linear-gradient(135deg, #fbbf24, #d97706)';
+        }
+
+        // 3. Quiz Logic
+        function checkAnswer(btn, isCorrect) {
+            const cards = document.querySelectorAll('.quiz-card');
+            const feedback = document.getElementById('quiz-feedback');
+            
+            cards.forEach(c => {
+                c.classList.remove('selected', 'border-green-500', 'border-red-500', 'ring-2');
+                c.disabled = true;
+                c.querySelector('i').setAttribute('data-lucide', 'circle');
+            });
+
+            btn.classList.add('selected');
+            feedback.classList.remove('hidden');
+
+            if (isCorrect) {
+                btn.classList.add('border-green-500', 'bg-green-500/10');
+                btn.querySelector('i').setAttribute('data-lucide', 'check-circle');
+                btn.querySelector('i').classList.add('text-green-500', '!opacity-100');
+                feedback.innerText = "Correct! The likelihood dominates the prior.";
+                feedback.className = "mt-4 text-sm font-medium text-green-500 flex items-center gap-2";
+            } else {
+                btn.classList.add('border-red-500', 'bg-red-500/10');
+                btn.querySelector('i').setAttribute('data-lucide', 'x-circle');
+                btn.querySelector('i').classList.add('text-red-500', '!opacity-100');
+                feedback.innerText = "Not quite. Infinite data usually overcomes any prior belief.";
+                feedback.className = "mt-4 text-sm font-medium text-red-500";
+                setTimeout(() => {
+                   cards.forEach(c => {
+                       c.disabled = false;
+                       c.classList.remove('border-red-500', 'bg-red-500/10', 'selected');
+                       c.querySelector('i').setAttribute('data-lucide', 'circle');
+                       c.querySelector('i').classList.remove('text-red-500', '!opacity-100');
+                   });
+                   feedback.classList.add('hidden');
+                }, 2000);
+            }
+            lucide.createIcons();
+        }
+
+        // Init
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            
+            // Render Math
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+
+            initChart();
+        };
+    </script>
+</body>
+</html>

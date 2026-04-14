@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyMath LMS | Linear Regression</title>
+
+    <!-- 1. FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <!-- 2. TAILWIND CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            600: '#0d9488', // Teal-600
+                            700: '#0f766e', // Teal-700
+                            900: '#134e4a',
+                        },
+                        math: {
+                            bg: '#fffbeb', // Amber-50
+                            border: '#d97706', // Amber-600
+                            text: '#92400e', // Amber-800
+                        }
+                    },
+                    typography: (theme) => ({
+                        DEFAULT: {
+                            css: {
+                                color: theme('colors.slate.700'),
+                                fontFamily: theme('fontFamily.serif'),
+                            },
+                        },
+                    }),
+                }
+            }
+        }
+    </script>
+
+    <!-- 3. KATEX (Math Rendering) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- 4. PRISM (Code Highlighting) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <!-- Custom Styles -->
+    <style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        .math-display { overflow-x: auto; overflow-y: hidden; padding: 1rem 0; }
+        
+        /* Custom Theorem Block styling */
+        .theorem-block {
+            box-shadow: 4px 4px 0px 0px rgba(251, 191, 36, 0.3);
+            transition: transform 0.2s ease;
+        }
+        .theorem-block:hover { transform: translateY(-2px); }
+
+        /* Sidebar active state marker */
+        .nav-item.active {
+            background-color: #f0fdfa; /* brand-50 */
+            border-right: 3px solid #0d9488; /* brand-600 */
+            color: #0f766e;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900">
+
+    <!-- MOBILE HEADER -->
+    <div class="lg:hidden flex items-center justify-between p-4 border-b border-slate-200 sticky top-0 bg-white/90 backdrop-blur z-50">
+        <div class="font-bold text-xl tracking-tight text-slate-900 font-sans">Poly<span class="text-brand-600">Math</span></div>
+        <button onclick="toggleSidebar()" class="text-slate-500 hover:text-brand-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- LEFT SIDEBAR: NAVIGATION -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-50 border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto no-scrollbar">
+            <div class="p-6 sticky top-0 bg-slate-50 z-10">
+                <div class="font-bold text-2xl tracking-tight text-slate-900 font-sans mb-1">Poly<span class="text-brand-600">Math</span></div>
+                <div class="text-xs font-mono text-slate-400 uppercase tracking-widest">Stats & Modeling</div>
+            </div>
+
+            <nav class="px-4 pb-8 space-y-8 font-sans text-sm">
+                <div>
+                    <h3 class="font-semibold text-slate-900 mb-3 px-2">01. Fundamentals</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="nav-item block px-2 py-2 rounded hover:bg-slate-100 text-slate-600">Probability Axioms</a></li>
+                        <li><a href="#" class="nav-item block px-2 py-2 rounded hover:bg-slate-100 text-slate-600">Random Variables</a></li>
+                        <li><a href="#" class="nav-item block px-2 py-2 rounded hover:bg-slate-100 text-slate-600">Distributions</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-slate-900 mb-3 px-2">02. Regression Analysis</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="nav-item active block px-2 py-2 rounded text-slate-600">Simple Linear Regression</a></li>
+                        <li><a href="#" class="nav-item block px-2 py-2 rounded hover:bg-slate-100 text-slate-600">Multiple Regression</a></li>
+                        <li><a href="#" class="nav-item block px-2 py-2 rounded hover:bg-slate-100 text-slate-600">Model Diagnostics</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-slate-900 mb-3 px-2">03. Bayesian Stats</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="nav-item block px-2 py-2 rounded hover:bg-slate-100 text-slate-600">Bayes' Theorem</a></li>
+                        <li><a href="#" class="nav-item block px-2 py-2 rounded hover:bg-slate-100 text-slate-600">MCMC Methods</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto lg:ml-64 relative scroll-smooth">
+            
+            <div class="max-w-4xl mx-auto px-6 py-12 lg:px-12 lg:py-16">
+                
+                <!-- Breadcrumbs -->
+                <div class="text-sm font-sans text-slate-400 mb-4 flex items-center gap-2">
+                    <span>Regression Analysis</span>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <span class="text-brand-600 font-medium">Simple Linear Model</span>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-4xl lg:text-5xl font-bold font-sans text-slate-900 tracking-tight mb-6">Simple Linear Regression</h1>
+                
+                <!-- Metadata -->
+                <div class="flex items-center gap-4 text-sm text-slate-500 font-sans mb-10 border-b border-slate-100 pb-8">
+                    <span class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        15 min read
+                    </span>
+                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-mono">MATH-201</span>
+                </div>
+
+                <!-- ARTICLE BODY -->
+                <div class="prose prose-lg prose-slate max-w-none font-serif text-slate-700 leading-loose">
+                    
+                    <p class="text-xl text-slate-500 font-sans leading-relaxed mb-8">
+                        Linear regression is a linear approach to modeling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables).
+                    </p>
+
+                    <h2 id="the-model" class="text-2xl font-bold font-sans text-slate-900 mt-12 mb-6 scroll-mt-20">The Mathematical Model</h2>
+                    <p>
+                        In simple linear regression, we predict a quantitative response $$Y$$ on the basis of a single predictor variable $$X$$. It assumes that there is approximately a linear relationship between $$X$$ and $$Y$$. Mathematically, we can write this relationship as:
+                    </p>
+
+                    <!-- Math Block -->
+                    <div class="my-6 p-6 bg-slate-50 border border-slate-100 rounded-lg text-center overflow-x-auto">
+                        $$ Y \approx \beta_0 + \beta_1 X + \epsilon $$
+                    </div>
+
+                    <p>
+                        Here, $$\beta_0$$ represents the <strong>intercept</strong>, and $$\beta_1$$ represents the <strong>slope</strong> in the linear model. The term $$\epsilon$$ is the error term, representing the deviation of the observation from the true linear relationship.
+                    </p>
+
+                    <!-- DEFINITION BLOCK -->
+                    <div class="my-10 pl-6 border-l-4 border-brand-600 bg-brand-50/50 p-6 rounded-r-lg">
+                        <h4 class="text-brand-700 font-sans font-bold uppercase text-xs tracking-wider mb-2">Definition 1.2</h4>
+                        <p class="italic m-0 text-slate-800">
+                            <strong>Residuals ($$e_i$$):</strong> The difference between the observed value of the dependent variable ($$y_i$$) and the predicted value ($$\hat{y}_i$$) is called the residual.
+                            $$ e_i = y_i - \hat{y}_i $$
+                        </p>
+                    </div>
+
+                    <h2 id="least-squares" class="text-2xl font-bold font-sans text-slate-900 mt-12 mb-6 scroll-mt-20">Least Squares Method</h2>
+                    <p>
+                        The goal is to find estimates $$\hat{\beta}_0$$ and $$\hat{\beta}_1$$ that minimize the Residual Sum of Squares (RSS).
+                    </p>
+
+                    <!-- THEOREM BLOCK -->
+                    <div class="theorem-block my-10 border border-math-border bg-math-bg rounded-lg p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-2 opacity-10">
+                            <svg class="w-16 h-16 text-math-border" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.75l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z"/></svg>
+                        </div>
+                        <h3 class="text-math-text font-sans font-bold text-lg mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                            Theorem: OLS Estimators
+                        </h3>
+                        <p class="text-slate-800 text-sm leading-relaxed">
+                            The least squares estimates for the regression coefficients are given by:
+                            $$ \hat{\beta}_1 = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2} $$
+                            $$ \hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x} $$
+                        </p>
+                    </div>
+
+                    <!-- COLLAPSIBLE PROOF -->
+                    <details class="group mb-8">
+                        <summary class="list-none flex items-center cursor-pointer text-sm font-sans font-medium text-slate-500 hover:text-brand-600 transition-colors select-none">
+                            <span class="mr-2 transform group-open:rotate-90 transition-transform text-slate-400">▶</span>
+                            View Derivation (Calculus)
+                        </summary>
+                        <div class="mt-4 p-6 bg-slate-50 rounded-lg border border-slate-200 text-sm">
+                            <p class="mb-2">We minimize the Loss Function $$L$$:</p>
+                            $$ L(\beta_0, \beta_1) = \sum_{i=1}^n (y_i - \beta_0 - \beta_1 x_i)^2 $$
+                            <p class="mt-4 mb-2">Take partial derivatives with respect to $$\beta_0$$ and $$\beta_1$$ and set to zero:</p>
+                            $$ \frac{\partial L}{\partial \beta_0} = -2 \sum (y_i - \beta_0 - \beta_1 x_i) = 0 $$
+                            $$ \frac{\partial L}{\partial \beta_1} = -2 \sum x_i (y_i - \beta_0 - \beta_1 x_i) = 0 $$
+                            <p class="mt-2 text-slate-500 italic">Solving this system yields the OLS estimators defined above.</p>
+                        </div>
+                    </details>
+
+                    <h2 id="implementation" class="text-2xl font-bold font-sans text-slate-900 mt-12 mb-6 scroll-mt-20">Python Implementation</h2>
+                    <p>
+                        We can calculate these coefficients manually using NumPy, or use `scikit-learn`. Here is the manual calculation to demonstrate the math above.
+                    </p>
+
+                    <!-- CODE BLOCK -->
+                    <div class="my-6 rounded-lg overflow-hidden border border-slate-700 shadow-2xl">
+                        <div class="bg-[#1d1f21] px-4 py-2 flex items-center justify-between border-b border-slate-700">
+                            <span class="text-xs font-mono text-slate-400">ols_calculation.py</span>
+                            <button onclick="copyCode(this)" class="text-xs font-sans text-slate-400 hover:text-white transition-colors">Copy</button>
+                        </div>
+                        <pre class="!m-0 !rounded-none"><code class="language-python">import numpy as np
+
+# 1. Sample Data
+X = np.array([1, 2, 3, 4, 5])
+Y = np.array([2, 3.5, 2.8, 4.6, 5.5])
+
+# 2. Calculate Means
+x_bar = np.mean(X)
+y_bar = np.mean(Y)
+
+# 3. Calculate Beta_1 (Slope)
+# numerator: sum((x - x_bar)(y - y_bar))
+numerator = np.sum((X - x_bar) * (Y - y_bar))
+# denominator: sum((x - x_bar)^2)
+denominator = np.sum((X - x_bar)**2)
+
+beta_1 = numerator / denominator
+
+# 4. Calculate Beta_0 (Intercept)
+beta_0 = y_bar - (beta_1 * x_bar)
+
+print(f"y = {beta_0:.2f} + {beta_1:.2f}x")
+# Output: y = 0.96 + 0.92x</code></pre>
+                    </div>
+
+                </div>
+                
+                <!-- Footer area of article -->
+                <div class="mt-20 pt-10 border-t border-slate-200 flex justify-between font-sans text-sm">
+                    <a href="#" class="text-slate-500 hover:text-brand-600 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        Previous: Distributions
+                    </a>
+                    <a href="#" class="text-brand-600 font-medium hover:text-brand-800 flex items-center">
+                        Next: Multiple Regression
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- RIGHT SIDEBAR: TABLE OF CONTENTS -->
+        <aside class="hidden xl:block w-64 p-8 sticky top-0 h-screen overflow-y-auto">
+            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 font-sans">On this page</h5>
+            <ul class="space-y-3 text-sm font-sans border-l border-slate-200">
+                <li><a href="#the-model" class="toc-link block pl-4 border-l-2 border-transparent text-slate-500 hover:text-slate-900 transition-colors">The Model</a></li>
+                <li><a href="#least-squares" class="toc-link block pl-4 border-l-2 border-transparent text-slate-500 hover:text-slate-900 transition-colors">Least Squares Method</a></li>
+                <li><a href="#implementation" class="toc-link block pl-4 border-l-2 border-transparent text-slate-500 hover:text-slate-900 transition-colors">Implementation</a></li>
+            </ul>
+        </aside>
+
+    </div>
+
+    <!-- 5. SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    
+    <script>
+        // 1. Initialize KaTeX (Math Rendering)
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError : false
+            });
+        });
+
+        // 2. Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        // 3. Table of Contents Highlighter (Intersection Observer)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                const link = document.querySelector(`.toc-link[href="#${id}"]`);
+                
+                if (entry.isIntersecting && link) {
+                    // Remove active class from all
+                    document.querySelectorAll('.toc-link').forEach(l => {
+                        l.classList.remove('text-brand-600', 'border-brand-600', 'font-medium');
+                        l.classList.add('border-transparent', 'text-slate-500');
+                    });
+                    // Add active class to current
+                    link.classList.remove('border-transparent', 'text-slate-500');
+                    link.classList.add('text-brand-600', 'border-brand-600', 'font-medium');
+                }
+            });
+        }, { rootMargin: '-100px 0px -66% 0px' });
+
+        // Track all h2 and h3
+        document.querySelectorAll('h2, h3').forEach((header) => {
+            observer.observe(header);
+        });
+
+        // 4. Simple Copy Code Function
+        function copyCode(btn) {
+            const pre = btn.parentElement.nextElementSibling;
+            const code = pre.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.classList.add('text-brand-400');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('text-brand-400');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

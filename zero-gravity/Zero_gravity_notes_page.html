@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // NOTES DB</title>
+    
+    <!-- Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        glass: 'rgba(255, 255, 255, 0.03)',
+                        border: 'rgba(255, 255, 255, 0.1)',
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#06B6D4',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px -10px rgba(6, 182, 212, 0.1);
+        }
+
+        /* Search Input Focus Glow */
+        .search-input:focus {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        /* Background Blobs */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #3B82F6; animation: blob 20s infinite alternate; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #8B5CF6; animation: blob 25s infinite alternate-reverse; }
+        
+        /* Filter Button Active State */
+        .filter-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-accent/30 selection:text-white">
+
+    <!-- Ambient Background -->
+    <div class="aurora-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl">
+        <div class="glass-panel rounded-full px-6 py-4 flex justify-between items-center transition-all duration-300 hover:bg-white/5">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                    A
+                </div>
+                <span class="font-bold tracking-tight text-white group-hover:text-primary transition-colors">ARYAN.DS</span>
+            </a>
+
+            <div class="hidden md:flex gap-8 text-sm font-medium text-gray-400">
+                <a href="index.html" class="hover:text-white transition-colors">Home</a>
+                <a href="#" class="text-white font-semibold">Notes</a>
+                <a href="solutions.html" class="hover:text-white transition-colors">Solutions</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden md:block w-px h-4 bg-white/10"></div>
+                <span class="text-xs font-mono text-gray-500 hidden md:block">DATABASE_ONLINE</span>
+                <button class="md:hidden text-white"><i data-lucide="menu" class="w-6 h-6"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="pt-40 pb-12 px-6 text-center max-w-4xl mx-auto">
+        <div class="animate-float mb-6">
+            <span class="px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-300 text-xs font-mono tracking-widest uppercase">
+                Second Brain Protocol
+            </span>
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">
+            Knowledge Base
+        </h1>
+        
+        <p class="text-gray-400 text-lg mb-12 max-w-2xl mx-auto leading-relaxed">
+            A curated collection of notes from my Data Science curriculum. Covering Mathematics, Statistics, Python, and ML algorithms.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="relative max-w-xl mx-auto group">
+            <input type="text" placeholder="Search for 'Bayesian Inference'..." 
+                class="search-input w-full bg-black/40 border border-white/10 rounded-full py-4 pl-14 pr-6 text-white placeholder-gray-500 focus:outline-none transition-all duration-300 backdrop-blur-md">
+            <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors"></i>
+            <div class="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex gap-2">
+                <kbd class="hidden sm:inline-block px-2 py-0.5 rounded bg-white/10 border border-white/10 text-[10px] text-gray-400 font-mono">⌘ K</kbd>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap justify-center gap-3 mt-8">
+            <button class="filter-btn active px-4 py-2 rounded-full border border-transparent text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">All</button>
+            <button class="filter-btn px-4 py-2 rounded-full border border-transparent text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">Statistics</button>
+            <button class="filter-btn px-4 py-2 rounded-full border border-transparent text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">Python</button>
+            <button class="filter-btn px-4 py-2 rounded-full border border-transparent text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">Calculus</button>
+            <button class="filter-btn px-4 py-2 rounded-full border border-transparent text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">Machine Learning</button>
+        </div>
+    </header>
+
+    <!-- Content Grid -->
+    <main class="px-6 pb-32 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Card 1 -->
+            <article class="glass-card rounded-3xl p-8 relative overflow-hidden group cursor-pointer">
+                <div class="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                    <i data-lucide="arrow-up-right" class="w-5 h-5 text-white"></i>
+                </div>
+
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5 text-blue-400"></i>
+                    </div>
+                    <span class="text-xs font-mono text-blue-400 px-2 py-1 rounded bg-blue-500/10 border border-blue-500/20">STATS_II</span>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">Bayesian Inference</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    Understanding posterior distributions, likelihood functions, and priors. Includes Python implementation examples.
+                </p>
+
+                <div class="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
+                    <span class="text-xs text-gray-500 font-mono">UPDATED 2D AGO</span>
+                    <div class="flex -space-x-2">
+                         <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 border border-black"></div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card 2 -->
+            <article class="glass-card rounded-3xl p-8 relative overflow-hidden group cursor-pointer">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                        <i data-lucide="code-2" class="w-5 h-5 text-purple-400"></i>
+                    </div>
+                    <span class="text-xs font-mono text-purple-400 px-2 py-1 rounded bg-purple-500/10 border border-purple-500/20">PYTHON</span>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-purple-400 transition-colors">Object Oriented Design</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    Deep dive into Classes, Inheritance, Polymorphism, and Encapsulation in Python.
+                </p>
+
+                <div class="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
+                    <span class="text-xs text-gray-500 font-mono">UPDATED 5D AGO</span>
+                </div>
+            </article>
+
+            <!-- Card 3 -->
+            <article class="glass-card rounded-3xl p-8 relative overflow-hidden group cursor-pointer">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
+                        <i data-lucide="sigma" class="w-5 h-5 text-cyan-400"></i>
+                    </div>
+                    <span class="text-xs font-mono text-cyan-400 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/20">MATH_II</span>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">Eigenvalues & Vectors</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    Visualizing linear transformations and calculating determinants for dimensionality reduction.
+                </p>
+
+                <div class="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
+                    <span class="text-xs text-gray-500 font-mono">UPDATED 1W AGO</span>
+                </div>
+            </article>
+
+            <!-- Card 4 -->
+            <article class="glass-card rounded-3xl p-8 relative overflow-hidden group cursor-pointer">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                        <i data-lucide="brain-circuit" class="w-5 h-5 text-emerald-400"></i>
+                    </div>
+                    <span class="text-xs font-mono text-emerald-400 px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">ML_OPS</span>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Gradient Descent</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    Optimization algorithms visualized. Stochastic vs Batch gradient descent performance comparison.
+                </p>
+
+                <div class="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
+                    <span class="text-xs text-gray-500 font-mono">UPDATED 2W AGO</span>
+                </div>
+            </article>
+            
+            <!-- Card 5 -->
+            <article class="glass-card rounded-3xl p-8 relative overflow-hidden group cursor-pointer">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                        <i data-lucide="gamepad-2" class="w-5 h-5 text-orange-400"></i>
+                    </div>
+                    <span class="text-xs font-mono text-orange-400 px-2 py-1 rounded bg-orange-500/10 border border-orange-500/20">GAME_DEV</span>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-orange-400 transition-colors">Physics: Raycasting</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    Implementing raycast logic in Unity C# for projectile collision detection and line-of-sight.
+                </p>
+
+                <div class="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
+                    <span class="text-xs text-gray-500 font-mono">UPDATED 1M AGO</span>
+                </div>
+            </article>
+
+            <!-- Card 6 -->
+             <article class="glass-card rounded-3xl p-8 relative overflow-hidden group cursor-pointer flex flex-col items-center justify-center text-center border-dashed border-white/20 hover:border-white/40">
+                <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:bg-white/10 transition-colors">
+                    <i data-lucide="plus" class="w-8 h-8 text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">Suggest a Topic</h3>
+                <p class="text-gray-500 text-xs">Looking for something specific?</p>
+            </article>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <span class="text-gray-500 text-sm">© 2026 Aryan.DS</span>
+            <div class="flex gap-6 text-sm text-gray-500">
+                <a href="#" class="hover:text-white transition-colors">GitHub</a>
+                <a href="#" class="hover:text-white transition-colors">Twitter</a>
+                <a href="#" class="hover:text-white transition-colors">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        
+        // Filter Buttons Interaction
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal UI Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cc: {
+                            bg: '#0a0a0a',       // Darker, cleaner background
+                            panel: '#141414',    // Panels (Library, Inspector)
+                            hover: '#222222',    // Hover states
+                            border: '#222222',   // Softer, cleaner borders
+                            cyan: '#00f0d1',     // Punchier, modern cyan
+                            cyanHover: '#00d6b9',
+                            textMain: '#f3f4f6', // Crisp white/gray
+                            textMuted: '#9ca3af',// Softer muted text
+                            track: '#0f0f0f',    // Timeline track
+                            clip: '#113333'      // Selected clip background
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                    fontSize: {
+                        'xxs': '0.65rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+
+        /* Sleek Dark Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #333;
+            border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -4px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Playhead styling */
+        .playhead-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1.5px;
+            background-color: #00f0d1;
+            z-index: 20;
+            pointer-events: none;
+        }
+        .playhead-handle {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 12px;
+            height: 16px;
+            background-color: #00f0d1;
+            border-radius: 2px;
+            cursor: ew-resize;
+            pointer-events: auto;
+        }
+        .playhead-handle::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 4px 4px 0;
+            border-style: solid;
+            border-color: #00f0d1 transparent transparent transparent;
+        }
+    </style>
+</head>
+<body class="bg-cc-bg text-cc-textMain h-screen w-screen flex flex-col overflow-hidden antialiased selection:bg-cc-cyan selection:text-black">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-12 border-b border-cc-border flex items-center justify-between px-4 shrink-0 bg-cc-bg">
+        <!-- Left -->
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 cursor-pointer hover:text-white transition">
+                <div class="w-5 h-5 bg-white rounded-sm flex items-center justify-center text-cc-bg font-bold text-xs">C</div>
+                <span class="text-sm font-medium tracking-wide">Studio</span>
+            </div>
+            <div class="h-4 w-px bg-cc-border"></div>
+            <button class="text-sm text-cc-textMuted hover:text-white transition">Menu</button>
+            <div class="flex items-center gap-1.5 text-xs text-cc-textMuted ml-2">
+                <i class="ph-fill ph-check-circle text-cc-cyan"></i>
+                Saved
+            </div>
+        </div>
+
+        <!-- Center -->
+        <div class="text-sm font-medium tracking-wide text-cc-textMuted hover:text-white transition cursor-pointer">Untitled Project</div>
+
+        <!-- Right -->
+        <div class="flex items-center gap-3">
+            <button class="flex items-center gap-1.5 bg-[#1a1a1a] hover:bg-[#222] px-4 py-1.5 rounded text-xs font-medium transition border border-cc-border">
+                <i class="ph ph-export"></i> Share
+            </button>
+            <button class="flex items-center gap-1 bg-cc-cyan hover:bg-cc-cyanHover text-black px-5 py-1.5 rounded text-xs font-bold transition shadow-[0_0_15px_rgba(0,240,209,0.15)]">
+                Export
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- 1. Primary Left Toolbar -->
+        <aside class="w-[72px] bg-cc-bg border-r border-cc-border flex flex-col items-center py-6 gap-8 shrink-0 overflow-y-auto">
+            <button class="flex flex-col items-center gap-1.5 text-cc-textMuted hover:text-white transition group">
+                <i class="ph ph-folder-notch text-xl group-hover:scale-110 transition-transform"></i>
+                <span class="text-xxs tracking-wide">Media</span>
+            </button>
+            <button class="flex flex-col items-center gap-1.5 text-cc-cyan transition group relative">
+                <i class="ph-fill ph-music-notes text-xl"></i>
+                <span class="text-xxs font-medium tracking-wide">Audio</span>
+                <div class="absolute -left-[18px] top-1/2 -translate-y-1/2 w-1 h-6 bg-cc-cyan rounded-r"></div>
+            </button>
+            <button class="flex flex-col items-center gap-1.5 text-cc-textMuted hover:text-white transition group">
+                <i class="ph ph-text-t text-xl group-hover:scale-110 transition-transform"></i>
+                <span class="text-xxs tracking-wide">Text</span>
+            </button>
+        </aside>
+
+        <!-- 2. Library Panel (Audio) -->
+        <section class="w-[320px] bg-cc-panel border-r border-cc-border flex flex-col shrink-0">
+            <!-- Sub tabs -->
+            <div class="flex items-center px-5 py-4 gap-6 border-b border-cc-border text-sm font-medium">
+                <button class="text-cc-textMuted hover:text-white transition">Import</button>
+                <button class="text-cc-cyan">Library</button>
+            </div>
+            
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Inner Sidebar -->
+                <div class="w-[90px] border-r border-cc-border flex flex-col gap-1 py-3 overflow-y-auto">
+                    <button class="px-3 py-2 text-xs text-left text-cc-cyan bg-[#1c1c1c] font-medium border-l-2 border-cc-cyan">Music</button>
+                    <button class="px-3 py-2 text-xs text-left text-cc-textMuted hover:bg-cc-hover transition">SFX</button>
+                </div>
+
+                <!-- Asset List -->
+                <div class="flex-1 flex flex-col p-4">
+                    <!-- Search -->
+                    <div class="relative mb-5">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-cc-textMuted"></i>
+                        <input type="text" placeholder="Search audio" class="w-full bg-[#0f0f0f] text-xs text-white rounded-md pl-9 pr-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-cc-cyan transition border border-transparent hover:border-[#333]">
+                    </div>
+
+                    <h3 class="text-xs text-cc-textMuted uppercase tracking-wider font-semibold mb-3">Trending</h3>
+
+                    <!-- Audio Tracks -->
+                    <div class="flex flex-col gap-1 overflow-y-auto pr-1">
+                        <!-- Track 1 -->
+                        <div class="flex items-center justify-between p-2 rounded-md bg-[#1c1c1c] hover:bg-[#222] cursor-pointer group transition border border-cc-border">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded bg-gradient-to-tr from-purple-500 to-orange-400 shrink-0 relative overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1516280440503-66f837ceabc0?auto=format&fit=crop&w=100&q=80" class="w-full h-full object-cover opacity-70" alt="cover">
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-medium truncate w-24">Violin Inspiration</span>
+                                    <span class="text-[10px] text-cc-textMuted truncate w-24">01:22</span>
+                                </div>
+                            </div>
+                            <i class="ph ph-plus text-cc-textMuted hover:text-white opacity-0 group-hover:opacity-100 transition"></i>
+                        </div>
+
+                        <!-- Track 2 -->
+                        <div class="flex items-center justify-between p-2 rounded-md hover:bg-[#1c1c1c] cursor-pointer group transition border border-transparent">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded bg-gradient-to-tr from-cyan-500 to-blue-500 shrink-0 relative overflow-hidden flex items-center justify-center">
+                                    <i class="ph-fill ph-music-notes text-white"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-medium truncate w-24">Background Music</span>
+                                    <span class="text-[10px] text-cc-textMuted truncate w-24">03:36</span>
+                                </div>
+                            </div>
+                            <i class="ph ph-plus text-cc-textMuted hover:text-white opacity-0 group-hover:opacity-100 transition"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Player Panel (Center) -->
+        <section class="flex-1 bg-cc-bg flex flex-col relative min-w-[300px]">
+            <!-- Player Header -->
+            <div class="h-10 flex items-center justify-between px-5 absolute top-0 w-full z-10">
+                <span class="text-xs text-cc-textMuted font-medium uppercase tracking-wider">Preview</span>
+            </div>
+            
+            <!-- Video Container -->
+            <div class="flex-1 flex items-center justify-center p-8 pb-4 relative">
+                <!-- Video Frame (Simulated) -->
+                <div class="w-full max-w-2xl aspect-video bg-black relative border border-[#1a1a1a] shadow-2xl group overflow-hidden rounded-sm">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80" class="w-1/2 h-full object-cover absolute left-0" style="filter: sepia(0.3) hue-rotate(320deg) saturate(2);" alt="Model 1">
+                    <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1000&q=80" class="w-1/2 h-full object-cover absolute right-0" style="filter: saturate(0) brightness(1.5);" alt="Model 2">
+                    <div class="absolute inset-0 bg-white/5 mix-blend-overlay"></div>
+                </div>
+            </div>
+
+            <!-- Playback Controls -->
+            <div class="h-14 flex items-center justify-between px-8 shrink-0 mb-2">
+                <!-- Timecode -->
+                <div class="w-32 text-xs font-mono tracking-wider">
+                    <span class="text-cc-cyan">00:01:11</span>
+                    <span class="text-cc-textMuted"> / 00:06:27</span>
+                </div>
+                
+                <!-- Play Controls -->
+                <div class="flex items-center gap-6">
+                    <i class="ph-fill ph-play text-2xl cursor-pointer hover:text-cc-cyan transition"></i>
+                </div>
+
+                <!-- View Controls -->
+                <div class="w-32 flex items-center justify-end gap-4 text-cc-textMuted">
+                    <span class="text-xs border border-cc-border px-2 py-1 rounded cursor-pointer hover:text-white transition">16:9</span>
+                    <i class="ph ph-corners-out text-lg cursor-pointer hover:text-white transition"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Inspector Panel (Right) -->
+        <aside class="w-[320px] bg-cc-panel border-l border-cc-border flex flex-col shrink-0">
+            <!-- Main Tabs -->
+            <div class="flex items-center px-5 pt-4 gap-6 border-b border-cc-border text-sm font-medium">
+                <button class="text-cc-cyan border-b-2 border-cc-cyan pb-3">Video</button>
+                <button class="text-cc-textMuted hover:text-white pb-3 transition">Audio</button>
+                <button class="text-cc-textMuted hover:text-white pb-3 transition">Speed</button>
+            </div>
+
+            <!-- Properties List -->
+            <div class="flex-1 overflow-y-auto p-5 space-y-8">
+                
+                <!-- Transform Section -->
+                <div>
+                    <div class="flex items-center justify-between mb-5">
+                        <h4 class="text-xs font-semibold text-cc-textMain uppercase tracking-wider">
+                            Transform
+                        </h4>
+                        <i class="ph ph-arrow-counter-clockwise text-cc-textMuted hover:text-white cursor-pointer transition"></i>
+                    </div>
+
+                    <div class="space-y-5 text-xs">
+                        <!-- Scale Slider -->
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-cc-textMuted w-14">Scale</span>
+                            <div class="flex-1 flex items-center gap-3">
+                                <input type="range" min="0" max="200" value="119" class="w-full">
+                                <span class="bg-[#0f0f0f] px-2 py-1.5 rounded w-14 text-center border border-cc-border font-mono text-cc-textMuted">119%</span>
+                            </div>
+                        </div>
+
+                        <!-- Position Inputs -->
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-cc-textMuted w-14">Position</span>
+                            <div class="flex-1 flex gap-2">
+                                <div class="flex-1 bg-[#0f0f0f] border border-cc-border rounded flex items-center px-3 py-1.5 focus-within:border-cc-cyan transition">
+                                    <span class="text-cc-textMuted mr-2 font-mono">X</span>
+                                    <input type="text" value="0" class="bg-transparent w-full outline-none text-center font-mono">
+                                </div>
+                                <div class="flex-1 bg-[#0f0f0f] border border-cc-border rounded flex items-center px-3 py-1.5 focus-within:border-cc-cyan transition">
+                                    <span class="text-cc-textMuted mr-2 font-mono">Y</span>
+                                    <input type="text" value="0" class="bg-transparent w-full outline-none text-center font-mono">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rotate Input -->
+                        <div class="flex items-center justify-between gap-4">
+                            <span class="text-cc-textMuted w-14">Rotate</span>
+                            <div class="flex-1 flex items-center gap-2">
+                                <div class="flex-1 bg-[#0f0f0f] border border-cc-border rounded px-3 py-1.5 flex items-center justify-between focus-within:border-cc-cyan transition">
+                                    <input type="text" value="0.00" class="bg-transparent w-full outline-none text-right font-mono">
+                                    <span class="text-cc-textMuted ml-2 font-mono">°</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Bottom Timeline Panel -->
+    <footer class="h-[280px] bg-[#0a0a0a] border-t border-cc-border flex flex-col shrink-0 relative z-10">
+        
+        <!-- Timeline Toolbar -->
+        <div class="h-12 border-b border-cc-border flex items-center justify-between px-5 bg-[#141414]">
+            <!-- Left Tools -->
+            <div class="flex items-center gap-5 text-cc-textMuted text-lg">
+                <i class="ph ph-cursor text-cc-cyan cursor-pointer transition"></i>
+                <div class="h-4 w-px bg-cc-border"></div>
+                <!-- Split -->
+                <i class="ph ph-scissors hover:text-white cursor-pointer transition"></i>
+                <!-- Delete -->
+                <i class="ph ph-trash hover:text-white cursor-pointer transition"></i>
+            </div>
+
+            <!-- Right Tools -->
+            <div class="flex items-center gap-4 text-cc-textMuted text-lg">
+                <!-- Zoom Slider -->
+                <div class="flex items-center gap-3 w-36">
+                    <i class="ph ph-minus text-sm hover:text-white cursor-pointer transition"></i>
+                    <input type="range" min="1" max="100" value="30" class="w-full">
+                    <i class="ph ph-plus text-sm hover:text-white cursor-pointer transition"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Tracks Area -->
+        <div class="flex-1 overflow-x-auto overflow-y-auto relative bg-[#0a0a0a]" id="timeline-container">
+            
+            <!-- Playhead -->
+            <div class="playhead-line" id="playhead" style="left: 180px;">
+                <div class="playhead-handle shadow-md shadow-black/50"></div>
+            </div>
+
+            <!-- Time Ruler -->
+            <div class="h-7 sticky top-0 bg-[#0a0a0a] border-b border-cc-border flex items-end text-[10px] text-cc-textMuted font-mono z-10 px-4 min-w-[1000px]">
+                <div class="absolute left-4 bottom-1.5">00:00</div>
+                <div class="absolute left-[300px] bottom-1.5">00:05</div>
+                <div class="absolute left-[600px] bottom-1.5">00:10</div>
+                <div class="absolute left-[900px] bottom-1.5">00:15</div>
+                
+                <!-- Ticks -->
+                <div class="w-full h-full flex justify-between px-4 pb-0.5 opacity-50">
+                    <div class="w-full h-1.5" style="background: repeating-linear-gradient(to right, transparent, transparent 19px, #444 19px, #444 20px);"></div>
+                </div>
+            </div>
+
+            <!-- Track Container -->
+            <div class="min-w-[1000px] py-6 px-4 flex flex-col gap-2 relative">
+                
+                <div class="pl-20 relative h-[64px]">
+                    <!-- The Video Clip (Selected) -->
+                    <div class="absolute left-[100px] top-0 h-[64px] w-[500px] bg-cc-clip border-[1.5px] border-white rounded-md flex flex-col overflow-hidden cursor-pointer group">
+                        <!-- Top handle bar -->
+                        <div class="h-4 w-full flex items-center px-2 text-[9px] text-white truncate shrink-0 bg-[#164e52]">
+                            Fashion show of models. Two beautiful models...
+                        </div>
+                        
+                        <!-- Video Thumbnails inside clip -->
+                        <div class="flex-1 flex w-full relative">
+                            <div class="w-full h-full bg-cover bg-repeat-x opacity-80" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=60&q=80'); background-size: contain;"></div>
+                            <div class="absolute inset-0 bg-white/5 group-hover:bg-transparent transition mix-blend-overlay"></div>
+                        </div>
+
+                        <!-- Left/Right trimming handles -->
+                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-white flex items-center justify-center cursor-ew-resize">
+                            <div class="w-0.5 h-3 bg-black rounded-full opacity-50"></div>
+                        </div>
+                        <div class="absolute right-0 top-0 bottom-0 w-2 bg-white flex items-center justify-center cursor-ew-resize">
+                            <div class="w-0.5 h-3 bg-black rounded-full opacity-50"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty Audio Track -->
+                <div class="pl-20 relative h-[44px] mt-2">
+                    <div class="absolute left-[100px] top-0 h-[44px] w-[500px] bg-[#141414] border border-cc-border border-dashed rounded-md flex items-center justify-center text-xs text-[#555] pointer-events-none">
+                        Drag audio here
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup draggable playhead
+            const playhead = document.getElementById('playhead');
+            const timelineContainer = document.getElementById('timeline-container');
+            let isDragging = false;
+
+            playhead.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                document.body.style.cursor = 'ew-resize';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const containerRect = timelineContainer.getBoundingClientRect();
+                let newX = e.clientX - containerRect.left + timelineContainer.scrollLeft;
+                
+                if (newX < 80) newX = 80; 
+                
+                playhead.style.left = `${newX}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                document.body.style.cursor = 'default';
+            });
+
+            timelineContainer.addEventListener('mousedown', (e) => {
+                if (e.target === playhead || playhead.contains(e.target)) return;
+                
+                const containerRect = timelineContainer.getBoundingClientRect();
+                let newX = e.clientX - containerRect.left + timelineContainer.scrollLeft;
+                if (newX >= 80) {
+                    playhead.style.left = `${newX}px`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

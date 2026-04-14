@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayesian Inference // Reading</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gemini: {
+                            bg: 'var(--bg-color)',
+                            surface: 'var(--surface-color)',
+                            surfaceHover: 'var(--surface-hover)',
+                            border: 'var(--border-color)',
+                            text: 'var(--text-color)',
+                            textMuted: 'var(--text-muted)',
+                            primary: 'var(--primary-color)',
+                            accent: 'var(--accent-color)',
+                        },
+                        discord: {
+                            server: 'var(--server-bg)',
+                            channels: 'var(--channels-bg)',
+                            chat: 'var(--chat-bg)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Light Mode */
+            --bg-color: #FFFFFF;
+            --surface-color: #F0F4F9;
+            --surface-hover: #E1E5EA;
+            --border-color: #E3E3E3;
+            --text-color: #1F1F1F;
+            --text-muted: #444746;
+            --primary-color: #5865F2; /* Discord Blurple-ish */
+            --accent-color: #D3E3FD;
+            --code-bg: #1e1e1e;
+            
+            /* Discord Layout Colors (Light) */
+            --server-bg: #E3E5E8;
+            --channels-bg: #F2F3F5;
+            --chat-bg: #FFFFFF;
+            --pill-color: #1F1F1F;
+        }
+
+        body[data-theme="dark"] {
+            /* Dark Mode */
+            --bg-color: #313338; /* Discord Chat BG */
+            --surface-color: #2B2D31;
+            --surface-hover: #404249;
+            --border-color: #1F2023; /* Subtle borders */
+            --text-color: #F2F3F5;
+            --text-muted: #949BA4;
+            --primary-color: #5865F2;
+            --accent-color: #4752C4;
+            --code-bg: #2B2D31;
+
+            /* Discord Layout Colors (Dark) */
+            --server-bg: #1E1F22;
+            --channels-bg: #2B2D31;
+            --chat-bg: #313338;
+            --pill-color: #FFFFFF;
+        }
+
+        body[data-theme="aurora"] {
+            /* Aurora Mode */
+            --bg-color: #000000;
+            --surface-color: rgba(30, 31, 32, 0.5);
+            --surface-hover: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-color: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --primary-color: #A8C7FA;
+            --accent-color: #1E1F20;
+            --code-bg: rgba(0, 0, 0, 0.8);
+            
+            --server-bg: rgba(10, 10, 10, 0.9);
+            --channels-bg: rgba(20, 20, 20, 0.8);
+            --chat-bg: rgba(0,0,0,0.5);
+            --pill-color: #A8C7FA;
+        }
+
+        body {
+            background-color: var(--chat-bg);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- DISCORD SIDEBAR STYLES --- */
+        
+        /* 1. Server Rail Icon (Squircle Transition) */
+        .server-icon-wrapper {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .server-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            overflow: hidden;
+        }
+
+        .server-icon-wrapper:hover .server-icon,
+        .server-icon-wrapper.active .server-icon {
+            border-radius: 16px; /* Squircle */
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+        }
+
+        /* 2. The Pill Indicator */
+        .nav-pill {
+            position: absolute;
+            left: -16px; /* Outside parent padding */
+            width: 4px;
+            height: 8px;
+            background-color: var(--pill-color);
+            border-radius: 0 4px 4px 0;
+            transition: height 0.2s ease-out, opacity 0.2s ease;
+            opacity: 0;
+        }
+
+        .server-icon-wrapper:hover .nav-pill {
+            height: 20px;
+            opacity: 1;
+        }
+        .server-icon-wrapper.active .nav-pill {
+            height: 40px;
+            opacity: 1;
+        }
+
+        /* 3. Channel List Items */
+        .channel-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 6px 8px;
+            margin: 1px 8px;
+            border-radius: 4px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        
+        .channel-item:hover {
+            background-color: var(--surface-hover);
+            color: var(--text-color);
+        }
+        
+        .channel-item.active {
+            background-color: var(--surface-hover); /* Selected channel bg */
+            color: var(--text-color);
+        }
+
+        .channel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 16px 8px 16px;
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .channel-header:hover {
+            color: var(--text-color);
+        }
+        
+        /* Utility */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .code-window { background-color: var(--code-bg); border: 1px solid var(--border-color); }
+        .prose p { color: var(--text-muted); line-height: 1.75; }
+        .prose h2 { color: var(--text-color); font-weight: 700; margin-top: 2rem; }
+    </style>
+</head>
+<body class="font-sans min-h-screen flex selection:bg-blue-500/20 overflow-hidden" data-theme="dark">
+
+    <!-- Aurora Background -->
+    <div class="aurora-layer fixed inset-0 z-0 pointer-events-none opacity-0 transition-opacity duration-700">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20"></div>
+    </div>
+
+    <!-- 1. SERVER RAIL (Far Left) -->
+    <nav class="hidden lg:flex flex-col items-center w-[72px] bg-discord-server py-3 gap-2 flex-shrink-0 z-50">
+        
+        <!-- Home / Dashboard -->
+        <div class="server-icon-wrapper" title="Dashboard">
+            <div class="nav-pill"></div>
+            <a href="index.html" class="server-icon bg-gemini-surface">
+                <img src="https://upload.wikimedia.org/wikipedia/en/6/69/IIT_Madras_Logo.svg" alt="IITM" class="w-6 h-6 grayscale hover:grayscale-0 transition-all">
+            </a>
+        </div>
+
+        <div class="w-8 h-[2px] bg-gemini-border rounded-full mx-auto my-1"></div>
+
+        <!-- Course 1 (Active) -->
+        <div class="server-icon-wrapper active" title="Statistics II">
+            <div class="nav-pill"></div>
+            <div class="server-icon font-bold text-sm">ST2</div>
+        </div>
+
+        <!-- Course 2 -->
+        <div class="server-icon-wrapper" title="Python">
+            <div class="nav-pill"></div>
+            <div class="server-icon font-bold text-sm">PY</div>
+        </div>
+
+        <!-- Course 3 -->
+        <div class="server-icon-wrapper" title="Math II">
+            <div class="nav-pill"></div>
+            <div class="server-icon font-bold text-sm">MA2</div>
+        </div>
+
+        <div class="w-8 h-[2px] bg-gemini-border rounded-full mx-auto my-1"></div>
+
+        <!-- Settings -->
+        <div class="server-icon-wrapper mt-auto" title="Settings" onclick="toggleTheme()">
+            <div class="nav-pill"></div>
+            <div class="server-icon text-green-500 hover:text-white bg-transparent">
+                <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. CHANNEL LIST (Middle Left) -->
+    <aside id="channel-sidebar" class="w-60 bg-discord-channels flex flex-col h-full flex-shrink-0 border-r border-gemini-border lg:border-none z-40 fixed lg:relative transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+        
+        <!-- Header (Course Name) -->
+        <div class="h-12 flex items-center justify-between px-4 border-b border-black/10 shadow-sm hover:bg-gemini-surfaceHover cursor-pointer transition-colors">
+            <h1 class="font-bold text-sm truncate">Statistics II</h1>
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        </div>
+
+        <!-- Scrollable List -->
+        <div class="flex-1 overflow-y-auto py-3 no-scrollbar custom-scrollbar">
+            
+            <!-- Category 1 -->
+            <div class="mb-2">
+                <div class="channel-header group">
+                    <span class="flex items-center gap-0.5 group-hover:text-gemini-text transition-colors">
+                        <i data-lucide="chevron-down" class="w-3 h-3"></i> MODULE 1: BASICS
+                    </span>
+                </div>
+                <div class="channel-item">
+                    <i data-lucide="hash" class="w-4 h-4 text-gemini-textMuted"></i>
+                    sample-space
+                </div>
+                <div class="channel-item">
+                    <i data-lucide="hash" class="w-4 h-4 text-gemini-textMuted"></i>
+                    events-axioms
+                </div>
+            </div>
+
+            <!-- Category 2 -->
+            <div class="mb-2">
+                <div class="channel-header group">
+                    <span class="flex items-center gap-0.5 group-hover:text-gemini-text transition-colors">
+                        <i data-lucide="chevron-down" class="w-3 h-3"></i> MODULE 2: INFERENCE
+                    </span>
+                </div>
+                <div class="channel-item active text-white">
+                    <i data-lucide="file-text" class="w-4 h-4 text-gemini-text"></i>
+                    bayesian-inference
+                </div>
+                <div class="channel-item">
+                    <i data-lucide="hash" class="w-4 h-4 text-gemini-textMuted"></i>
+                    conjugate-priors
+                </div>
+                <div class="channel-item">
+                    <i data-lucide="hash" class="w-4 h-4 text-gemini-textMuted"></i>
+                    mcmc-methods
+                </div>
+            </div>
+
+            <!-- Category 3 -->
+            <div class="mb-2">
+                <div class="channel-header group">
+                    <span class="flex items-center gap-0.5 group-hover:text-gemini-text transition-colors">
+                        <i data-lucide="chevron-right" class="w-3 h-3"></i> MODULE 3: TESTING
+                    </span>
+                </div>
+                <!-- Collapsed content hidden -->
+            </div>
+
+            <!-- Category 4 -->
+            <div class="mb-2">
+                <div class="channel-header group">
+                    <span class="flex items-center gap-0.5 group-hover:text-gemini-text transition-colors">
+                        <i data-lucide="chevron-down" class="w-3 h-3"></i> RESOURCES
+                    </span>
+                </div>
+                <div class="channel-item text-blue-400 hover:text-blue-300">
+                    <i data-lucide="link" class="w-4 h-4"></i>
+                    simulation-code
+                </div>
+                <div class="channel-item text-blue-400 hover:text-blue-300">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    lecture-slides-pdf
+                </div>
+            </div>
+
+        </div>
+
+        <!-- User Mini Profile -->
+        <div class="h-[52px] bg-[#232428] flex items-center px-2 gap-2 mt-auto">
+            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white relative">
+                AS
+                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#232428] rounded-full"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-xs font-bold truncate">Aryan S.</div>
+                <div class="text-[10px] text-gray-400 truncate">Online</div>
+            </div>
+            <div class="flex">
+                <button class="p-1.5 hover:bg-gemini-surfaceHover rounded"><i data-lucide="mic-off" class="w-4 h-4"></i></button>
+                <button class="p-1.5 hover:bg-gemini-surfaceHover rounded"><i data-lucide="headphones" class="w-4 h-4"></i></button>
+                <button class="p-1.5 hover:bg-gemini-surfaceHover rounded"><i data-lucide="settings" class="w-4 h-4"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 3. MAIN CHAT/CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 bg-discord-chat relative">
+        
+        <!-- Chat Header -->
+        <header class="h-12 border-b border-black/10 flex items-center justify-between px-4 bg-discord-chat z-10 shadow-sm flex-shrink-0">
+            <div class="flex items-center gap-2 overflow-hidden">
+                <button class="lg:hidden mr-2 text-gemini-textMuted" onclick="toggleMobileSidebar()">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <i data-lucide="hash" class="w-5 h-5 text-gemini-textMuted"></i>
+                <h3 class="font-bold text-sm truncate">bayesian-inference</h3>
+                <span class="hidden sm:inline text-xs text-gemini-textMuted border-l border-gemini-border pl-3 ml-1 truncate">Reading: Intro to Priors & Posteriors</span>
+            </div>
+            <div class="flex items-center gap-4 text-gemini-textMuted">
+                <i data-lucide="bell" class="w-5 h-5 cursor-pointer hover:text-gemini-text transition-colors"></i>
+                <i data-lucide="pin" class="w-5 h-5 cursor-pointer hover:text-gemini-text transition-colors"></i>
+                <i data-lucide="users" class="w-5 h-5 cursor-pointer hover:text-gemini-text transition-colors"></i>
+                
+                <!-- Search -->
+                <div class="hidden md:flex items-center bg-discord-server px-2 py-1 rounded text-xs w-36 transition-all focus-within:w-52">
+                    <input type="text" placeholder="Search" class="bg-transparent border-none outline-none text-gemini-text w-full placeholder-gemini-textMuted">
+                    <i data-lucide="search" class="w-3 h-3"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Stream -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 scroll-smooth custom-scrollbar">
+            
+            <!-- Welcome Message -->
+            <div class="mt-8 mb-8 pb-4 border-b border-gemini-border">
+                <div class="w-16 h-16 rounded-full bg-gemini-surface mb-4 flex items-center justify-center">
+                    <i data-lucide="hash" class="w-10 h-10 text-gemini-text"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Welcome to #bayesian-inference!</h1>
+                <p class="text-gemini-textMuted">This is the start of the Bayesian Inference module notes.</p>
+            </div>
+
+            <!-- Note Content Wrapper -->
+            <article class="prose max-w-4xl mx-auto">
+                <div class="flex gap-4 group">
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 mt-1 cursor-pointer hover:opacity-80"></div>
+                    
+                    <!-- Message Body -->
+                    <div class="flex-1">
+                        <div class="flex items-baseline gap-2 mb-1">
+                            <span class="font-medium text-gemini-text hover:underline cursor-pointer">Aryan S.</span>
+                            <span class="text-[10px] text-gemini-textMuted bg-gemini-primary/20 text-gemini-primary px-1 rounded font-bold">BOT</span>
+                            <span class="text-xs text-gemini-textMuted">Today at 10:42 AM</span>
+                        </div>
+                        
+                        <p class="text-gemini-text text-sm md:text-base leading-relaxed">
+                            Bayesian inference is a method of statistical inference in which Bayes' theorem is used to update the probability for a hypothesis as more evidence or information becomes available.
+                        </p>
+
+                        <!-- Math Embed -->
+                        <div class="mt-3 p-4 rounded bg-gemini-surface border-l-4 border-gemini-primary max-w-md">
+                            <div class="text-xs font-bold text-gemini-textMuted mb-1 uppercase">Equation</div>
+                            <code class="text-lg font-mono text-gemini-text">P(A|B) = [P(B|A) · P(A)] / P(B)</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 group mt-6">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 mt-1"></div>
+                    <div class="flex-1">
+                        <div class="flex items-baseline gap-2 mb-1">
+                            <span class="font-medium text-gemini-text">Aryan S.</span>
+                            <span class="text-[10px] text-gemini-textMuted bg-gemini-primary/20 text-gemini-primary px-1 rounded font-bold">BOT</span>
+                            <span class="text-xs text-gemini-textMuted">Today at 10:45 AM</span>
+                        </div>
+                        
+                        <p class="text-gemini-text text-sm md:text-base mb-2">Here is the Python simulation code for the coin flip experiment:</p>
+                        
+                        <!-- Code Block Embed -->
+                        <div class="code-window rounded-md overflow-hidden max-w-2xl text-sm border border-black/20">
+                            <div class="bg-[#1e1f22] px-4 py-1 flex justify-between items-center text-xs text-gray-400">
+                                <span>python</span>
+                                <span class="flex items-center gap-1 cursor-pointer hover:text-white"><i data-lucide="copy" class="w-3 h-3"></i> Copy</span>
+                            </div>
+                            <div class="p-4 bg-[#2b2d31] font-mono overflow-x-auto text-gray-300">
+<pre><code><span class="text-purple-400">import</span> numpy <span class="text-purple-400">as</span> np
+
+<span class="text-gray-500"># 1. Define Prior</span>
+prior = np.ones(100) / 100 
+p_grid = np.linspace(0, 1, 100)
+
+<span class="text-blue-400">def</span> <span class="text-yellow-200">update</span>(prior, heads, total):
+    likelihood = p_grid**heads * (1 - p_grid)**(total - heads)
+    posterior = likelihood * prior
+    <span class="text-purple-400">return</span> posterior / posterior.sum()</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <div class="h-10"></div>
+        </div>
+
+        <!-- Chat Input Mock -->
+        <div class="px-4 pb-6 pt-2 flex-shrink-0">
+            <div class="bg-discord-server rounded-lg px-4 py-3 flex items-center gap-4 cursor-text">
+                <i data-lucide="plus-circle" class="w-6 h-6 text-gemini-textMuted cursor-pointer hover:text-gemini-text"></i>
+                <input type="text" placeholder="Message #bayesian-inference" class="bg-transparent border-none outline-none text-gemini-text flex-1 placeholder-gemini-textMuted" disabled>
+                <div class="flex items-center gap-3 text-gemini-textMuted">
+                    <i data-lucide="gift" class="w-6 h-6 cursor-pointer hover:text-gemini-text"></i>
+                    <i data-lucide="sticker" class="w-6 h-6 cursor-pointer hover:text-gemini-text"></i>
+                    <i data-lucide="smile" class="w-6 h-6 cursor-pointer hover:text-gemini-text"></i>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Overlay for Mobile -->
+    <div id="backdrop" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('channel-sidebar');
+            const backdrop = document.getElementById('backdrop');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            let next = 'dark';
+            if (current === 'dark') next = 'light';
+            else if (current === 'light') next = 'aurora';
+            else next = 'dark';
+
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            
+            // Handle Aurora bg opacity
+            const aurora = document.querySelector('.aurora-layer');
+            if(next === 'aurora') aurora.style.opacity = '0.6';
+            else aurora.style.opacity = '0';
+        }
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        if(savedTheme === 'aurora') document.querySelector('.aurora-layer').style.opacity = '0.6';
+    </script>
+</body>
+</html>

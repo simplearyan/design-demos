@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // NOTES ARCHIVE</title>
+    
+    <!-- Design System Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration (Shared with Index) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gravity: {
+                            base: '#09090B',
+                            surface: '#18181B',
+                            border: '#27272A',
+                            text: '#E4E4E7',
+                            muted: '#A1A1AA',
+                            accent: '#D4FF00',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        heading: ['Space Grotesk', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-tech': "linear-gradient(to right, #27272A 1px, transparent 1px), linear-gradient(to bottom, #27272A 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #09090B;
+            color: #E4E4E7;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, .font-heading { font-family: 'Space Grotesk', sans-serif; }
+        code, pre, .font-mono { font-family: 'Space Mono', monospace; }
+        ::selection { background-color: #D4FF00; color: #000000; }
+
+        /* Tech Grid Background */
+        .bg-tech-grid {
+            background-size: 4rem 4rem;
+            mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+        }
+
+        /* Card Hover Effect */
+        .note-card { transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .note-card:hover { transform: translateY(-4px); border-color: #D4FF00; }
+        
+        /* Filter Button Active State */
+        .filter-btn.active { background-color: #D4FF00; color: black; border-color: #D4FF00; }
+    </style>
+</head>
+<body class="overflow-x-hidden min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 left-0 border-b border-gravity-border bg-gravity-base/90 backdrop-blur-md">
+        <div class="max-w-[1600px] mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 group cursor-pointer">
+                <div class="w-2 h-8 bg-gravity-border group-hover:bg-gravity-accent transition-colors"></div>
+                <div class="flex flex-col leading-none">
+                    <span class="font-heading font-bold text-xl tracking-tight text-white">ARYAN.DS</span>
+                    <span class="font-mono text-[10px] text-gravity-muted tracking-widest">/ NOTES_ARCHIVE</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 font-mono text-xs tracking-widest font-bold">
+                <a href="index.html" class="hover:text-gravity-accent transition-colors">HOME</a>
+                <div class="h-4 w-px bg-gravity-border"></div>
+                <span class="text-gravity-accent">BROWSE_NOTES</span>
+            </div>
+            
+            <button class="md:hidden p-2 text-gravity-muted"><i data-lucide="menu" class="w-6 h-6"></i></button>
+        </div>
+    </nav>
+
+    <!-- Header / Search Section -->
+    <header class="pt-32 pb-12 border-b border-gravity-border relative bg-gravity-base">
+        <div class="absolute inset-0 bg-grid-tech bg-tech-grid opacity-20 pointer-events-none"></div>
+        <div class="max-w-[1600px] mx-auto px-6 relative z-10">
+            
+            <div class="flex flex-col md:flex-row justify-between md:items-end gap-8 mb-12">
+                <div>
+                    <div class="font-mono text-xs text-gravity-accent mb-4">/// SECOND_BRAIN_PROTOCOL</div>
+                    <h1 class="text-5xl md:text-7xl font-bold font-heading tracking-tighter text-white mb-4">
+                        DIGITAL<br>GARDEN
+                    </h1>
+                    <p class="text-gravity-muted max-w-lg font-mono text-xs md:text-sm leading-relaxed">
+                        Indexing 150+ academic notes, code snippets, and cheat sheets from my Data Science curriculum. Updated weekly.
+                    </p>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="w-full md:w-auto md:min-w-[400px]">
+                    <div class="relative group">
+                        <input type="text" placeholder="SEARCH_DATABASE..." 
+                            class="w-full bg-gravity-surface border border-gravity-border p-4 pl-12 font-mono text-sm text-white focus:outline-none focus:border-gravity-accent transition-colors placeholder:text-gravity-muted/50">
+                        <i data-lucide="search" class="w-5 h-5 text-gravity-muted absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-gravity-accent transition-colors"></i>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 flex gap-1">
+                            <span class="text-[10px] bg-gravity-border px-1.5 py-0.5 rounded text-gravity-muted font-mono">CTRL</span>
+                            <span class="text-[10px] bg-gravity-border px-1.5 py-0.5 rounded text-gravity-muted font-mono">K</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-2 font-mono text-xs font-bold tracking-wider">
+                <button class="filter-btn active px-4 py-2 border border-gravity-border hover:border-gravity-accent transition-all uppercase">All</button>
+                <button class="filter-btn px-4 py-2 border border-gravity-border hover:border-gravity-accent hover:text-white text-gravity-muted transition-all uppercase">Statistics</button>
+                <button class="filter-btn px-4 py-2 border border-gravity-border hover:border-gravity-accent hover:text-white text-gravity-muted transition-all uppercase">Python</button>
+                <button class="filter-btn px-4 py-2 border border-gravity-border hover:border-gravity-accent hover:text-white text-gravity-muted transition-all uppercase">Calculus</button>
+                <button class="filter-btn px-4 py-2 border border-gravity-border hover:border-gravity-accent hover:text-white text-gravity-muted transition-all uppercase">Machine Learning</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 bg-gravity-base py-16">
+        <div class="max-w-[1600px] mx-auto px-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+                <!-- Note Card 1 -->
+                <article class="note-card bg-gravity-surface border border-gravity-border p-6 flex flex-col h-full group cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/5 to-transparent -mr-8 -mt-8 rounded-full blur-xl group-hover:from-gravity-accent/20 transition-all"></div>
+                    
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted group-hover:text-gravity-accent group-hover:border-gravity-accent/50 transition-colors">
+                            STATISTICS_1
+                        </span>
+                        <i data-lucide="file-text" class="w-5 h-5 text-gravity-muted group-hover:text-white transition-colors"></i>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Bayesian Inference & Probability</h3>
+                    <p class="text-gravity-muted text-sm mb-8 line-clamp-3">
+                        Detailed breakdown of Bayes Theorem, conditional probability, and prior/posterior distributions with Python examples.
+                    </p>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <span>UPDATED: 2D AGO</span>
+                        <span class="group-hover:translate-x-1 transition-transform">READ -></span>
+                    </div>
+                </article>
+
+                <!-- Note Card 2 -->
+                <article class="note-card bg-gravity-surface border border-gravity-border p-6 flex flex-col h-full group cursor-pointer">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted group-hover:text-gravity-accent group-hover:border-gravity-accent/50 transition-colors">
+                            PYTHON_OOP
+                        </span>
+                        <i data-lucide="code" class="w-5 h-5 text-gravity-muted group-hover:text-white transition-colors"></i>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Classes, Inheritance & Dunder Methods</h3>
+                    <p class="text-gravity-muted text-sm mb-8 line-clamp-3">
+                        Deep dive into Object Oriented Programming in Python. Covers polymorphism, encapsulation, and magic methods.
+                    </p>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <span>UPDATED: 5D AGO</span>
+                        <span class="group-hover:translate-x-1 transition-transform">READ -></span>
+                    </div>
+                </article>
+
+                <!-- Note Card 3 -->
+                <article class="note-card bg-gravity-surface border border-gravity-border p-6 flex flex-col h-full group cursor-pointer">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted group-hover:text-gravity-accent group-hover:border-gravity-accent/50 transition-colors">
+                            MATH_2
+                        </span>
+                        <i data-lucide="sigma" class="w-5 h-5 text-gravity-muted group-hover:text-white transition-colors"></i>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Linear Algebra: Eigenvectors</h3>
+                    <p class="text-gravity-muted text-sm mb-8 line-clamp-3">
+                        Understanding vectors, matrices, determinants, and how to calculate eigenvalues for dimensionality reduction.
+                    </p>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <span>UPDATED: 1W AGO</span>
+                        <span class="group-hover:translate-x-1 transition-transform">READ -></span>
+                    </div>
+                </article>
+
+                <!-- Note Card 4 -->
+                <article class="note-card bg-gravity-surface border border-gravity-border p-6 flex flex-col h-full group cursor-pointer">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted group-hover:text-gravity-accent group-hover:border-gravity-accent/50 transition-colors">
+                            ML_OPS
+                        </span>
+                        <i data-lucide="box" class="w-5 h-5 text-gravity-muted group-hover:text-white transition-colors"></i>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Dockerizing ML Models</h3>
+                    <p class="text-gravity-muted text-sm mb-8 line-clamp-3">
+                        A practical guide to creating Dockerfiles for Python/Scikit-Learn applications and deploying them.
+                    </p>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <span>UPDATED: 2W AGO</span>
+                        <span class="group-hover:translate-x-1 transition-transform">READ -></span>
+                    </div>
+                </article>
+                
+                 <!-- Note Card 5 -->
+                 <article class="note-card bg-gravity-surface border border-gravity-border p-6 flex flex-col h-full group cursor-pointer">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted group-hover:text-gravity-accent group-hover:border-gravity-accent/50 transition-colors">
+                            CALCULUS
+                        </span>
+                        <i data-lucide="function-square" class="w-5 h-5 text-gravity-muted group-hover:text-white transition-colors"></i>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Multivariate Chain Rule</h3>
+                    <p class="text-gravity-muted text-sm mb-8 line-clamp-3">
+                        Notes on partial derivatives and applying the chain rule in higher dimensions for gradient descent optimization.
+                    </p>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <span>UPDATED: 1M AGO</span>
+                        <span class="group-hover:translate-x-1 transition-transform">READ -></span>
+                    </div>
+                </article>
+
+                 <!-- Note Card 6 -->
+                 <article class="note-card bg-gravity-surface border border-gravity-border p-6 flex flex-col h-full group cursor-pointer">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="font-mono text-[10px] bg-gravity-base border border-gravity-border px-2 py-1 text-gravity-muted group-hover:text-gravity-accent group-hover:border-gravity-accent/50 transition-colors">
+                            GAME_DEV
+                        </span>
+                        <i data-lucide="gamepad-2" class="w-5 h-5 text-gravity-muted group-hover:text-white transition-colors"></i>
+                    </div>
+
+                    <h3 class="text-xl font-heading font-bold text-white mb-2 group-hover:text-gravity-accent transition-colors">Unity: Raycasting Logic</h3>
+                    <p class="text-gravity-muted text-sm mb-8 line-clamp-3">
+                        Implementing line-of-sight and shooting mechanics using Physics.Raycast in C#. Includes code snippets.
+                    </p>
+
+                    <div class="mt-auto pt-4 border-t border-gravity-border flex justify-between items-center text-xs font-mono text-gravity-muted">
+                        <span>UPDATED: 1M AGO</span>
+                        <span class="group-hover:translate-x-1 transition-transform">READ -></span>
+                    </div>
+                </article>
+
+            </div>
+            
+            <!-- Pagination -->
+            <div class="mt-16 border-t border-gravity-border pt-8 flex justify-between items-center font-mono text-xs">
+                <button class="text-gravity-muted hover:text-white uppercase disabled:opacity-50"><- Previous</button>
+                <div class="flex gap-2">
+                    <span class="text-gravity-accent">1</span>
+                    <span class="text-gravity-muted hover:text-white cursor-pointer">2</span>
+                    <span class="text-gravity-muted hover:text-white cursor-pointer">3</span>
+                    <span class="text-gravity-muted">...</span>
+                </div>
+                <button class="text-gravity-muted hover:text-white uppercase">Next -></button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-gravity-border py-12">
+        <div class="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-4 bg-gravity-accent"></div>
+                <span class="font-heading font-bold text-white">ARYAN.DS</span>
+            </div>
+            <div class="font-mono text-xs text-gravity-muted">
+                <a href="index.html" class="hover:text-white mr-6">HOME</a>
+                <a href="#" class="hover:text-white mr-6">GITHUB</a>
+                <a href="#" class="hover:text-white">TWITTER</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        
+        // Simple Filter Logic (Visual Only)
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

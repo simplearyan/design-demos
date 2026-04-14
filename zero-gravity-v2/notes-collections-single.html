@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARYAN.DS // STATISTICS II</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#F97316',
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Base Transitions */
+        body { transition: background-color 0.5s ease, color 0.5s ease; }
+
+        /* THEME ENGINE */
+        body[data-theme="light"] {
+            --bg-color: #ffffff;
+            --text-main: #18181b;
+            --text-muted: #71717a;
+            --border: #e4e4e7;
+            --card-bg: #f4f4f5;
+            --card-hover: #e4e4e7;
+            --blob-opacity: 0;
+            --item-bg: #ffffff;
+        }
+
+        body[data-theme="dark"] {
+            --bg-color: #09090b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --card-bg: #18181b;
+            --card-hover: #27272a;
+            --blob-opacity: 0;
+            --item-bg: #18181b;
+        }
+
+        body[data-theme="aurora"] {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-hover: rgba(255, 255, 255, 0.08);
+            --blob-opacity: 0.4;
+            --item-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Adaptive Components */
+        .adaptive-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .adaptive-card:hover {
+            background-color: var(--card-hover);
+            transform: translateY(-4px);
+        }
+
+        /* Playlist Item */
+        .playlist-item {
+            background-color: var(--item-bg);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        .playlist-item:hover {
+            border-color: #3B82F6;
+            transform: translateX(4px);
+        }
+
+        /* Typography Toggles */
+        body.font-outfit { font-family: 'Outfit', sans-serif; }
+        body.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Aurora Elements */
+        .aurora-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: var(--blob-opacity);
+            transition: opacity 0.8s ease; overflow: hidden;
+        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
+        .blob-1 { top: -10%; left: 20%; width: 60vw; height: 60vw; background: #3B82F6; animation: blob 25s infinite alternate; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #8B5CF6; animation: blob 20s infinite alternate-reverse; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+    </style>
+</head>
+<body class="font-jakarta min-h-screen relative selection:bg-blue-500/30" data-theme="dark">
+
+    <!-- Aurora Background Layer -->
+    <div class="aurora-layer">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="absolute inset-0 opacity-[0.05] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 border-b border-[var(--border)] bg-[var(--bg-color)]/80 backdrop-blur-md transition-colors duration-500">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-105 transition-transform">
+                    A
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg tracking-tight leading-none">ARYAN.DS</span>
+                    <span class="text-[10px] font-mono opacity-50 tracking-widest">PORTFOLIO</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium opacity-80">
+                <a href="index.html" class="hover:text-blue-500 hover:opacity-100 transition-all">Home</a>
+                <a href="notes.html" class="text-blue-500 font-bold">Notes</a>
+                <a href="solutions.html" class="hover:text-purple-500 hover:opacity-100 transition-all">Solutions</a>
+                <a href="devlogs.html" class="hover:text-orange-500 hover:opacity-100 transition-all">Dev Logs</a>
+            </div>
+
+            <!-- Settings / Actions -->
+            <div class="flex items-center gap-4">
+                <a href="notes.html" class="hidden md:flex items-center gap-2 text-xs font-mono opacity-60 hover:opacity-100 transition-opacity">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> BACK_TO_BASE
+                </a>
+                
+                <div class="relative group">
+                    <button class="p-2 rounded-full hover:bg-[var(--card-hover)] transition-colors border border-transparent hover:border-[var(--border)]">
+                        <i data-lucide="settings-2" class="w-5 h-5 text-[var(--text-main)]"></i>
+                    </button>
+                    
+                    <div class="absolute right-0 top-full mt-2 w-64 p-4 rounded-2xl adaptive-card shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 z-50">
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-[10px] font-mono uppercase opacity-50 mb-2 tracking-wider text-[var(--text-main)]">Theme</p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="setTheme('light')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-[var(--text-main)]">
+                                        <i data-lucide="sun" class="w-4 h-4"></i> Light
+                                    </button>
+                                    <button onclick="setTheme('dark')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-[var(--text-main)]">
+                                        <i data-lucide="moon" class="w-4 h-4"></i> Dark
+                                    </button>
+                                    <button onclick="setTheme('aurora')" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs text-purple-400">
+                                        <i data-lucide="sparkles" class="w-4 h-4"></i> Aurora
+                                    </button>
+                                </div>
+                            </div>
+                            <hr class="border-[var(--border)]">
+                            <div>
+                                <p class="text-[10px] font-mono uppercase opacity-50 mb-2 tracking-wider text-[var(--text-main)]">Typography</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="setFont('jakarta')" class="p-2 rounded-lg border border-[var(--border)] hover:border-blue-500 transition-colors text-xs font-jakarta text-[var(--text-main)]">Jakarta</button>
+                                    <button onclick="setFont('outfit')" class="p-2 rounded-lg border border-[var(--border)] hover:border-blue-500 transition-colors text-xs font-outfit text-[var(--text-main)]">Outfit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 px-6">
+        
+        <div class="max-w-6xl mx-auto">
+            
+            <!-- Collection Header -->
+            <div class="flex flex-col md:flex-row gap-12 mb-16 animate-fade-in">
+                <!-- Cover Image -->
+                <div class="w-full md:w-1/3">
+                    <div class="aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-blue-900 to-slate-900 flex items-center justify-center border border-[var(--border)] shadow-2xl relative group">
+                        <i data-lucide="bar-chart-2" class="w-32 h-32 text-blue-500 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
+                        <div class="absolute bottom-6 left-6 right-6">
+                            <div class="h-1.5 w-full bg-black/20 rounded-full overflow-hidden">
+                                <div class="h-full w-2/3 bg-blue-500 rounded-full"></div>
+                            </div>
+                            <div class="flex justify-between mt-2 text-xs font-mono text-blue-200">
+                                <span>8/12 COMPLETED</span>
+                                <span>66%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meta Info -->
+                <div class="w-full md:w-2/3 flex flex-col justify-center">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs font-bold tracking-wide uppercase">Course Collection</span>
+                        <span class="px-3 py-1 rounded-full border border-[var(--border)] text-[var(--text-muted)] text-xs font-mono uppercase">Updated 2 days ago</span>
+                    </div>
+                    
+                    <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-6">Statistics II: Inference</h1>
+                    
+                    <p class="text-[var(--text-muted)] text-lg mb-8 leading-relaxed max-w-2xl">
+                        A comprehensive deep dive into statistical inference. This collection covers Bayesian methods, hypothesis testing frameworks, and practical Python implementations for data analysis.
+                    </p>
+
+                    <div class="flex flex-wrap gap-4">
+                        <button class="px-6 py-3 rounded-full bg-blue-600 text-white font-bold text-sm hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20 flex items-center gap-2">
+                            <i data-lucide="play-circle" class="w-4 h-4"></i> Resume Learning
+                        </button>
+                        <button class="px-6 py-3 rounded-full adaptive-card font-bold text-sm hover:bg-[var(--card-hover)] transition-colors flex items-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i> Download Assets
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content List -->
+            <section>
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-xl font-bold">Course Modules</h2>
+                    <div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+                        <span>FILTER:</span>
+                        <button class="hover:text-blue-500 transition-colors">ALL</button>
+                        <span>/</span>
+                        <button class="hover:text-blue-500 transition-colors">UNREAD</button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    
+                    <!-- Item 1 (Active/Read) -->
+                    <a href="single-note.html" class="playlist-item rounded-xl p-4 flex items-center gap-6 group">
+                        <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0 font-mono text-sm font-bold group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                            01
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-lg mb-1 group-hover:text-blue-500 transition-colors">Introduction to Probability</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1">Foundational concepts: Sample space, events, axioms of probability.</p>
+                        </div>
+                        <div class="hidden sm:flex flex-col items-end gap-1 text-xs text-[var(--text-muted)]">
+                            <span class="font-mono">10 MIN READ</span>
+                            <span class="text-green-500 flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3 h-3"></i> COMPLETED</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-[var(--text-muted)] group-hover:text-blue-500 transition-colors"></i>
+                    </a>
+
+                    <!-- Item 2 (Active/Read) -->
+                    <a href="single-note.html" class="playlist-item rounded-xl p-4 flex items-center gap-6 group">
+                        <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0 font-mono text-sm font-bold group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                            02
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-lg mb-1 group-hover:text-blue-500 transition-colors">Bayesian Inference</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1">Priors, Likelihoods, and Posterior distributions with Python.</p>
+                        </div>
+                        <div class="hidden sm:flex flex-col items-end gap-1 text-xs text-[var(--text-muted)]">
+                            <span class="font-mono">15 MIN READ</span>
+                            <span class="text-green-500 flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3 h-3"></i> COMPLETED</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-[var(--text-muted)] group-hover:text-blue-500 transition-colors"></i>
+                    </a>
+
+                    <!-- Item 3 (Current) -->
+                    <a href="#" class="playlist-item rounded-xl p-4 flex items-center gap-6 group border-blue-500/50 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                        <div class="w-12 h-12 rounded-lg bg-blue-500 flex items-center justify-center text-white flex-shrink-0 font-mono text-sm font-bold">
+                            <i data-lucide="play" class="w-4 h-4 fill-white"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-lg mb-1 text-blue-500">Hypothesis Testing</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1">Null vs Alternative, P-values, and Type I/II errors.</p>
+                        </div>
+                        <div class="hidden sm:flex flex-col items-end gap-1 text-xs text-[var(--text-muted)]">
+                            <span class="font-mono">20 MIN READ</span>
+                            <span class="text-blue-500 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> IN PROGRESS</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-blue-500"></i>
+                    </a>
+
+                    <!-- Item 4 (Locked/Unread) -->
+                    <div class="playlist-item rounded-xl p-4 flex items-center gap-6 opacity-60">
+                        <div class="w-12 h-12 rounded-lg bg-[var(--card-bg)] flex items-center justify-center text-[var(--text-muted)] flex-shrink-0 font-mono text-sm font-bold">
+                            04
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-lg mb-1">Linear Regression</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1">Least squares, R-squared, and residual analysis.</p>
+                        </div>
+                        <div class="hidden sm:flex flex-col items-end gap-1 text-xs text-[var(--text-muted)]">
+                            <span class="font-mono">18 MIN READ</span>
+                            <span class="flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3"></i> LOCKED</span>
+                        </div>
+                    </div>
+
+                    <!-- Item 5 (Locked/Unread) -->
+                    <div class="playlist-item rounded-xl p-4 flex items-center gap-6 opacity-60">
+                        <div class="w-12 h-12 rounded-lg bg-[var(--card-bg)] flex items-center justify-center text-[var(--text-muted)] flex-shrink-0 font-mono text-sm font-bold">
+                            05
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-lg mb-1">Logistic Regression</h3>
+                            <p class="text-xs text-[var(--text-muted)] line-clamp-1">Classification problems, sigmoid functions, and decision boundaries.</p>
+                        </div>
+                        <div class="hidden sm:flex flex-col items-end gap-1 text-xs text-[var(--text-muted)]">
+                            <span class="font-mono">22 MIN READ</span>
+                            <span class="flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3"></i> LOCKED</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-[var(--border)] py-12">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <span class="text-sm text-[var(--text-muted)]">© 2026 Aryan.DS</span>
+            <div class="flex gap-6 text-sm font-medium text-[var(--text-muted)]">
+                <a href="notes.html" class="hover:text-blue-500 transition-colors">Back to Archive</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Theme Logic
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            if (theme === 'light') { document.documentElement.classList.remove('dark'); } 
+            else { document.documentElement.classList.add('dark'); }
+            localStorage.setItem('theme', theme);
+        }
+
+        // Font Logic
+        function setFont(font) {
+            document.body.classList.remove('font-jakarta', 'font-outfit');
+            document.body.classList.add('font-' + font);
+            localStorage.setItem('font', font);
+        }
+
+        // Init State
+        window.addEventListener('load', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const savedFont = localStorage.getItem('font') || 'jakarta';
+            setTheme(savedTheme);
+            setFont(savedFont);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Mode // Statistics II</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        page: 'var(--bg-page)',
+                        sidebar: 'var(--bg-sidebar)',
+                        surface: 'var(--bg-surface)',
+                        surfaceHover: 'var(--bg-surface-hover)',
+                        border: 'var(--border)',
+                        text: 'var(--text-main)',
+                        muted: 'var(--text-muted)',
+                        primary: 'var(--primary)',
+                        primaryDim: 'var(--primary-dim)',
+                        accent: 'var(--accent)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    transitionProperty: {
+                        'width': 'width, min-width, max-width',
+                        'spacing': 'margin, padding',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* --- EYE COMFORT PALETTE --- */
+        
+        :root {
+            /* LIGHT MODE (Soft Slate) */
+            --bg-page: #f8fafc;        /* Slate-50 */
+            --bg-sidebar: #ffffff;     /* White */
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #f1f5f9; /* Slate-100 */
+            --border: #e2e8f0;         /* Slate-200 */
+            --text-main: #0f172a;      /* Slate-900 */
+            --text-muted: #64748b;     /* Slate-500 */
+            --primary: #4f46e5;        /* Indigo-600 */
+            --primary-dim: #e0e7ff;    /* Indigo-100 */
+            --accent: #0ea5e9;         /* Sky-500 */
+            --code-bg: #1e293b;        /* Slate-800 */
+        }
+
+        body[data-theme="dark"] {
+            /* DARK MODE (Deep Slate - Easier than black) */
+            --bg-page: #0f172a;        /* Slate-900 */
+            --bg-sidebar: #020617;     /* Slate-950 */
+            --bg-surface: #1e293b;     /* Slate-800 */
+            --bg-surface-hover: #334155; /* Slate-700 */
+            --border: #1e293b;         /* Slate-800 */
+            --text-main: #f8fafc;      /* Slate-50 */
+            --text-muted: #94a3b8;     /* Slate-400 */
+            --primary: #818cf8;        /* Indigo-400 */
+            --primary-dim: rgba(99, 102, 241, 0.15);
+            --accent: #38bdf8;         /* Sky-400 */
+            --code-bg: #020617;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- LAYOUT & DEPTH --- */
+        
+        /* Smooth Collapse */
+        #sidebar-panel {
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        /* Depth Shadow for Sidebar */
+        .sidebar-shadow {
+            box-shadow: 4px 0 24px -4px rgba(0, 0, 0, 0.05);
+        }
+        body[data-theme="dark"] .sidebar-shadow {
+            box-shadow: 4px 0 24px -4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Active Item Indicator */
+        .nav-item.active {
+            background-color: var(--primary-dim);
+            color: var(--primary);
+            position: relative;
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Typography */
+        .prose p { margin-bottom: 1.5rem; line-height: 1.8; color: var(--text-muted); font-size: 1.05rem; }
+        .prose h2 { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-main); }
+        .prose ul { margin-bottom: 1.5rem; }
+        .prose li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; color: var(--text-muted); }
+        .prose li::before { content: "•"; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+
+        /* Code Block */
+        .code-window {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    </style>
+</head>
+<body class="font-sans h-screen flex overflow-hidden" data-theme="dark">
+
+    <!-- 1. COURSE SIDEBAR (Collapsible) -->
+    <aside id="sidebar-panel" class="w-80 bg-sidebar border-r border-border flex flex-col z-20 flex-shrink-0 sidebar-shadow absolute lg:relative h-full transform -translate-x-full lg:translate-x-0">
+        
+        <!-- Header -->
+        <div class="h-16 flex items-center justify-between px-6 border-b border-border flex-shrink-0">
+            <div>
+                <h2 class="font-bold text-sm tracking-tight font-display text-text">Statistics II</h2>
+                <div class="flex items-center gap-2 text-xs text-muted mt-0.5">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span>16% Complete</span>
+                </div>
+            </div>
+            <button class="lg:hidden p-2 rounded-lg hover:bg-surfaceHover text-muted" onclick="toggleMobileSidebar()">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Search / Filter -->
+        <div class="p-4 border-b border-border">
+            <div class="relative">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted"></i>
+                <input type="text" placeholder="Filter topics..." class="w-full bg-surfaceHover rounded-lg py-2 pl-9 pr-4 text-xs focus:outline-none focus:ring-1 focus:ring-primary text-text transition-all">
+            </div>
+        </div>
+
+        <!-- Module List -->
+        <div class="flex-1 overflow-y-auto p-2">
+            
+            <!-- Module 1 -->
+            <div class="mb-2">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-muted uppercase hover:text-text transition-colors">
+                    <span>Module 1: Foundations</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                </button>
+                <div class="space-y-0.5">
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-surfaceHover transition-all opacity-70">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
+                        <span class="text-sm font-medium">Sample Space & Events</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-surfaceHover transition-all opacity-70">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
+                        <span class="text-sm font-medium">Random Variables</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Module 2 (Active) -->
+            <div class="mb-2">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-primary uppercase bg-primaryDim/30 rounded-lg mb-1">
+                    <span>Module 2: Inference</span>
+                    <i data-lucide="chevron-up" class="w-3 h-3"></i>
+                </button>
+                <div class="space-y-0.5">
+                    <!-- Active Item -->
+                    <a href="#" class="nav-item active flex items-center gap-3 px-4 py-2.5 rounded-r-lg transition-all">
+                        <i data-lucide="play-circle" class="w-4 h-4 text-primary fill-current opacity-20"></i>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold">Bayesian Inference</span>
+                            <span class="text-[10px] opacity-70 font-mono">15 MIN</span>
+                        </div>
+                    </a>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-surfaceHover transition-all text-muted hover:text-text">
+                        <div class="w-4 flex justify-center text-[10px] font-mono opacity-50">02</div>
+                        <span class="text-sm font-medium">Conjugate Priors</span>
+                    </a>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-surfaceHover transition-all text-muted hover:text-text">
+                        <div class="w-4 flex justify-center text-[10px] font-mono opacity-50">03</div>
+                        <span class="text-sm font-medium">MCMC Methods</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Module 3 -->
+            <div class="mb-2">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-muted uppercase hover:text-text transition-colors">
+                    <span>Module 3: Testing</span>
+                    <i data-lucide="lock" class="w-3 h-3 opacity-50"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- User/Settings -->
+        <div class="p-4 border-t border-border flex items-center justify-between bg-sidebar">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-xs text-white font-bold">A</div>
+                <div class="text-xs">
+                    <div class="font-bold text-text">Aryan.DS</div>
+                    <div class="text-muted">Pro Plan</div>
+                </div>
+            </div>
+            <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-surfaceHover text-muted transition-colors">
+                <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- 2. MAIN READING AREA -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-page transition-colors">
+        
+        <!-- Top Navigation -->
+        <header class="h-16 flex items-center justify-between px-6 md:px-10 border-b border-transparent hover:border-border transition-colors flex-shrink-0 z-10 bg-page/80 backdrop-blur-sm sticky top-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleDesktopSidebar()" class="hidden lg:flex p-2 rounded-lg hover:bg-surfaceHover text-muted transition-colors" title="Toggle Focus Mode">
+                    <i data-lucide="panel-left" class="w-5 h-5"></i>
+                </button>
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-surfaceHover text-text">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                
+                <!-- Breadcrumbs -->
+                <div class="flex items-center gap-2 text-sm text-muted">
+                    <span class="hidden sm:inline">Module 2</span>
+                    <i data-lucide="chevron-right" class="w-3 h-3 opacity-50"></i>
+                    <span class="font-medium text-text">Lesson 1</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button class="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-surfaceHover text-muted text-xs font-medium transition-colors">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Save</span>
+                </button>
+                <a href="course-collection.html" class="p-2 rounded-lg hover:bg-surfaceHover text-muted transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto scroll-smooth" id="scroll-container">
+            <div class="max-w-3xl mx-auto px-6 md:px-10 py-10 pb-24">
+                
+                <!-- Title Block -->
+                <div class="mb-12 animate-fade-in">
+                    <h1 class="text-3xl md:text-5xl font-display font-bold text-text mb-4 leading-tight">Bayesian Inference</h1>
+                    <p class="text-lg text-muted font-light leading-relaxed">Understanding priors, likelihoods, and posterior distributions through mathematical intuition and code.</p>
+                </div>
+
+                <!-- Main Prose -->
+                <article class="prose max-w-none">
+                    <p>
+                        Bayesian inference is a method of statistical inference in which Bayes' theorem is used to update the probability for a hypothesis as more evidence or information becomes available.
+                    </p>
+
+                    <!-- Feature Block -->
+                    <div class="my-10 p-8 rounded-2xl bg-surface border border-border flex flex-col items-center justify-center gap-4 group">
+                        <div class="text-xs font-bold uppercase tracking-widest text-muted">Bayes' Theorem</div>
+                        <div class="text-2xl md:text-4xl font-serif italic text-text text-center transition-transform group-hover:scale-105 duration-300">
+                            P(A|B) = <span class="inline-flex flex-col items-center align-middle mx-3 relative -top-1"><span class="border-b border-muted pb-1 mb-1">P(B|A) &cdot; P(A)</span><span>P(B)</span></span>
+                        </div>
+                    </div>
+
+                    <p>
+                        Unlike frequentist statistics which treats parameters as fixed constants, Bayesian statistics treats them as random variables described by a probability distribution.
+                    </p>
+
+                    <h2>Python Implementation</h2>
+                    <p>Let's look at how we can implement a simple updater function in Python.</p>
+
+                    <!-- Code Snippet -->
+                    <div class="code-window my-8 shadow-2xl shadow-black/10">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-white/5">
+                            <span class="text-xs font-mono text-gray-400">bayes.py</span>
+                            <div class="flex gap-1.5">
+                                <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                            </div>
+                        </div>
+                        <div class="p-5 overflow-x-auto">
+<pre class="font-mono text-sm leading-relaxed text-gray-300"><code><span class="text-purple-400">import</span> numpy <span class="text-purple-400">as</span> np
+
+<span class="text-gray-500"># 1. Define Prior</span>
+prior = np.ones(100) / 100 
+p_grid = np.linspace(0, 1, 100)
+
+<span class="text-blue-400">def</span> <span class="text-yellow-300">update</span>(prior, heads, total):
+    likelihood = p_grid**heads * (1 - p_grid)**(total - heads)
+    posterior = likelihood * prior
+    <span class="text-purple-400">return</span> posterior / posterior.sum()</code></pre>
+                        </div>
+                    </div>
+
+                    <h2>Key Concepts</h2>
+                    <ul>
+                        <li><strong>Prior:</strong> What we know before seeing data.</li>
+                        <li><strong>Likelihood:</strong> How probable the data is given our hypothesis.</li>
+                        <li><strong>Posterior:</strong> Our updated belief after seeing data.</li>
+                    </ul>
+                </article>
+
+                <!-- Navigation Footer -->
+                <div class="mt-16 pt-8 border-t border-border flex justify-between items-center">
+                    <button class="flex items-center gap-3 text-left group px-4 py-2 rounded-lg hover:bg-surfaceHover transition-colors">
+                        <i data-lucide="arrow-left" class="w-5 h-5 text-muted group-hover:text-primary transition-colors"></i>
+                        <div>
+                            <span class="text-xs text-muted block mb-0.5">Previous Lesson</span>
+                            <span class="text-sm font-bold text-text group-hover:text-primary transition-colors">Introduction</span>
+                        </div>
+                    </button>
+
+                    <button class="flex items-center gap-3 text-right group px-4 py-2 rounded-lg hover:bg-surfaceHover transition-colors">
+                        <div>
+                            <span class="text-xs text-muted block mb-0.5">Next Lesson</span>
+                            <span class="text-sm font-bold text-text group-hover:text-primary transition-colors">Conjugate Priors</span>
+                        </div>
+                        <i data-lucide="arrow-right" class="w-5 h-5 text-muted group-hover:text-primary transition-colors"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Backdrop -->
+    <div id="backdrop" class="fixed inset-0 bg-black/60 z-10 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0" onclick="toggleMobileSidebar()"></div>
+
+    <script>
+        lucide.createIcons();
+
+        // Mobile Sidebar Logic
+        const sidebar = document.getElementById('sidebar-panel');
+        const backdrop = document.getElementById('backdrop');
+
+        function toggleMobileSidebar() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        // Desktop Focus Mode (Collapse)
+        function toggleDesktopSidebar() {
+            if (window.innerWidth >= 1024) {
+                if (sidebar.classList.contains('lg:w-0')) {
+                    // Open
+                    sidebar.classList.remove('lg:w-0', 'lg:border-r-0', 'overflow-hidden');
+                    sidebar.classList.add('lg:w-80', 'border-r');
+                } else {
+                    // Close (Focus Mode)
+                    sidebar.classList.remove('lg:w-80', 'border-r');
+                    sidebar.classList.add('lg:w-0', 'lg:border-r-0', 'overflow-hidden');
+                }
+            }
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            let next = 'dark';
+            if (current === 'dark') next = 'light';
+            else next = 'dark';
+            
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+    </script>
+</body>
+</html>

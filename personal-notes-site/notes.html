@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes Library // Aryan.DS</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gemini: {
+                            bg: 'var(--bg-color)',
+                            surface: 'var(--surface-color)',
+                            surfaceHover: 'var(--surface-hover)',
+                            border: 'var(--border-color)',
+                            text: 'var(--text-color)',
+                            textMuted: 'var(--text-muted)',
+                            primary: 'var(--primary-color)',
+                            accent: 'var(--accent-color)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            /* Light Mode */
+            --bg-color: #FFFFFF;
+            --surface-color: #F0F4F9;
+            --surface-hover: #E1E5EA;
+            --border-color: #E3E3E3;
+            --text-color: #1F1F1F;
+            --text-muted: #444746;
+            --primary-color: #0B57D0;
+            --accent-color: #D3E3FD;
+            --blob-opacity: 0;
+        }
+
+        body[data-theme="dark"] {
+            /* Dark Mode */
+            --bg-color: #131314;
+            --surface-color: #1E1F20;
+            --surface-hover: #2D2E30;
+            --border-color: #444746;
+            --text-color: #E3E3E3;
+            --text-muted: #C4C7C5;
+            --primary-color: #A8C7FA;
+            --accent-color: #0F294D;
+            --blob-opacity: 0;
+        }
+
+        body[data-theme="aurora"] {
+            /* Aurora Mode */
+            --bg-color: #000000;
+            --surface-color: rgba(30, 31, 32, 0.5);
+            --surface-hover: rgba(45, 46, 48, 0.6);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-color: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --primary-color: #A8C7FA;
+            --accent-color: #1E1F20;
+            --blob-opacity: 0.4;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Smart Navbar */
+        .smart-nav {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-hidden {
+            transform: translateY(-100%);
+        }
+
+        /* Aurora Elements */
+        .aurora-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: var(--blob-opacity);
+            transition: opacity 0.8s ease; overflow: hidden;
+        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
+        .blob-1 { top: -10%; left: 20%; width: 60vw; height: 60vw; background: #3B82F6; animation: float 25s infinite alternate; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #8B5CF6; animation: float 20s infinite alternate-reverse; }
+
+        /* Card Interactions */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -10px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+        body[data-theme="aurora"] .card-hover:hover {
+            box-shadow: 0 12px 30px -10px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Collection Stack Effect */
+        .collection-stack {
+            position: relative;
+            z-index: 1;
+        }
+        .collection-stack::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            height: 100%;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            z-index: -1;
+            opacity: 0.7;
+            transition: transform 0.3s ease;
+        }
+        .collection-stack::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 100%;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            z-index: -2;
+            opacity: 0.4;
+            transition: transform 0.3s ease;
+        }
+        .card-hover:hover .collection-stack::before {
+            transform: translateX(-50%) translateY(-3px);
+        }
+        .card-hover:hover .collection-stack::after {
+            transform: translateX(-50%) translateY(-6px);
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen flex flex-col selection:bg-blue-500/20" data-theme="dark">
+
+    <!-- Aurora Background -->
+    <div class="aurora-layer">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="absolute inset-0 opacity-[0.05] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
+    </div>
+
+    <!-- Smart Navbar -->
+    <nav id="navbar" class="fixed top-0 left-0 w-full z-50 border-b border-gemini-border bg-gemini-bg/80 backdrop-blur-md smart-nav">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">A</div>
+                <div class="flex flex-col">
+                    <span class="font-display font-bold text-lg leading-none">Aryan's Notes</span>
+                    <span class="text-[10px] text-gemini-textMuted uppercase tracking-widest font-bold">Knowledge Base</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gemini-textMuted">
+                <a href="index.html" class="hover:text-gemini-primary transition-colors">Home</a>
+                <a href="#" class="text-gemini-primary font-bold">Notes</a>
+                <a href="solutions.html" class="hover:text-gemini-primary transition-colors">Solutions</a>
+                <a href="about.html" class="hover:text-gemini-primary transition-colors">About</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gemini-surfaceHover text-gemini-textMuted transition-colors">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+                <a href="https://github.com" target="_blank" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-gemini-text text-gemini-bg font-bold text-xs hover:opacity-90 transition-opacity">
+                    <i data-lucide="github" class="w-4 h-4"></i> GitHub
+                </a>
+                <button class="md:hidden p-2 rounded-full hover:bg-gemini-surfaceHover" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 bg-gemini-bg transform translate-x-full transition-transform duration-300 md:hidden flex flex-col">
+        <div class="flex justify-end p-6">
+            <button onclick="toggleMobileMenu()" class="p-2 rounded-full hover:bg-gemini-surfaceHover">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+        </div>
+        <div class="flex flex-col items-center gap-8 text-2xl font-display font-bold p-10">
+            <a href="index.html" onclick="toggleMobileMenu()">Home</a>
+            <a href="#" onclick="toggleMobileMenu()" class="text-gemini-primary">Notes</a>
+            <a href="solutions.html" onclick="toggleMobileMenu()">Solutions</a>
+            <a href="about.html" onclick="toggleMobileMenu()">About</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20 px-6">
+        
+        <!-- Hero Section -->
+        <section class="max-w-4xl mx-auto text-center mb-16 animate-fade-in">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gemini-surface border border-gemini-border text-xs font-mono mb-6 text-gemini-textMuted">
+                <i data-lucide="library" class="w-3 h-3"></i>
+                Digital Library
+            </div>
+            
+            <h1 class="text-4xl md:text-6xl font-display font-bold mb-6 tracking-tight">
+                Explore Notes & <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Learning Collections</span>
+            </h1>
+            
+            <!-- Search Bar -->
+            <div class="max-w-2xl mx-auto relative group mt-8">
+                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-gemini-textMuted group-focus-within:text-gemini-primary transition-colors"></i>
+                </div>
+                <input type="text" placeholder="Search for concepts, formulas, or code snippets..." 
+                    class="w-full py-4 pl-12 pr-4 rounded-full bg-gemini-surface border border-gemini-border focus:border-gemini-primary focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm shadow-sm hover:shadow-md">
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap justify-center gap-2 mt-6">
+                <button class="px-4 py-2 rounded-full bg-gemini-text text-gemini-bg text-sm font-bold">All</button>
+                <button class="px-4 py-2 rounded-full bg-gemini-surface border border-gemini-border text-gemini-textMuted text-sm hover:bg-gemini-surfaceHover hover:text-gemini-text transition-colors">Statistics</button>
+                <button class="px-4 py-2 rounded-full bg-gemini-surface border border-gemini-border text-gemini-textMuted text-sm hover:bg-gemini-surfaceHover hover:text-gemini-text transition-colors">Data Science</button>
+                <button class="px-4 py-2 rounded-full bg-gemini-surface border border-gemini-border text-gemini-textMuted text-sm hover:bg-gemini-surfaceHover hover:text-gemini-text transition-colors">Mathematics</button>
+                <button class="px-4 py-2 rounded-full bg-gemini-surface border border-gemini-border text-gemini-textMuted text-sm hover:bg-gemini-surfaceHover hover:text-gemini-text transition-colors">Python</button>
+            </div>
+        </section>
+
+        <!-- Collections Section (Playlists) -->
+        <section class="max-w-7xl mx-auto mb-20">
+            <div class="flex items-center gap-4 mb-8">
+                <h2 class="text-xl font-display font-bold">Featured Collections</h2>
+                <div class="h-px bg-gemini-border flex-grow"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-12">
+                
+                <!-- Collection 1: Stats II -->
+                <a href="course-collection.html" class="group card-hover">
+                    <div class="collection-stack bg-gemini-surface border border-gemini-border rounded-[1.5rem] p-1 aspect-[16/10] relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 to-slate-900 opacity-90"></div>
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                        
+                        <div class="relative h-full flex flex-col justify-between p-6 z-10">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-black/30 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">COURSE</span>
+                                <i data-lucide="bar-chart-2" class="w-8 h-8 text-blue-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-display font-bold text-white mb-1">Statistics II</h3>
+                                <p class="text-blue-200 text-xs line-clamp-2">Inference, Hypothesis Testing, and Regression Analysis.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Hover Overlay -->
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 backdrop-blur-sm rounded-[1.4rem]">
+                            <span class="flex items-center gap-2 text-white font-bold tracking-widest text-sm uppercase">
+                                <i data-lucide="play-circle" class="w-5 h-5"></i> View Collection
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-4 px-2">
+                        <div class="flex items-center justify-between text-xs text-gemini-textMuted mb-2">
+                            <span class="font-bold text-gemini-text">12 Notes</span>
+                            <span>Updated 2d ago</span>
+                        </div>
+                        <div class="w-full bg-gemini-border h-1 rounded-full overflow-hidden">
+                            <div class="bg-blue-500 h-full w-[66%]"></div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Collection 2: Python OOP -->
+                <a href="#" class="group card-hover">
+                    <div class="collection-stack bg-gemini-surface border border-gemini-border rounded-[1.5rem] p-1 aspect-[16/10] relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-900 to-slate-900 opacity-90"></div>
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                        
+                        <div class="relative h-full flex flex-col justify-between p-6 z-10">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-black/30 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">MODULE</span>
+                                <i data-lucide="terminal" class="w-8 h-8 text-purple-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-display font-bold text-white mb-1">Python OOP</h3>
+                                <p class="text-purple-200 text-xs line-clamp-2">Classes, Inheritance, Dunder Methods, and Design Patterns.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 backdrop-blur-sm rounded-[1.4rem]">
+                            <span class="flex items-center gap-2 text-white font-bold tracking-widest text-sm uppercase">
+                                <i data-lucide="play-circle" class="w-5 h-5"></i> View Collection
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-4 px-2">
+                        <div class="flex items-center justify-between text-xs text-gemini-textMuted mb-2">
+                            <span class="font-bold text-gemini-text">8 Notes</span>
+                            <span>Updated 1w ago</span>
+                        </div>
+                        <div class="w-full bg-gemini-border h-1 rounded-full overflow-hidden">
+                            <div class="bg-purple-500 h-full w-[40%]"></div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Collection 3: Game Math -->
+                <a href="#" class="group card-hover">
+                    <div class="collection-stack bg-gemini-surface border border-gemini-border rounded-[1.5rem] p-1 aspect-[16/10] relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-orange-900 to-slate-900 opacity-90"></div>
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                        
+                        <div class="relative h-full flex flex-col justify-between p-6 z-10">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-black/30 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">SERIES</span>
+                                <i data-lucide="gamepad-2" class="w-8 h-8 text-orange-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-display font-bold text-white mb-1">Game Math</h3>
+                                <p class="text-orange-200 text-xs line-clamp-2">Vectors, Matrices, Quaternions, and Physics for Unity.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 backdrop-blur-sm rounded-[1.4rem]">
+                            <span class="flex items-center gap-2 text-white font-bold tracking-widest text-sm uppercase">
+                                <i data-lucide="play-circle" class="w-5 h-5"></i> View Collection
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-4 px-2">
+                        <div class="flex items-center justify-between text-xs text-gemini-textMuted mb-2">
+                            <span class="font-bold text-gemini-text">15 Notes</span>
+                            <span>Updated 3d ago</span>
+                        </div>
+                        <div class="w-full bg-gemini-border h-1 rounded-full overflow-hidden">
+                            <div class="bg-orange-500 h-full w-[80%]"></div>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- Recent Notes Grid -->
+        <section class="max-w-7xl mx-auto">
+            <div class="flex items-center gap-4 mb-8">
+                <h2 class="text-xl font-display font-bold">Recent Notes</h2>
+                <div class="h-px bg-gemini-border flex-grow"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Note Card 1 -->
+                <a href="course-read.html" class="card-hover p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border flex flex-col group relative overflow-hidden h-full">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-gemini-textMuted border border-gemini-border px-2 py-1 rounded-full">STATS II</span>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold font-display mb-2 group-hover:text-gemini-primary transition-colors">Bayesian Inference Guide</h3>
+                    <p class="text-xs text-gemini-textMuted mb-6 line-clamp-3 flex-grow leading-relaxed">
+                        Detailed breakdown of priors, likelihoods, and posterior distributions with Python implementations.
+                    </p>
+
+                    <div class="flex items-center justify-between text-[10px] text-gemini-textMuted border-t border-gemini-border pt-4 mt-auto">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 15 MIN</span>
+                        <span class="group-hover:translate-x-1 transition-transform">Read Note -></span>
+                    </div>
+                </a>
+
+                <!-- Note Card 2 -->
+                <a href="#" class="card-hover p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border flex flex-col group relative overflow-hidden h-full">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
+                            <i data-lucide="code" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-gemini-textMuted border border-gemini-border px-2 py-1 rounded-full">PYTHON</span>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold font-display mb-2 group-hover:text-purple-500 transition-colors">Python Magic Methods</h3>
+                    <p class="text-xs text-gemini-textMuted mb-6 line-clamp-3 flex-grow leading-relaxed">
+                        Understanding __init__, __str__, and operator overloading for custom classes.
+                    </p>
+
+                    <div class="flex items-center justify-between text-[10px] text-gemini-textMuted border-t border-gemini-border pt-4 mt-auto">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 8 MIN</span>
+                        <span class="group-hover:translate-x-1 transition-transform">Read Note -></span>
+                    </div>
+                </a>
+
+                <!-- Note Card 3 -->
+                <a href="#" class="card-hover p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border flex flex-col group relative overflow-hidden h-full">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+                            <i data-lucide="sigma" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-gemini-textMuted border border-gemini-border px-2 py-1 rounded-full">MATH II</span>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold font-display mb-2 group-hover:text-green-500 transition-colors">Eigenvalues & Vectors</h3>
+                    <p class="text-xs text-gemini-textMuted mb-6 line-clamp-3 flex-grow leading-relaxed">
+                        Visualizing linear transformations and calculating determinants for PCA.
+                    </p>
+
+                    <div class="flex items-center justify-between text-[10px] text-gemini-textMuted border-t border-gemini-border pt-4 mt-auto">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 12 MIN</span>
+                        <span class="group-hover:translate-x-1 transition-transform">Read Note -></span>
+                    </div>
+                </a>
+
+                <!-- Note Card 4 -->
+                <a href="#" class="card-hover p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border flex flex-col group relative overflow-hidden h-full">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500">
+                            <i data-lucide="box" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-gemini-textMuted border border-gemini-border px-2 py-1 rounded-full">GAME DEV</span>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold font-display mb-2 group-hover:text-orange-500 transition-colors">Unity Raycasting</h3>
+                    <p class="text-xs text-gemini-textMuted mb-6 line-clamp-3 flex-grow leading-relaxed">
+                        Implementing line-of-sight checks and projectile physics in C# using Physics.Raycast.
+                    </p>
+
+                    <div class="flex items-center justify-between text-[10px] text-gemini-textMuted border-t border-gemini-border pt-4 mt-auto">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 10 MIN</span>
+                        <span class="group-hover:translate-x-1 transition-transform">Read Note -></span>
+                    </div>
+                </a>
+
+            </div>
+            
+            <div class="mt-12 text-center">
+                <button class="px-6 py-3 rounded-full border border-gemini-border text-sm font-bold hover:bg-gemini-surfaceHover transition-colors flex items-center gap-2 mx-auto">
+                    <i data-lucide="loader" class="w-4 h-4"></i> Load More Notes
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gemini-border mt-auto">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600"></div>
+                <span class="font-bold text-sm">Aryan.DS</span>
+            </div>
+            <div class="flex gap-6 text-sm text-gemini-textMuted font-medium">
+                <a href="#" class="hover:text-gemini-text transition-colors">GitHub</a>
+                <a href="#" class="hover:text-gemini-text transition-colors">LinkedIn</a>
+                <a href="#" class="hover:text-gemini-text transition-colors">Email</a>
+            </div>
+            <span class="text-xs text-gemini-textMuted">© 2026 Aryan.DS</span>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Theme Logic
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            let next = 'dark';
+            if (current === 'dark') next = 'light';
+            else if (current === 'light') next = 'aurora';
+            else next = 'dark'; // Cycle
+
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+
+        // Smart Navbar
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > lastScroll && currentScroll > 60) {
+                navbar.classList.add('nav-hidden');
+            } else {
+                navbar.classList.remove('nav-hidden');
+            }
+            lastScroll = currentScroll;
+        });
+
+        // Mobile Menu
+        const mobileMenu = document.getElementById('mobile-menu');
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('translate-x-full');
+            document.body.classList.toggle('overflow-hidden');
+        }
+    </script>
+</body>
+</html>
