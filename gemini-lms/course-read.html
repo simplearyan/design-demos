@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayesian Inference // Reading</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gemini: {
+                            bg: 'var(--bg-color)',
+                            surface: 'var(--surface-color)',
+                            surfaceHover: 'var(--surface-hover)',
+                            border: 'var(--border-color)',
+                            text: 'var(--text-color)',
+                            textMuted: 'var(--text-muted)',
+                            primary: 'var(--primary-color)',
+                            accent: 'var(--accent-color)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 40px -10px var(--primary-color)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --bg-color: #FFFFFF;
+            --surface-color: #F0F4F9;
+            --surface-hover: #E1E5EA;
+            --border-color: #E3E3E3;
+            --text-color: #1F1F1F;
+            --text-muted: #444746;
+            --primary-color: #0B57D0;
+            --accent-color: #D3E3FD;
+            --code-bg: #1e1e1e;
+        }
+
+        .dark {
+            --bg-color: #131314;
+            --surface-color: #1E1F20;
+            --surface-hover: #2D2E30;
+            --border-color: #444746;
+            --text-color: #E3E3E3;
+            --text-muted: #C4C7C5;
+            --primary-color: #A8C7FA;
+            --accent-color: #0F294D;
+            --code-bg: #000000;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Sidebar Transition */
+        #desktop-sidebar, #playlist-sidebar {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Active Playlist Item */
+        .playlist-item.active {
+            background-color: var(--accent-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        .playlist-item.active h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Typography for Content */
+        .prose p { margin-bottom: 1.5rem; line-height: 1.75; color: var(--text-muted); font-size: 1.05rem; }
+        .prose h2 { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-color); }
+        .prose ul { margin-bottom: 1.5rem; list-style-type: none; padding-left: 0; }
+        .prose li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; color: var(--text-muted); }
+        .prose li::before { content: "•"; position: absolute; left: 0; color: var(--primary-color); font-weight: bold; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+    </style>
+</head>
+<body class="font-sans min-h-screen flex selection:bg-blue-500/20 overflow-hidden">
+
+    <!-- Global Left Sidebar (Collapsed Icon Nav) -->
+    <aside id="desktop-sidebar" class="hidden lg:flex flex-col w-20 h-screen sticky top-0 border-r border-gemini-border p-4 bg-gemini-bg z-40 flex-shrink-0">
+        <!-- Logo Icon -->
+        <a href="index.html" class="flex justify-center mb-8">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-700 to-orange-600 flex items-center justify-center shadow-lg text-white font-bold">
+                <img src="https://upload.wikimedia.org/wikipedia/en/6/69/IIT_Madras_Logo.svg" alt="IITM" class="w-6 h-6 brightness-200 grayscale-0">
+            </div>
+        </a>
+
+        <!-- Icons Only Nav -->
+        <nav class="flex-1 flex flex-col gap-4 items-center">
+            <a href="index.html" class="p-3 rounded-xl hover:bg-gemini-surfaceHover text-gemini-textMuted hover:text-gemini-primary transition-colors" title="Dashboard">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+            </a>
+            <a href="stats-course.html" class="p-3 rounded-xl bg-gemini-accent text-gemini-primary transition-colors" title="Course Home">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+            </a>
+            <a href="#" class="p-3 rounded-xl hover:bg-gemini-surfaceHover text-gemini-textMuted hover:text-gemini-primary transition-colors" title="Grades">
+                <i data-lucide="file-bar-chart" class="w-5 h-5"></i>
+            </a>
+        </nav>
+
+        <!-- Toggle Sidebar Expand -->
+        <button onclick="expandSidebar()" class="mt-auto p-3 rounded-xl hover:bg-gemini-surfaceHover text-gemini-textMuted flex justify-center">
+            <i data-lucide="panel-left-open" class="w-5 h-5"></i>
+        </button>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen">
+        
+        <!-- Header -->
+        <header class="h-16 border-b border-gemini-border flex items-center justify-between px-6 bg-gemini-bg/95 backdrop-blur-md z-30 flex-shrink-0">
+            <div class="flex items-center gap-4">
+                <!-- Mobile Sidebar Toggle -->
+                <button class="lg:hidden p-2 rounded-full hover:bg-gemini-surfaceHover text-gemini-primary" onclick="togglePlaylist()">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+
+                <a href="stats-course.html" class="p-2 rounded-full hover:bg-gemini-surfaceHover text-gemini-textMuted hidden sm:block">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </a>
+                <div>
+                    <h1 class="text-sm font-bold font-display">Statistics for Data Science II</h1>
+                    <span class="text-xs text-gemini-textMuted">Module 2: Bayesian Inference</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-2 text-xs font-mono text-gemini-textMuted mr-4">
+                    <i data-lucide="clock" class="w-3 h-3"></i> 15 min read
+                </div>
+                <!-- Theme -->
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gemini-surfaceHover text-gemini-textMuted">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Split Layout (Syllabus Left, Content Right) -->
+        <div class="flex flex-1 overflow-hidden relative">
+            
+            <!-- Left: Playlist Sidebar (Sticky/Fixed) -->
+            <!-- Changed order: Now appears before main content in DOM -->
+            <aside id="playlist-sidebar" class="w-80 flex-shrink-0 bg-gemini-bg border-r border-gemini-border flex flex-col h-full fixed top-0 bottom-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 shadow-2xl lg:shadow-none">
+                
+                <div class="p-4 border-b border-gemini-border flex items-center justify-between bg-gemini-bg sticky top-0 z-10">
+                    <div>
+                        <h2 class="font-bold text-sm">Course Syllabus</h2>
+                        <span class="text-xs text-gemini-textMuted">2/12 Completed</span>
+                    </div>
+                    <button class="lg:hidden p-2 hover:bg-gemini-surface rounded-full" onclick="togglePlaylist()">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-2 space-y-1">
+                    
+                    <!-- Module 1 Header -->
+                    <div class="px-3 py-2 mt-2 text-[10px] font-bold text-gemini-textMuted uppercase tracking-wider">Module 1: Foundations</div>
+                    
+                    <!-- Item 1 (Done) -->
+                    <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-gemini-surface transition-colors group opacity-60">
+                        <div class="mt-1"><i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i></div>
+                        <div>
+                            <h4 class="text-sm font-medium">Sample Space & Events</h4>
+                            <span class="text-xs text-gemini-textMuted">10 min</span>
+                        </div>
+                    </a>
+
+                    <!-- Module 2 Header -->
+                    <div class="px-3 py-2 mt-4 text-[10px] font-bold text-gemini-textMuted uppercase tracking-wider">Module 2: Bayesian Inference</div>
+
+                    <!-- Item 2 (Active) -->
+                    <a href="#" class="playlist-item active flex gap-3 p-3 rounded-xl bg-gemini-accent border border-transparent transition-colors">
+                        <div class="mt-1"><i data-lucide="play-circle" class="w-4 h-4 text-gemini-primary"></i></div>
+                        <div>
+                            <h4 class="text-sm font-bold text-gemini-primary">Priors & Posteriors</h4>
+                            <span class="text-xs text-gemini-textMuted font-mono">Reading Now</span>
+                        </div>
+                    </a>
+
+                    <!-- Item 3 -->
+                    <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-gemini-surface transition-colors group">
+                        <div class="mt-1 text-gemini-textMuted font-mono text-xs w-4 text-center">03</div>
+                        <div>
+                            <h4 class="text-sm font-medium group-hover:text-gemini-primary">Conjugate Priors</h4>
+                            <span class="text-xs text-gemini-textMuted">20 min</span>
+                        </div>
+                    </a>
+
+                    <!-- Item 4 -->
+                    <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-gemini-surface transition-colors group">
+                        <div class="mt-1 text-gemini-textMuted font-mono text-xs w-4 text-center">04</div>
+                        <div>
+                            <h4 class="text-sm font-medium group-hover:text-gemini-primary">Markov Chain Monte Carlo</h4>
+                            <span class="text-xs text-gemini-textMuted">25 min</span>
+                        </div>
+                    </a>
+
+                    <!-- Module 3 Header -->
+                    <div class="px-3 py-2 mt-4 text-[10px] font-bold text-gemini-textMuted uppercase tracking-wider opacity-60">Module 3: Hypothesis Testing</div>
+
+                    <!-- Item 5 -->
+                    <a href="#" class="flex gap-3 p-3 rounded-xl hover:bg-gemini-surface transition-colors group opacity-60">
+                        <div class="mt-1"><i data-lucide="lock" class="w-3 h-3 text-gemini-textMuted"></i></div>
+                        <div>
+                            <h4 class="text-sm font-medium">Null vs Alternative</h4>
+                            <span class="text-xs text-gemini-textMuted">Locked</span>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Center: Reading Content -->
+            <main class="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth relative" id="main-scroll">
+                <div class="max-w-3xl mx-auto pb-20">
+                    
+                    <!-- Cover -->
+                    <div class="aspect-video rounded-3xl bg-gradient-to-br from-blue-900 to-slate-900 relative overflow-hidden mb-8 flex items-center justify-center shadow-2xl">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                        <div class="text-center p-6 z-10">
+                            <span class="px-3 py-1 rounded-full bg-white/10 text-white text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/10 mb-4 inline-block">Lesson 2.1</span>
+                            <h1 class="text-3xl md:text-5xl font-display font-bold text-white mb-2">Priors & Posteriors</h1>
+                            <p class="text-blue-100/80 text-sm">Understanding the mathematical framework of belief updates.</p>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <article class="prose max-w-none">
+                        <p>
+                            Bayesian inference is a method of statistical inference in which Bayes' theorem is used to update the probability for a hypothesis as more evidence or information becomes available.
+                        </p>
+
+                        <h2>The Core Equation</h2>
+                        <div class="p-6 rounded-2xl bg-gemini-surface border border-gemini-border flex justify-center my-6">
+                            <code class="text-lg font-serif italic text-gemini-text">P(A|B) = [P(B|A) · P(A)] / P(B)</code>
+                        </div>
+                        <p>
+                            Where <strong>P(A|B)</strong> is the posterior probability, <strong>P(B|A)</strong> is the likelihood, and <strong>P(A)</strong> is the prior.
+                        </p>
+
+                        <h2>Python Simulation</h2>
+                        <p>
+                            Let's simulate a coin flip experiment. We start with a uniform prior (assuming the coin could be anything from 0% to 100% biased).
+                        </p>
+
+                        <div class="rounded-xl overflow-hidden border border-gemini-border bg-gemini-bg my-6">
+                            <div class="flex items-center justify-between px-4 py-2 bg-gemini-surface border-b border-gemini-border">
+                                <span class="text-xs font-mono text-gemini-textMuted">bayes.py</span>
+                                <i data-lucide="copy" class="w-3 h-3 text-gemini-textMuted cursor-pointer hover:text-gemini-primary"></i>
+                            </div>
+                            <div class="p-4 overflow-x-auto bg-[#0d0d0d]"> <!-- Always dark for code -->
+                                <pre class="text-sm font-mono text-gray-300"><code><span class="text-purple-400">import</span> numpy <span class="text-purple-400">as</span> np
+
+<span class="text-gray-500"># 1. Define Prior</span>
+prior = np.ones(100) / 100 
+p_grid = np.linspace(0, 1, 100)
+
+<span class="text-blue-400">def</span> <span class="text-yellow-300">update</span>(prior, heads, total):
+    likelihood = p_grid**heads * (1 - p_grid)**(total - heads)
+    posterior = likelihood * prior
+    <span class="text-purple-400">return</span> posterior / posterior.sum()</code></pre>
+                            </div>
+                        </div>
+
+                        <h2>Summary</h2>
+                        <p>
+                            As we observe more data, the likelihood dominates the prior, and our posterior distribution converges to the true parameter value.
+                        </p>
+                    </article>
+
+                    <!-- Nav Buttons -->
+                    <div class="flex justify-between items-center mt-12 pt-8 border-t border-gemini-border">
+                        <button class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gemini-surface transition-colors group text-left">
+                            <i data-lucide="chevron-left" class="w-5 h-5 text-gemini-textMuted group-hover:text-gemini-primary"></i>
+                            <div>
+                                <span class="text-xs text-gemini-textMuted block">Previous</span>
+                                <span class="font-bold text-sm">Introduction</span>
+                            </div>
+                        </button>
+                        
+                        <button class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gemini-surface transition-colors group text-right">
+                            <div>
+                                <span class="text-xs text-gemini-textMuted block">Next</span>
+                                <span class="font-bold text-sm">Conjugate Priors</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-gemini-textMuted group-hover:text-gemini-primary"></i>
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <!-- Backdrop for Mobile Sidebar -->
+    <div id="backdrop" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0" onclick="togglePlaylist()"></div>
+
+    <script>
+        lucide.createIcons();
+
+        // Playlist Toggle (Mobile)
+        const playlist = document.getElementById('playlist-sidebar');
+        const backdrop = document.getElementById('backdrop');
+
+        function togglePlaylist() {
+            // Check if hidden (translated off screen to left)
+            const isClosed = playlist.classList.contains('-translate-x-full');
+            if (isClosed) {
+                playlist.classList.remove('-translate-x-full'); // Slide in
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+            } else {
+                playlist.classList.add('-translate-x-full'); // Slide out
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        // Expand Left Sidebar (Mock functionality for now)
+        function expandSidebar() {
+            alert("This would expand the global navigation sidebar.");
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Init Theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</body>
+</html>

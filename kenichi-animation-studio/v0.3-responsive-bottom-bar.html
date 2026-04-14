@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenichi Animation Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0f1115',
+                            800: '#161920',
+                            700: '#222631',
+                            600: '#2e3442'
+                        },
+                        brand: {
+                            500: '#3b82f6',
+                            600: '#2563eb'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1115; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e3442; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6; 
+        }
+        
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 0.375rem;
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-gray-200 h-screen overflow-hidden flex flex-col font-sans relative">
+
+    <!-- Top Navigation -->
+    <header class="h-16 bg-dark-800 border-b border-dark-700 flex items-center justify-between px-4 lg:px-6 shrink-0 z-20 relative">
+        <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" onclick="switchView('home')">
+            <i class="ph-fill ph-play-circle text-brand-500 text-2xl lg:text-3xl"></i>
+            <h1 class="font-bold text-lg lg:text-xl tracking-tight text-white">Kenichi<span class="text-gray-400 font-normal">Studio</span></h1>
+        </div>
+        
+        <!-- Editor specific header actions (Desktop Only) -->
+        <div id="editor-actions" class="hidden lg:flex items-center gap-4">
+            <button onclick="switchView('home')" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-medium transition-colors flex items-center gap-1">
+                <i class="ph-bold ph-squares-four"></i> Gallery
+            </button>
+            <div id="recording-indicator" class="hidden items-center gap-2 text-red-500 text-sm font-semibold animate-pulse">
+                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                <span>Recording...</span>
+            </div>
+            <button id="export-btn" onclick="exportAnimation()" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2 rounded-md text-base font-medium transition-colors flex items-center gap-2 shadow-lg shadow-brand-500/20">
+                <i class="ph-bold ph-export"></i>
+                <span>Export</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Home View: Template Gallery -->
+    <div id="home-view" class="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12 w-full max-w-7xl mx-auto">
+        <div class="mb-8 md:mb-12 text-center md:text-left">
+            <h2 class="text-3xl md:text-5xl font-bold text-white mb-4">Discover Templates</h2>
+            <p class="text-gray-400 text-lg">Select from our massive library of highly customizable animations, configure them, and export directly to your device.</p>
+        </div>
+        
+        <!-- Search & Filter Bar (Visual only for demo) -->
+        <div class="flex flex-col md:flex-row gap-4 mb-8">
+            <div class="relative flex-1">
+                <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" placeholder="Search thousands of templates..." class="w-full bg-dark-800 border border-dark-700 rounded-lg pl-12 pr-4 py-3 text-white focus:outline-none focus:border-brand-500 transition-colors">
+            </div>
+            <select class="bg-dark-800 border border-dark-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500 cursor-pointer outline-none">
+                <option>All Categories</option>
+                <option>Data Visualization</option>
+                <option>Educational</option>
+                <option>Motion Graphics</option>
+            </select>
+        </div>
+
+        <!-- Template Grid -->
+        <div id="home-template-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+            <!-- Populated via JS -->
+        </div>
+    </div>
+
+    <!-- Main Workspace (Editor View) -->
+    <main id="editor-view" class="hidden flex-1 flex-col lg:flex-row overflow-hidden relative">
+        
+        <!-- Left Sidebar: Templates (Hidden on mobile, visible on desktop) -->
+        <aside class="hidden lg:flex w-64 bg-dark-800 border-r border-dark-700 flex-col shrink-0 z-10">
+            <div class="p-4 border-b border-dark-700">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Quick Switch</h2>
+            </div>
+            <div id="template-list" class="flex-1 overflow-y-auto p-3 space-y-2">
+                <!-- Templates generated via JS -->
+            </div>
+        </aside>
+
+        <!-- Center: Canvas Preview -->
+        <section class="flex-1 bg-dark-900 flex flex-col items-center justify-start lg:justify-center p-4 lg:p-8 relative overflow-y-auto lg:overflow-hidden pb-24 lg:pb-8">
+            
+            <!-- Custom Toast Notification -->
+            <div id="toast" class="absolute top-6 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-full shadow-2xl font-medium transform transition-all duration-300 opacity-0 -translate-y-4 pointer-events-none z-50 flex items-center gap-2">
+                <i class="ph-bold ph-check-circle text-xl"></i>
+                <span id="toast-msg">Export Complete!</span>
+            </div>
+
+            <!-- Canvas Wrapper to maintain aspect ratio -->
+            <div class="relative w-full max-w-4xl aspect-video bg-black rounded-lg shadow-2xl overflow-hidden ring-1 ring-dark-700 group shrink-0 mt-2 lg:mt-0">
+                <canvas id="stage" class="w-full h-full block object-contain"></canvas>
+                
+                <!-- Playback controls overlay (Desktop Only) -->
+                <div class="hidden lg:flex absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark-800/80 backdrop-blur-md px-4 py-2 rounded-full border border-dark-600 items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="restartAnimation()" class="text-gray-300 hover:text-white transition-colors" title="Restart Animation">
+                        <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
+                    </button>
+                    <div class="w-px h-4 bg-dark-600"></div>
+                    <span id="time-display" class="font-mono text-xs text-gray-400">00:00</span>
+                </div>
+                <!-- Time display for mobile overlaying canvas -->
+                <div class="lg:hidden absolute bottom-2 right-2 bg-dark-800/60 backdrop-blur px-2 py-1 rounded text-[10px] font-mono text-white">
+                    <span id="time-display-mobile">00:00</span>
+                </div>
+            </div>
+            
+            <p class="text-dark-600 mt-4 text-xs lg:text-sm text-center">Preview rendering in real-time at 60fps</p>
+            
+        </section>
+
+        <!-- Right Sidebar / Bottom Drawer (Properties) -->
+        
+        <!-- Mobile Drawer Backdrop -->
+        <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden lg:hidden opacity-0 transition-opacity duration-300" onclick="toggleMobileDrawer(false)"></div>
+
+        <aside id="properties-drawer" class="w-full lg:w-80 bg-dark-800 lg:border-l border-dark-700 flex flex-col fixed lg:static inset-x-0 bottom-0 z-50 transform translate-y-full lg:translate-y-0 transition-transform duration-300 h-[80vh] lg:h-full rounded-t-3xl lg:rounded-none shadow-[0_-10px_40px_rgba(0,0,0,0.5)] lg:shadow-none shrink-0">
+            <!-- Mobile Drag Handle -->
+            <div class="w-full flex justify-center py-3 lg:hidden cursor-pointer" onclick="toggleMobileDrawer(false)">
+                <div class="w-12 h-1.5 bg-dark-600 rounded-full"></div>
+            </div>
+            
+            <div class="px-5 pb-4 pt-1 lg:p-4 border-b border-dark-700 flex items-center justify-between bg-dark-800 sticky top-0 z-10">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Properties</h2>
+                <button class="lg:hidden text-gray-400 hover:text-white transition-colors" onclick="toggleMobileDrawer(false)">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+                <i class="ph-bold ph-sliders-horizontal text-gray-400 hidden lg:block"></i>
+            </div>
+            
+            <div id="properties-panel" class="flex-1 overflow-y-auto p-5 space-y-6 pb-20 lg:pb-5">
+                <!-- Controls generated via JS -->
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Mobile Bottom Action Bar -->
+    <nav id="mobile-bottom-bar" class="hidden fixed bottom-0 left-0 right-0 bg-dark-800/95 backdrop-blur-md border-t border-dark-700 items-center justify-around py-3 z-30 pb-[env(safe-area-inset-bottom)] lg:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
+        <button onclick="switchView('home')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors w-16">
+            <i class="ph-bold ph-squares-four text-xl"></i>
+            <span class="text-[10px] font-medium">Gallery</span>
+        </button>
+        <button onclick="toggleMobileDrawer(true)" class="flex flex-col items-center gap-1 text-brand-500 hover:text-brand-400 transition-colors w-16">
+            <i class="ph-bold ph-faders text-xl"></i>
+            <span class="text-[10px] font-medium">Edit</span>
+        </button>
+        <button onclick="restartAnimation()" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors w-16">
+            <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
+            <span class="text-[10px] font-medium">Restart</span>
+        </button>
+        <button id="export-btn-mobile" onclick="exportAnimation()" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors w-16">
+            <i class="ph-bold ph-export text-xl" id="export-icon-mobile"></i>
+            <span class="text-[10px] font-medium" id="export-text-mobile">Export</span>
+        </button>
+    </nav>
+
+    <script>
+        // --- 1. State Management ---
+        let currentView = 'home';
+        let currentTemplateId = 'chart_1';
+        let config = {};
+        let animationTime = 0;
+        let lastTimestamp = 0;
+        let isRecording = false;
+        
+        // --- 2. Canvas Setup ---
+        const canvas = document.getElementById('stage');
+        const ctx = canvas.getContext('2d');
+        const W = 1920; // Internal 1080p rendering resolution
+        const H = 1080;
+        canvas.width = W;
+        canvas.height = H;
+
+        // --- 3. Base Render Functions ---
+        // We define the render logic separately so we can apply them to multiple mock templates
+        const renderChart = (ctx, t, cfg) => {
+            ctx.fillStyle = cfg.bgColor;
+            ctx.fillRect(0, 0, W, H);
+            const time = t * cfg.speed;
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 70px Inter, sans-serif';
+            ctx.fillText(cfg.title, 100, 150);
+            
+            const bars = [
+                { name: cfg.label1 || "Product A", color: cfg.color1, targetVal: cfg.val1 || 1400, delay: 0 },
+                { name: cfg.label2 || "Product B", color: cfg.color2, targetVal: cfg.val2 || 950, delay: 0.5 },
+                { name: cfg.label3 || "Product C", color: cfg.color3, targetVal: cfg.val3 || 1100, delay: 0.2 }
+            ];
+
+            bars.forEach((bar, i) => {
+                const y = 300 + (i * 180);
+                let progress = Math.max(0, Math.min(1, (time - bar.delay) / 2));
+                const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                const currentWidth = ease * bar.targetVal;
+                
+                ctx.fillStyle = bar.color;
+                ctx.beginPath();
+                ctx.roundRect(100, y, currentWidth, 100, 10);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '50px Inter, sans-serif';
+                ctx.fillText(bar.name, 100, y - 20);
+                
+                if (currentWidth > 50) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 40px Inter, sans-serif';
+                    ctx.fillText(Math.floor(currentWidth * 10), 100 + currentWidth + 20, y + 65);
+                }
+            });
+        };
+
+        const renderMath = (ctx, t, cfg) => {
+            ctx.fillStyle = cfg.bgColor;
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.strokeStyle = '#2e3442';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(100, H/2); ctx.lineTo(W-100, H/2);
+            ctx.moveTo(W/2, 100); ctx.lineTo(W/2, H-100);
+            ctx.stroke();
+
+            ctx.fillStyle = cfg.waveColor;
+            ctx.font = 'italic bold 60px "Times New Roman", serif';
+            ctx.fillText(cfg.equation, 150, 150);
+
+            ctx.strokeStyle = cfg.waveColor;
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            
+            const revealProgress = Math.min(1, t / 3);
+            const drawWidth = (W - 200) * revealProgress;
+
+            for (let x = 0; x < drawWidth; x += 5) {
+                const actualX = 100 + x;
+                const angle = (x / (W-200)) * Math.PI * 2 * cfg.frequency;
+                const phaseShift = t * 2; 
+                // Math.sin or Math.cos based on config
+                let yVal = Math.sin(angle - phaseShift);
+                if(cfg.equation.includes('cos')) yVal = Math.cos(angle - phaseShift);
+                
+                const y = H/2 - yVal * cfg.amplitude;
+                
+                if (x === 0) ctx.moveTo(actualX, y);
+                else ctx.lineTo(actualX, y);
+            }
+            ctx.stroke();
+        };
+
+        const renderOverlay = (ctx, t, cfg) => {
+            ctx.clearRect(0, 0, W, H);
+            
+            let introEase = Math.min(1, t / 1.5);
+            introEase = 1 - Math.pow(1 - introEase, 4);
+            
+            let outroEase = t > 5 ? Math.max(0, 1 - (t - 5) / 1) : 1;
+            outroEase = outroEase * outroEase;
+
+            const totalEase = introEase * outroEase;
+            if(totalEase <= 0.01) return;
+
+            ctx.save();
+            ctx.translate(cfg.posX || 150, cfg.posY || (H - 250 + (1-totalEase)*200));
+            ctx.globalAlpha = totalEase;
+
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 30;
+            ctx.shadowOffsetY = 15;
+
+            ctx.fillStyle = cfg.boxColor;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 700, 160, 20);
+            ctx.fill();
+
+            ctx.fillStyle = cfg.accentColor;
+            ctx.shadowColor = 'transparent';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 15, 160, {tl: 20, bl: 20, tr: 0, br: 0});
+            ctx.fill();
+
+            ctx.fillStyle = cfg.textColor;
+            ctx.font = 'bold 55px Inter, sans-serif';
+            ctx.fillText(cfg.name, 60, 75);
+            
+            ctx.fillStyle = cfg.accentColor;
+            ctx.font = '35px Inter, sans-serif';
+            ctx.fillText(cfg.handle, 60, 130);
+
+            ctx.restore();
+        };
+
+        // --- 4. Generate Mock Template Database ---
+        // We generate 12 templates to simulate the "Thousands" experience
+        const templates = [];
+        
+        // Data Viz Templates
+        const chartColors = [
+            ['#3b82f6', '#10b981', '#8b5cf6'],
+            ['#ef4444', '#f59e0b', '#3b82f6'],
+            ['#14b8a6', '#06b6d4', '#0ea5e9'],
+            ['#ec4899', '#d946ef', '#a855f7']
+        ];
+        
+        for(let i=1; i<=4; i++) {
+            templates.push({
+                id: `chart_${i}`,
+                name: `Race Chart V${i}`,
+                description: "Dynamic bar chart for visualizing racing data metrics.",
+                icon: 'ph-chart-bar',
+                category: 'Data Viz',
+                defaultConfig: {
+                    title: `Q${i} Performance Tracker`,
+                    color1: chartColors[i-1][0], color2: chartColors[i-1][1], color3: chartColors[i-1][2],
+                    val1: 1400 + (Math.random()*500), val2: 950 + (Math.random()*500), val3: 1100 + (Math.random()*500),
+                    label1: "Metric Alpha", label2: "Metric Beta", label3: "Metric Gamma",
+                    speed: 1.5, bgColor: "#0f1115"
+                },
+                controls: [
+                    { key: 'title', label: 'Chart Title', type: 'text' },
+                    { key: 'label1', label: 'Item 1 Name', type: 'text' },
+                    { key: 'color1', label: 'Item 1 Color', type: 'color' },
+                    { key: 'label2', label: 'Item 2 Name', type: 'text' },
+                    { key: 'color2', label: 'Item 2 Color', type: 'color' },
+                    { key: 'label3', label: 'Item 3 Name', type: 'text' },
+                    { key: 'color3', label: 'Item 3 Color', type: 'color' },
+                    { key: 'speed', label: 'Animation Speed', type: 'range', min: 0.5, max: 3, step: 0.1 },
+                    { key: 'bgColor', label: 'Background Color', type: 'color' }
+                ],
+                render: renderChart
+            });
+        }
+
+        // Math Templates
+        const mathEq = ["y = sin(x)", "y = cos(x)", "y = 2*sin(x)", "y = sin(2x)"];
+        for(let i=1; i<=4; i++) {
+            templates.push({
+                id: `math_${i}`,
+                name: `Wave Visualizer ${i}`,
+                description: "Educational wave plotting with dynamic amplitude and frequency.",
+                icon: 'ph-wave-sine',
+                category: 'Educational',
+                defaultConfig: {
+                    equation: mathEq[i-1],
+                    frequency: i % 2 === 0 ? 4 : 2,
+                    amplitude: i > 2 ? 300 : 200,
+                    waveColor: chartColors[i-1][2],
+                    bgColor: "#161920"
+                },
+                controls: [
+                    { key: 'equation', label: 'Display Equation', type: 'text' },
+                    { key: 'frequency', label: 'Frequency', type: 'range', min: 1, max: 10, step: 0.5 },
+                    { key: 'amplitude', label: 'Amplitude', type: 'range', min: 50, max: 400, step: 10 },
+                    { key: 'waveColor', label: 'Wave Color', type: 'color' },
+                    { key: 'bgColor', label: 'Background Color', type: 'color' }
+                ],
+                render: renderMath
+            });
+        }
+
+        // Overlay Templates
+        for(let i=1; i<=4; i++) {
+            templates.push({
+                id: `overlay_${i}`,
+                name: `Social Lower Third ${i}`,
+                description: "Clean, animated pop-up for YouTube/Twitch social handles.",
+                icon: 'ph-youtube-logo',
+                category: 'Motion Graphics',
+                defaultConfig: {
+                    name: "Creator Name",
+                    handle: "@creator_handle",
+                    accentColor: chartColors[i-1][0],
+                    boxColor: "#ffffff",
+                    textColor: "#0f1115",
+                    posX: 150, posY: 0 
+                },
+                controls: [
+                    { key: 'name', label: 'Main Name', type: 'text' },
+                    { key: 'handle', label: 'Social Handle', type: 'text' },
+                    { key: 'accentColor', label: 'Accent Color', type: 'color' },
+                    { key: 'boxColor', label: 'Box Color', type: 'color' },
+                    { key: 'textColor', label: 'Text Color', type: 'color' }
+                ],
+                render: renderOverlay
+            });
+        }
+
+        // --- 5. UI Routing & Generation ---
+        function switchView(view) {
+            currentView = view;
+            const homeView = document.getElementById('home-view');
+            const editorView = document.getElementById('editor-view');
+            const editorActions = document.getElementById('editor-actions');
+            const mobileBottomBar = document.getElementById('mobile-bottom-bar');
+
+            if (view === 'home') {
+                homeView.classList.remove('hidden');
+                editorView.classList.add('hidden');
+                editorView.classList.remove('flex');
+                editorActions.classList.add('hidden');
+                editorActions.classList.remove('lg:flex');
+                
+                // Hide mobile bottom bar
+                mobileBottomBar.classList.add('hidden');
+                mobileBottomBar.classList.remove('flex');
+                toggleMobileDrawer(false);
+                
+            } else {
+                homeView.classList.add('hidden');
+                editorView.classList.remove('hidden');
+                editorView.classList.add('flex');
+                editorActions.classList.remove('hidden');
+                editorActions.classList.add('lg:flex');
+                
+                // Show mobile bottom bar
+                mobileBottomBar.classList.remove('hidden');
+                mobileBottomBar.classList.add('flex');
+            }
+        }
+
+        function toggleMobileDrawer(show) {
+            const drawer = document.getElementById('properties-drawer');
+            const backdrop = document.getElementById('drawer-backdrop');
+            
+            if (show) {
+                drawer.classList.remove('translate-y-full');
+                drawer.classList.add('translate-y-0');
+                
+                backdrop.classList.remove('hidden');
+                // Trigger reflow for animation
+                void backdrop.offsetWidth;
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100');
+            } else {
+                drawer.classList.remove('translate-y-0');
+                drawer.classList.add('translate-y-full');
+                
+                backdrop.classList.remove('opacity-100');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => {
+                    backdrop.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function renderHomeGallery() {
+            const grid = document.getElementById('home-template-grid');
+            grid.innerHTML = '';
+            
+            templates.forEach(tpl => {
+                const card = document.createElement('div');
+                card.className = 'bg-dark-800 border border-dark-700 rounded-xl overflow-hidden hover:border-brand-500 transition-colors group cursor-pointer flex flex-col';
+                card.onclick = () => {
+                    selectTemplate(tpl.id);
+                    switchView('editor');
+                };
+                
+                // Card visual placeholder
+                const color = tpl.defaultConfig.color1 || tpl.defaultConfig.waveColor || tpl.defaultConfig.accentColor;
+                
+                card.innerHTML = `
+                    <div class="h-40 w-full relative overflow-hidden flex items-center justify-center border-b border-dark-700" style="background-color: ${tpl.defaultConfig.bgColor || '#161920'}">
+                        <div class="absolute inset-0 opacity-20 bg-gradient-to-tr from-transparent to-[${color}]"></div>
+                        <i class="ph-bold ${tpl.icon} text-5xl opacity-80" style="color: ${color}"></i>
+                        <div class="absolute inset-0 bg-brand-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm bg-opacity-80">
+                            <span class="text-white font-bold flex items-center gap-2"><i class="ph-bold ph-pencil-simple"></i> Edit Template</span>
+                        </div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="text-xs text-brand-500 font-bold uppercase tracking-wider mb-2">${tpl.category}</div>
+                        <h3 class="text-lg font-bold text-white mb-2">${tpl.name}</h3>
+                        <p class="text-sm text-gray-400 flex-1">${tpl.description}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderEditorSidebar() {
+            const listEl = document.getElementById('template-list');
+            listEl.innerHTML = '';
+            templates.forEach(tpl => {
+                const btn = document.createElement('button');
+                btn.className = `w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${tpl.id === currentTemplateId ? 'bg-brand-600 text-white shadow-lg' : 'hover:bg-dark-700 text-gray-400'}`;
+                btn.innerHTML = `
+                    <div class="w-10 h-10 rounded bg-black/20 flex items-center justify-center shrink-0">
+                        <i class="ph-bold ${tpl.icon} text-xl"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="font-medium text-sm text-white truncate">${tpl.name}</div>
+                        <div class="text-xs opacity-70 truncate">${tpl.category}</div>
+                    </div>
+                `;
+                btn.onclick = () => selectTemplate(tpl.id);
+                listEl.appendChild(btn);
+            });
+        }
+
+        function selectTemplate(id) {
+            currentTemplateId = id;
+            const tpl = templates.find(t => t.id === id);
+            config = JSON.parse(JSON.stringify(tpl.defaultConfig));
+            animationTime = 0; 
+            renderEditorSidebar();
+            renderProperties();
+        }
+
+        function renderProperties() {
+            const panel = document.getElementById('properties-panel');
+            panel.innerHTML = '';
+            
+            const tpl = templates.find(t => t.id === currentTemplateId);
+            
+            tpl.controls.forEach(ctrl => {
+                const wrap = document.createElement('div');
+                wrap.className = 'space-y-2';
+                
+                const label = document.createElement('label');
+                label.className = 'block text-xs font-medium text-gray-400';
+                label.innerText = ctrl.label;
+                wrap.appendChild(label);
+
+                if (ctrl.type === 'text') {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = config[ctrl.key];
+                    input.className = 'w-full bg-dark-900 border border-dark-600 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors';
+                    input.oninput = (e) => config[ctrl.key] = e.target.value;
+                    wrap.appendChild(input);
+                } 
+                else if (ctrl.type === 'color') {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center gap-3 bg-dark-900 border border-dark-600 rounded-md p-1 pr-3';
+                    
+                    const inputWrap = document.createElement('div');
+                    inputWrap.className = 'w-8 h-8 rounded shrink-0 overflow-hidden relative cursor-pointer';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'color';
+                    input.value = config[ctrl.key];
+                    input.className = 'absolute inset-0 w-full h-full cursor-pointer opacity-0 z-10';
+                    
+                    const colorDisplay = document.createElement('div');
+                    colorDisplay.className = 'absolute inset-0 w-full h-full rounded pointer-events-none';
+                    colorDisplay.style.backgroundColor = config[ctrl.key];
+
+                    const hex = document.createElement('input');
+                    hex.type = 'text';
+                    hex.className = 'bg-transparent text-sm font-mono text-gray-300 uppercase w-full focus:outline-none';
+                    hex.value = config[ctrl.key];
+
+                    input.oninput = (e) => {
+                        config[ctrl.key] = e.target.value;
+                        hex.value = e.target.value;
+                        colorDisplay.style.backgroundColor = e.target.value;
+                    };
+                    
+                    hex.oninput = (e) => {
+                        const val = e.target.value;
+                        if(/^#[0-9A-F]{6}$/i.test(val)){
+                            config[ctrl.key] = val;
+                            input.value = val;
+                            colorDisplay.style.backgroundColor = val;
+                        }
+                    }
+                    
+                    inputWrap.appendChild(input);
+                    inputWrap.appendChild(colorDisplay);
+                    div.appendChild(inputWrap);
+                    div.appendChild(hex);
+                    wrap.appendChild(div);
+                }
+                else if (ctrl.type === 'range') {
+                    const input = document.createElement('input');
+                    input.type = 'range';
+                    input.min = ctrl.min;
+                    input.max = ctrl.max;
+                    input.step = ctrl.step;
+                    input.value = config[ctrl.key];
+                    input.className = 'w-full accent-brand-500';
+                    input.oninput = (e) => config[ctrl.key] = parseFloat(e.target.value);
+                    wrap.appendChild(input);
+                }
+
+                panel.appendChild(wrap);
+            });
+        }
+
+        // --- 6. Render Loop ---
+        function renderLoop(timestamp) {
+            // Calculate delta time
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const delta = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+
+            // Only process intense canvas rendering if we are actually in the editor
+            if (currentView === 'editor') {
+                animationTime += delta;
+
+                const tpl = templates.find(t => t.id === currentTemplateId);
+                if (tpl) {
+                    ctx.clearRect(0, 0, W, H);
+                    tpl.render(ctx, animationTime, config);
+                }
+
+                const mins = Math.floor(animationTime / 60).toString().padStart(2, '0');
+                const secs = Math.floor(animationTime % 60).toString().padStart(2, '0');
+                
+                // Update both Desktop and Mobile timer displays
+                document.getElementById('time-display').innerText = `${mins}:${secs}`;
+                document.getElementById('time-display-mobile').innerText = `${mins}:${secs}`;
+            }
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        function restartAnimation() {
+            animationTime = 0;
+        }
+
+        // --- 7. Export Engine (MediaRecorder) ---
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.className = `absolute top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl font-medium transform transition-all duration-300 z-50 flex items-center gap-2 ${isError ? 'bg-red-500' : 'bg-green-500'} text-white opacity-100 translate-y-0`;
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-4');
+            }, 3000);
+        }
+
+        function exportAnimation() {
+            if (isRecording) return;
+            isRecording = true;
+            animationTime = 0; 
+            toggleMobileDrawer(false); // Close drawer if open
+            
+            // UI Elements: Desktop
+            const desktopBtn = document.getElementById('export-btn');
+            const desktopIndicator = document.getElementById('recording-indicator');
+            
+            // UI Elements: Mobile
+            const mobileBtnIcon = document.getElementById('export-icon-mobile');
+            const mobileBtnText = document.getElementById('export-text-mobile');
+
+            // Apply Recording UI
+            desktopBtn.classList.add('hidden');
+            desktopIndicator.classList.remove('hidden');
+            desktopIndicator.classList.add('flex');
+            
+            mobileBtnIcon.classList.remove('ph-export');
+            mobileBtnIcon.classList.add('ph-record', 'text-red-500', 'animate-pulse');
+            mobileBtnText.innerText = "Recording";
+            mobileBtnText.classList.add('text-red-500');
+
+            try {
+                const stream = canvas.captureStream(60);
+                const options = { mimeType: 'video/webm; codecs=vp9' };
+                let mediaRecorder;
+                
+                try {
+                    mediaRecorder = new MediaRecorder(stream, options);
+                } catch (e) {
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                }
+
+                const chunks = [];
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `kenichi_${currentTemplateId}_${Date.now()}.webm`;
+                    a.click();
+                    
+                    URL.revokeObjectURL(url);
+                    
+                    // Reset UI
+                    isRecording = false;
+                    
+                    desktopBtn.classList.remove('hidden');
+                    desktopIndicator.classList.add('hidden');
+                    desktopIndicator.classList.remove('flex');
+                    
+                    mobileBtnIcon.classList.add('ph-export');
+                    mobileBtnIcon.classList.remove('ph-record', 'text-red-500', 'animate-pulse');
+                    mobileBtnText.innerText = "Export";
+                    mobileBtnText.classList.remove('text-red-500');
+
+                    showToast('Video exported successfully!');
+                };
+
+                mediaRecorder.start();
+
+                // Stop after 6s
+                setTimeout(() => {
+                    if (mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                    }
+                }, 6000);
+
+            } catch (err) {
+                console.error("Export failed:", err);
+                isRecording = false;
+                
+                // Revert UI on error
+                desktopBtn.classList.remove('hidden');
+                desktopIndicator.classList.add('hidden');
+                desktopIndicator.classList.remove('flex');
+                
+                mobileBtnIcon.classList.add('ph-export');
+                mobileBtnIcon.classList.remove('ph-record', 'text-red-500', 'animate-pulse');
+                mobileBtnText.innerText = "Export";
+                mobileBtnText.classList.remove('text-red-500');
+                
+                showToast('Export failed. Browser unsupported.', true);
+            }
+        }
+
+        // --- 8. Initialization ---
+        renderHomeGallery();
+        selectTemplate('chart_1'); 
+        requestAnimationFrame(renderLoop);
+
+    </script>
+</body>
+</html>

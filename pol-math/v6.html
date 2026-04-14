@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyMath LMS | Linear Regression</title>
+
+    <!-- 1. FONTS: Outfit (Headings) & Merriweather (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- 2. TAILWIND CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1', // Indigo-500
+                            600: '#4f46e5', // Indigo-600
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        },
+                        dark: {
+                            bg: '#020617',    // Slate-950 (Main Content)
+                            sidebar: '#0f172a', // Slate-900 (Sidebar)
+                            surface: '#1e293b', // Slate-800 (Cards)
+                            border: '#1e293b',  // Slate-800
+                        }
+                    },
+                    typography: (theme) => ({
+                        DEFAULT: {
+                            css: {
+                                color: theme('colors.slate.700'),
+                                fontFamily: theme('fontFamily.serif'),
+                                fontSize: '1.125rem',
+                                lineHeight: '1.8',
+                                maxWidth: 'none', 
+                                'h1, h2, h3, h4': {
+                                    fontFamily: theme('fontFamily.sans'),
+                                    letterSpacing: '-0.025em',
+                                    marginTop: '2em',
+                                },
+                                code: {
+                                    fontFamily: theme('fontFamily.mono'),
+                                    fontWeight: '500',
+                                    color: theme('colors.brand.600'),
+                                    backgroundColor: theme('colors.brand.50'),
+                                    padding: '0.2em 0.4em',
+                                    borderRadius: '0.25rem',
+                                },
+                                'code::before': { content: '""' },
+                                'code::after': { content: '""' },
+                            },
+                        },
+                        dark: {
+                            css: {
+                                color: theme('colors.slate.300'),
+                                'h1, h2, h3, h4': {
+                                    color: theme('colors.slate.100'),
+                                },
+                                strong: {
+                                    color: theme('colors.slate.100'),
+                                },
+                                code: {
+                                    color: theme('colors.brand.300'),
+                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                }
+                            }
+                        }
+                    }),
+                }
+            }
+        }
+    </script>
+
+    <!-- 3. KATEX (Math Rendering) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- 4. PRISM (Code Highlighting) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <!-- Custom Styles -->
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .katex-display { 
+            overflow-x: auto; 
+            overflow-y: hidden; 
+            padding: 0.5rem 0;
+            margin: 1.5rem 0 !important;
+        }
+        
+        .theorem-block { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .theorem-block:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+
+        body, aside, main, div, span, p, h1, h2, h3, h4, a, button, nav {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Sidebar active state marker */
+        .nav-item.active {
+            background-color: #fff;
+            border-left: 4px solid #4f46e5;
+            color: #4338ca;
+            font-weight: 600;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .dark .nav-item.active {
+            background-color: #1e293b;
+            border-left: 4px solid #818cf8;
+            color: #e0e7ff;
+            box-shadow: none;
+        }
+        
+        /* Non-active nav hover */
+        .nav-item:not(.active):hover {
+            background-color: rgba(241, 245, 249, 0.8);
+        }
+        .dark .nav-item:not(.active):hover {
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+
+        .prose a {
+            text-decoration-color: #818cf8;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 4px;
+            transition: all 0.2s;
+        }
+        .prose a:hover {
+            color: #4f46e5;
+            text-decoration-color: #4f46e5;
+        }
+        .dark .prose a:hover {
+            color: #818cf8;
+            text-decoration-color: #818cf8;
+        }
+        
+        /* Mobile Backdrop */
+        .mobile-backdrop {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(2px);
+        }
+    </style>
+
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+</head>
+<body class="bg-white dark:bg-dark-bg text-slate-800 dark:text-slate-200 antialiased selection:bg-brand-100 dark:selection:bg-brand-900 selection:text-brand-900 dark:selection:text-brand-100">
+
+    <!-- MOBILE HEADER -->
+    <div class="lg:hidden flex items-center justify-between p-4 border-b border-slate-200 dark:border-dark-border sticky top-0 bg-white/90 dark:bg-dark-sidebar/90 backdrop-blur z-50">
+        <div class="font-bold text-xl tracking-tight text-slate-900 dark:text-white font-sans flex items-center gap-2">
+            <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+            <span>Poly<span class="text-brand-600 dark:text-brand-400">Math</span></span>
+        </div>
+        <div class="flex items-center gap-2">
+             <button id="theme-toggle-mobile" class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+            </button>
+            <button onclick="toggleSidebar()" class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="backdrop" onclick="toggleSidebar()" class="fixed inset-0 z-30 mobile-backdrop hidden lg:hidden transition-opacity opacity-0"></div>
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- LEFT SIDEBAR -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-80 bg-slate-50 dark:bg-dark-sidebar border-r border-slate-200 dark:border-dark-border transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto no-scrollbar flex flex-col shadow-xl lg:shadow-none">
+            
+            <!-- Sidebar Header -->
+            <div class="p-6 sticky top-0 bg-slate-50/95 dark:bg-dark-sidebar/95 backdrop-blur z-10 border-b border-slate-100 dark:border-slate-800/50">
+                <div class="flex items-center gap-2 mb-0">
+                    <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div>
+                        <div class="font-bold text-lg tracking-tight text-slate-900 dark:text-white font-sans leading-none">Poly<span class="text-brand-600 dark:text-brand-400">Math</span></div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Stats & Modeling</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 py-6 font-sans text-sm overflow-y-auto">
+                
+                <!-- Section 00 -->
+                <div class="mb-4">
+                    <button onclick="toggleSection('00')" class="w-full flex items-center justify-between text-slate-400 dark:text-slate-500 mb-2 px-3 text-xs font-bold uppercase tracking-wider hover:text-slate-700 dark:hover:text-slate-300 transition-colors focus:outline-none group">
+                        <div class="flex items-center">
+                            <span class="w-5 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 transition-colors">00</span>
+                            <span>Overview</span>
+                        </div>
+                        <svg id="icon-00" class="w-4 h-4 transform transition-transform duration-200 -rotate-90 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <ul id="list-00" class="space-y-1 hidden">
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Syllabus
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Section 01 -->
+                <div class="mb-4">
+                    <button onclick="toggleSection('01')" class="w-full flex items-center justify-between text-slate-400 dark:text-slate-500 mb-2 px-3 text-xs font-bold uppercase tracking-wider hover:text-slate-700 dark:hover:text-slate-300 transition-colors focus:outline-none group">
+                        <div class="flex items-center">
+                            <span class="w-5 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 transition-colors">01</span>
+                            <span>Fundamentals</span>
+                        </div>
+                        <svg id="icon-01" class="w-4 h-4 transform transition-transform duration-200 -rotate-90 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <ul id="list-01" class="space-y-1 hidden">
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Probability Axioms
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Random Variables
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Distributions
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Section 02 -->
+                <div class="mb-4">
+                    <button onclick="toggleSection('02')" class="w-full flex items-center justify-between text-brand-600 dark:text-brand-400 mb-2 px-3 text-xs font-bold uppercase tracking-wider hover:text-brand-700 dark:hover:text-brand-300 transition-colors focus:outline-none group">
+                        <div class="flex items-center">
+                            <span class="w-5 text-brand-300 dark:text-brand-700">02</span>
+                            <span>Regression Analysis</span>
+                        </div>
+                        <svg id="icon-02" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <ul id="list-02" class="space-y-1">
+                        <li>
+                            <a href="#" class="nav-item active group flex items-center justify-between px-3 py-2.5 rounded-md transition-colors">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Simple Linear Model
+                                </span>
+                                <span class="flex w-2 h-2 bg-brand-500 rounded-full"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    Multiple Regression
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    Model Diagnostics
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    Variable Selection
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Section 03 -->
+                <div class="mb-4">
+                    <button onclick="toggleSection('03')" class="w-full flex items-center justify-between text-slate-400 dark:text-slate-500 mb-2 px-3 text-xs font-bold uppercase tracking-wider hover:text-slate-700 dark:hover:text-slate-300 transition-colors focus:outline-none group">
+                        <div class="flex items-center">
+                            <span class="w-5 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 transition-colors">03</span>
+                            <span>Bayesian Stats</span>
+                        </div>
+                        <svg id="icon-03" class="w-4 h-4 transform transition-transform duration-200 -rotate-90 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <ul id="list-03" class="space-y-1 hidden">
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors opacity-75 hover:opacity-100">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    Bayes' Theorem
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors opacity-75 hover:opacity-100">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    MCMC Methods
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors opacity-75 hover:opacity-100">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    Hierarchical Models
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Section 04 -->
+                 <div class="mb-4">
+                    <button onclick="toggleSection('04')" class="w-full flex items-center justify-between text-slate-400 dark:text-slate-500 mb-2 px-3 text-xs font-bold uppercase tracking-wider hover:text-slate-700 dark:hover:text-slate-300 transition-colors focus:outline-none group">
+                        <div class="flex items-center">
+                            <span class="w-5 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 transition-colors">04</span>
+                            <span>Machine Learning</span>
+                        </div>
+                        <svg id="icon-04" class="w-4 h-4 transform transition-transform duration-200 -rotate-90 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <ul id="list-04" class="space-y-1 hidden">
+                        <li>
+                             <a href="#" class="nav-item group flex items-center justify-between px-3 py-2.5 rounded-md text-slate-600 dark:text-slate-400 transition-colors opacity-75 hover:opacity-100">
+                                <span class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    Bias-Variance Tradeoff
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto lg:ml-80 relative scroll-smooth bg-white dark:bg-dark-bg transition-colors duration-300">
+            
+            <!-- Desktop Theme Toggle -->
+            <div class="hidden lg:flex absolute top-6 right-8 z-20">
+                <button id="theme-toggle" class="p-2.5 rounded-lg bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-all shadow-sm hover:shadow-md">
+                </button>
+            </div>
+
+            <!-- Content Container: Optimized spacing -->
+            <div class="max-w-4xl mx-auto px-6 py-12 lg:px-12 lg:py-16">
+                
+                <!-- Breadcrumbs -->
+                <div class="text-sm font-sans text-slate-500 dark:text-slate-400 mb-8 flex items-center gap-2">
+                    <span class="hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors">Regression Analysis</span>
+                    <svg class="w-3 h-3 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <span class="text-brand-600 dark:text-brand-400 font-medium px-2 py-0.5 bg-brand-50 dark:bg-brand-900/30 rounded-md">Simple Linear Model</span>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-4xl lg:text-5xl font-bold font-sans text-slate-900 dark:text-white tracking-tight mb-8 leading-tight">Simple Linear Regression</h1>
+                
+                <!-- Metadata -->
+                <div class="flex flex-wrap items-center gap-6 text-sm text-slate-500 dark:text-slate-400 font-sans mb-12 border-b border-slate-100 dark:border-dark-border pb-8">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        15 min read
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        MATH-201
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <div class="flex -space-x-2">
+                            <img class="w-6 h-6 rounded-full border-2 border-white dark:border-dark-bg" src="https://ui-avatars.com/api/?name=Prof+Smith&background=random" alt="Prof">
+                            <img class="w-6 h-6 rounded-full border-2 border-white dark:border-dark-bg" src="https://ui-avatars.com/api/?name=TA+Lee&background=random" alt="TA">
+                        </div>
+                        <span class="text-xs">Updated 2 days ago</span>
+                    </span>
+                </div>
+
+                <!-- ARTICLE BODY -->
+                <div class="prose prose-lg prose-slate dark:prose-invert max-w-none font-serif leading-loose">
+                    
+                    <p class="text-xl text-slate-600 dark:text-slate-300 font-sans leading-relaxed mb-12">
+                        Linear regression is a linear approach to modeling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables).
+                    </p>
+
+                    <h2 id="the-model" class="font-sans font-bold text-slate-900 dark:text-white mt-16 mb-6 scroll-mt-24 border-b border-slate-100 dark:border-dark-border pb-2">The Mathematical Model</h2>
+                    
+                    <p>
+                        In simple linear regression, we predict a quantitative response $Y$ on the basis of a single predictor variable $X$. It assumes that there is approximately a linear relationship between $X$ and $Y$. Mathematically, we can write this relationship as:
+                    </p>
+
+                    <!-- Math Block (Display Mode) -->
+                    <div class="my-8 p-8 bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-xl text-center shadow-sm relative group">
+                        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button class="p-1 text-slate-400 hover:text-brand-600" title="Copy LaTeX"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+                        </div>
+                        $$ Y \approx \beta_0 + \beta_1 X + \epsilon $$
+                    </div>
+
+                    <p>
+                        Here, $\beta_0$ represents the <strong>intercept</strong>, and $\beta_1$ represents the <strong>slope</strong> in the linear model. The term $\epsilon$ is the error term, representing the deviation of the observation from the true linear relationship.
+                    </p>
+
+                    <!-- DEFINITION BLOCK -->
+                    <div class="my-12 flex rounded-lg overflow-hidden border border-brand-100 dark:border-brand-900/50 shadow-md">
+                        <div class="w-1.5 bg-brand-500"></div>
+                        <div class="flex-1 p-6 bg-brand-50/50 dark:bg-brand-900/10">
+                            <h4 class="text-brand-700 dark:text-brand-300 font-sans font-bold uppercase text-xs tracking-wider mb-3 !mt-0 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Definition 1.2
+                            </h4>
+                            <p class="italic m-0 text-slate-800 dark:text-slate-200 text-lg">
+                                <strong>Residuals ($e_i$):</strong> The difference between the observed value of the dependent variable ($y_i$) and the predicted value ($\hat{y}_i$) is called the residual.
+                                <span class="block mt-4 text-center font-normal">$$ e_i = y_i - \hat{y}_i $$</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <h2 id="least-squares" class="font-sans font-bold text-slate-900 dark:text-white mt-16 mb-6 scroll-mt-24 border-b border-slate-100 dark:border-dark-border pb-2">Least Squares Method</h2>
+                    <p>
+                        The goal is to find estimates $\hat{\beta}_0$ and $\hat{\beta}_1$ that minimize the Residual Sum of Squares (RSS).
+                    </p>
+
+                    <!-- THEOREM BLOCK -->
+                    <div class="theorem-block my-12 border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-[#1a1500]/50 rounded-xl p-8 relative overflow-hidden shadow-sm hover:shadow-md">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 dark:opacity-5 transform rotate-12 scale-150">
+                            <svg class="w-32 h-32 text-amber-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.75l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z"/></svg>
+                        </div>
+                        <h3 class="text-amber-800 dark:text-amber-400 font-sans font-bold text-lg mb-4 flex items-center gap-2 relative z-10 !mt-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                            Theorem: OLS Estimators
+                        </h3>
+                        <p class="text-amber-900 dark:text-amber-100 text-base leading-relaxed relative z-10">
+                            The least squares estimates for the regression coefficients are given by:
+                            $$ \hat{\beta}_1 = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2} $$
+                            $$ \hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x} $$
+                        </p>
+                    </div>
+
+                    <!-- COLLAPSIBLE PROOF -->
+                    <details class="group mb-8 rounded-lg border border-slate-200 dark:border-dark-border overflow-hidden">
+                        <summary class="flex items-center justify-between p-4 cursor-pointer bg-slate-50 dark:bg-dark-surface hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none">
+                            <span class="text-sm font-sans font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                Derivation (Calculus)
+                            </span>
+                            <span class="transform group-open:rotate-180 transition-transform text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </span>
+                        </summary>
+                        <div class="p-6 bg-white dark:bg-dark-bg text-sm border-t border-slate-200 dark:border-dark-border">
+                            <p class="mb-2">We minimize the Loss Function $L$:</p>
+                            $$ L(\beta_0, \beta_1) = \sum_{i=1}^n (y_i - \beta_0 - \beta_1 x_i)^2 $$
+                            <p class="mt-4 mb-2">Take partial derivatives with respect to $\beta_0$ and $\beta_1$ and set to zero:</p>
+                            $$ \frac{\partial L}{\partial \beta_0} = -2 \sum (y_i - \beta_0 - \beta_1 x_i) = 0 $$
+                            $$ \frac{\partial L}{\partial \beta_1} = -2 \sum x_i (y_i - \beta_0 - \beta_1 x_i) = 0 $$
+                            <p class="mt-4 text-slate-500 italic">Solving this system yields the OLS estimators defined above.</p>
+                        </div>
+                    </details>
+
+                    <h2 id="implementation" class="font-sans font-bold text-slate-900 dark:text-white mt-16 mb-6 scroll-mt-24 border-b border-slate-100 dark:border-dark-border pb-2">Python Implementation</h2>
+                    <p>
+                        We can calculate these coefficients manually using NumPy, or use `scikit-learn`. Here is the manual calculation to demonstrate the math above.
+                    </p>
+
+                    <!-- CODE BLOCK -->
+                    <div class="my-8 rounded-xl overflow-hidden border border-slate-200 dark:border-dark-border shadow-lg bg-[#1e1e1e] group relative">
+                         <div class="absolute top-3 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            <button onclick="copyCode(this)" class="text-xs font-sans text-slate-400 hover:text-white bg-white/10 px-2 py-1 rounded transition-colors backdrop-blur">Copy</button>
+                        </div>
+                        <div class="bg-[#252526] px-4 py-3 flex items-center justify-between border-b border-[#333]">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                            </div>
+                            <span class="text-xs font-mono text-slate-400 mr-8">ols_calculation.py</span>
+                            <div></div>
+                        </div>
+                        <pre class="!m-0 !rounded-none !p-6 !bg-transparent !shadow-none"><code class="language-python">import numpy as np
+
+# 1. Sample Data
+X = np.array([1, 2, 3, 4, 5])
+Y = np.array([2, 3.5, 2.8, 4.6, 5.5])
+
+# 2. Calculate Means
+x_bar = np.mean(X)
+y_bar = np.mean(Y)
+
+# 3. Calculate Beta_1 (Slope)
+numerator = np.sum((X - x_bar) * (Y - y_bar))
+denominator = np.sum((X - x_bar)**2)
+
+beta_1 = numerator / denominator
+
+# 4. Calculate Beta_0 (Intercept)
+beta_0 = y_bar - (beta_1 * x_bar)
+
+print(f"y = {beta_0:.2f} + {beta_1:.2f}x")
+# Output: y = 0.96 + 0.92x</code></pre>
+                    </div>
+
+                </div>
+                
+                <!-- Footer area of article -->
+                <div class="mt-24 pt-10 border-t border-slate-200 dark:border-dark-border flex flex-col md:flex-row justify-between gap-6 font-sans text-sm">
+                    <a href="#" class="group flex items-center text-left p-4 rounded-xl border border-transparent hover:border-slate-200 dark:hover:border-dark-border hover:bg-slate-50 dark:hover:bg-dark-surface transition-all">
+                        <span class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-4 group-hover:bg-brand-100 dark:group-hover:bg-brand-900 transition-colors">
+                            <svg class="w-5 h-5 text-slate-500 group-hover:text-brand-600 dark:text-slate-400 dark:group-hover:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </span>
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Previous Lesson</div>
+                            <div class="font-medium text-slate-700 dark:text-slate-200 group-hover:text-brand-600 dark:group-hover:text-brand-400">Normal Distribution</div>
+                        </div>
+                    </a>
+                    <a href="#" class="group flex items-center justify-end text-right p-4 rounded-xl border border-transparent hover:border-slate-200 dark:hover:border-dark-border hover:bg-slate-50 dark:hover:bg-dark-surface transition-all">
+                         <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Next Lesson</div>
+                            <div class="font-medium text-slate-700 dark:text-slate-200 group-hover:text-brand-600 dark:group-hover:text-brand-400">Multiple Regression</div>
+                        </div>
+                        <span class="w-10 h-10 rounded-full bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center ml-4 group-hover:bg-brand-100 dark:group-hover:bg-brand-900 transition-colors">
+                            <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </span>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- RIGHT SIDEBAR: TABLE OF CONTENTS -->
+        <aside class="hidden xl:block w-72 p-8 sticky top-0 h-screen overflow-y-auto bg-white dark:bg-dark-bg border-l border-slate-100 dark:border-dark-border">
+            <h5 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6 font-sans pl-4">On this page</h5>
+            <ul class="space-y-4 text-sm font-sans border-l border-slate-200 dark:border-dark-border relative">
+                <li><a href="#the-model" class="toc-link block pl-4 border-l-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors -ml-[2px]">The Model</a></li>
+                <li><a href="#least-squares" class="toc-link block pl-4 border-l-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors -ml-[2px]">Least Squares Method</a></li>
+                <li><a href="#implementation" class="toc-link block pl-4 border-l-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors -ml-[2px]">Implementation</a></li>
+            </ul>
+        </aside>
+
+    </div>
+
+    <!-- 5. SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    
+    <script>
+        // 1. Initialize KaTeX (Math Rendering)
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError : false
+            });
+        });
+
+        // 2. Mobile Sidebar Toggle with Backdrop logic
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden', 'opacity-0');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        // 3. Toggle Sidebar Section Logic
+        function toggleSection(id) {
+            const list = document.getElementById(`list-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            
+            if (list.classList.contains('hidden')) {
+                // Open
+                list.classList.remove('hidden');
+                icon.classList.remove('-rotate-90');
+            } else {
+                // Close
+                list.classList.add('hidden');
+                icon.classList.add('-rotate-90');
+            }
+        }
+
+        // 4. Dark Mode Logic
+        const toggleBtns = [document.getElementById('theme-toggle'), document.getElementById('theme-toggle-mobile')];
+        
+        function updateIcons(isDark) {
+            const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`;
+            const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
+            
+            toggleBtns.forEach(btn => {
+                if(btn) btn.innerHTML = isDark ? sunIcon : moonIcon;
+            });
+        }
+
+        updateIcons(document.documentElement.classList.contains('dark'));
+
+        toggleBtns.forEach(btn => {
+            if(btn) {
+                btn.addEventListener('click', function() {
+                    const isDark = document.documentElement.classList.contains('dark');
+                    if (isDark) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.theme = 'light';
+                        updateIcons(false);
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.theme = 'dark';
+                        updateIcons(true);
+                    }
+                });
+            }
+        });
+
+        // 5. Table of Contents Highlighter
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                const link = document.querySelector(`.toc-link[href="#${id}"]`);
+                
+                if (entry.isIntersecting && link) {
+                    document.querySelectorAll('.toc-link').forEach(l => {
+                        l.classList.remove('text-brand-600', 'dark:text-brand-400', 'border-brand-600', 'dark:border-brand-400', 'font-medium');
+                        l.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+                    });
+                    link.classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+                    link.classList.add('text-brand-600', 'dark:text-brand-400', 'border-brand-600', 'dark:border-brand-400', 'font-medium');
+                }
+            });
+        }, { rootMargin: '-100px 0px -66% 0px' });
+
+        document.querySelectorAll('h2, h3').forEach((header) => {
+            observer.observe(header);
+        });
+
+        // 6. Copy Code
+        function copyCode(btn) {
+            const pre = btn.parentElement.parentElement.querySelector('code');
+            const code = pre.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.classList.add('text-brand-400', 'bg-white/20');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('text-brand-400', 'bg-white/20');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

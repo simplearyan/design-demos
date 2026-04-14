@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualization Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons for clean, professional icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            teal: '#0e828a',
+                            green: '#2e9e63',
+                            gray: '#f7f7f7',
+                            border: '#e5e7eb',
+                            text: '#333333',
+                            subtext: '#666666'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+
+        /* Custom scrollbar for a polished look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Hide default details marker for custom accordions */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        /* Custom Radio Button Styling */
+        .segmented-control input:checked + label {
+            background-color: #f1f5f9;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+
+        /* Editor Canvas Shadow */
+        .canvas-paper {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05), 0 0 1px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-white h-screen w-full overflow-hidden flex flex-col">
+
+    <!-- ========================================== -->
+    <!-- VIEW 1: TEMPLATE GALLERY                   -->
+    <!-- ========================================== -->
+    <div id="view-gallery" class="flex-1 flex flex-col h-full w-full max-w-[1600px] mx-auto bg-white">
+        
+        <!-- Gallery Header -->
+        <header class="px-8 pt-8 pb-4">
+            <h1 class="text-3xl font-bold text-slate-800">Choose a template</h1>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden px-4 md:px-8 pb-8 gap-8">
+            
+            <!-- Gallery Left Sidebar (Filters) -->
+            <aside class="w-64 hidden md:flex flex-col shrink-0 overflow-y-auto pr-2">
+                <!-- Search -->
+                <div class="relative mb-6">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                    <input type="text" placeholder="Search templates" class="w-full pl-10 pr-4 py-2 border border-brand-border rounded text-sm focus:outline-none focus:border-brand-teal transition-colors">
+                </div>
+
+                <!-- Authors -->
+                <div class="mb-8 space-y-2">
+                    <button class="w-full flex items-center gap-2 text-sm font-medium text-slate-800 hover:text-brand-teal transition-colors">
+                        <i class="ph-fill ph-sun text-lg"></i> By Studio
+                    </button>
+                    <button class="w-full flex items-center gap-2 text-sm text-slate-600 hover:text-brand-teal transition-colors">
+                        <i class="ph ph-buildings text-lg"></i> By Organization
+                    </button>
+                    <button class="w-full flex items-center gap-2 text-sm text-slate-600 hover:text-brand-teal transition-colors">
+                        <i class="ph ph-user text-lg"></i> By Me
+                    </button>
+                </div>
+
+                <!-- Tags: Type -->
+                <div class="mb-8">
+                    <h3 class="text-sm font-bold flex items-center gap-2 mb-3 text-slate-800">
+                        <i class="ph-bold ph-chart-line-up"></i> Type
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="px-3 py-1 text-xs rounded-full bg-brand-teal text-white border border-brand-teal">All</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">3D</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Animated</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Areas</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Bars</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Circles</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Lines</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Pies</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Radial</button>
+                    </div>
+                </div>
+
+                <!-- Tags: Purpose -->
+                <div>
+                    <h3 class="text-sm font-bold flex items-center gap-2 mb-3 text-slate-800">
+                        <i class="ph-bold ph-lightbulb"></i> Purpose
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="px-3 py-1 text-xs rounded-full bg-brand-teal text-white border border-brand-teal">All</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Change over time</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Comparison</button>
+                        <button class="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:border-slate-400">Distribution</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Gallery Main Grid -->
+            <main class="flex-1 overflow-y-auto border border-brand-border rounded-lg p-6 relative">
+                
+                <h2 class="text-base font-bold text-slate-800 mb-4">Hierarchies & Bubbles</h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="template-grid">
+                    <!-- Cards will be generated by JS -->
+                </div>
+
+                <!-- Floating Help Button -->
+                <button class="absolute bottom-6 right-6 bg-[#2782a0] hover:bg-[#1f6b85] text-white px-4 py-2 rounded shadow-lg flex items-center gap-2 text-sm font-medium transition-colors z-10">
+                    <i class="ph-bold ph-chat-circle-text text-lg"></i> Help
+                </button>
+            </main>
+
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: EDITOR / VISUALIZATION WORKSPACE   -->
+    <!-- ========================================== -->
+    <div id="view-editor" class="hidden flex-1 flex flex-col h-full w-full bg-[#f8f9fa]">
+        
+        <!-- Editor Top Navbar -->
+        <nav class="h-14 bg-white border-b border-brand-border flex items-center justify-between px-4 shrink-0 shadow-sm z-20">
+            <!-- Left: Title & Navigation -->
+            <div class="flex items-center gap-4">
+                <button onclick="switchView('gallery')" class="text-slate-500 hover:text-slate-800 transition-colors" title="Back to Gallery">
+                    <i class="ph-fill ph-house text-xl"></i>
+                </button>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <div class="flex items-center gap-2 group cursor-pointer">
+                    <h2 class="text-slate-500 italic font-medium group-hover:text-slate-800 transition-colors">Untitled visualisation</h2>
+                    <i class="ph-bold ph-caret-down text-slate-400"></i>
+                </div>
+            </div>
+
+            <!-- Center: View Toggles -->
+            <div class="hidden md:flex bg-[#f1f5f9] rounded p-1 border border-slate-200">
+                <button class="px-6 py-1 text-sm font-medium bg-white rounded shadow-sm flex items-center gap-2 text-slate-800">
+                    <i class="ph-fill ph-chart-bar"></i> Preview
+                </button>
+                <button class="px-6 py-1 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center gap-2">
+                    <i class="ph-bold ph-table"></i> Data
+                </button>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-3">
+                <button class="hidden sm:flex border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-1.5 rounded text-sm font-medium transition-colors">
+                    <i class="ph-bold ph-play-circle mr-2"></i> Create a story
+                </button>
+                <button onclick="exportVisualization()" class="bg-brand-green hover:bg-[#258250] text-white px-4 py-1.5 rounded text-sm font-medium transition-colors flex items-center shadow-sm">
+                    <i class="ph-bold ph-cloud-arrow-up mr-2"></i> Export & publish
+                </button>
+                <div class="h-8 w-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 ml-2">
+                    <i class="ph-fill ph-user text-lg"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Editor Main Body -->
+        <div class="flex-1 flex overflow-hidden relative">
+            
+            <!-- Mobile Toggle for View/Data (Visible only on small screens) -->
+            <div class="md:hidden absolute top-4 left-1/2 -translate-x-1/2 flex bg-[#f1f5f9] rounded p-1 border border-slate-200 z-10 shadow-md">
+                <button class="px-4 py-1 text-sm font-medium bg-white rounded shadow-sm">Preview</button>
+                <button class="px-4 py-1 text-sm font-medium text-slate-500">Data</button>
+            </div>
+
+            <!-- Canvas Area (Center) -->
+            <div class="flex-1 bg-[#f4f5f7] overflow-auto flex items-center justify-center p-4 lg:p-8">
+                <!-- The "Paper" Container -->
+                <div class="canvas-paper bg-white w-full max-w-4xl aspect-[4/3] sm:aspect-video md:aspect-[4/3] rounded-sm relative overflow-hidden transition-all duration-300" id="canvas-container">
+                    <canvas id="viz-canvas" class="w-full h-full block"></canvas>
+                </div>
+            </div>
+
+            <!-- Properties Panel (Right Sidebar) -->
+            <aside class="w-80 bg-white border-l border-brand-border flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar shadow-[-4px_0_15px_rgba(0,0,0,0.03)] z-10">
+                
+                <!-- Selected Template Info -->
+                <div class="p-4 border-b border-slate-200 flex items-center gap-3 bg-slate-50">
+                    <div class="w-12 h-12 bg-white border border-slate-200 p-1 flex flex-wrap gap-0.5 rounded shadow-sm">
+                        <div class="w-[45%] h-[45%] bg-[#0e828a] rounded-full"></div>
+                        <div class="w-[45%] h-[45%] bg-[#f59e0b] rounded-full"></div>
+                        <div class="w-[45%] h-[45%] bg-[#ec4899] rounded-full"></div>
+                        <div class="w-[45%] h-[45%] bg-[#8b5cf6] rounded-full"></div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-0.5">Selected template</div>
+                        <div class="text-sm font-bold text-slate-800">Hierarchy <span class="text-slate-400 font-normal text-xs ml-1">16.0.1</span></div>
+                    </div>
+                </div>
+
+                <!-- Theme Selector -->
+                <div class="p-4 border-b border-slate-200">
+                    <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
+                        Theme <i class="ph-fill ph-question text-slate-400"></i>
+                    </label>
+                    <div class="flex gap-2">
+                        <select class="flex-1 border border-slate-300 rounded px-2 py-1.5 text-sm text-slate-700 bg-white outline-none focus:border-brand-teal">
+                            <option>Kiln: default</option>
+                            <option>Corporate Light</option>
+                            <option>Dark Mode</option>
+                        </select>
+                        <button class="px-2 border border-slate-300 rounded hover:bg-slate-50 text-slate-600 transition-colors">
+                            <i class="ph-bold ph-arrows-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Accordions Container -->
+                <div class="flex-1 flex flex-col" id="accordions">
+                    
+                    <!-- Accordion 1: Hierarchy (Open by default) -->
+                    <details class="border-b border-slate-200 group" open>
+                        <summary class="flex items-center justify-between p-3 bg-[#6b7280] text-white cursor-pointer select-none">
+                            <span class="text-sm font-bold flex items-center gap-2">
+                                <i class="ph-bold ph-caret-right transition-transform group-open:rotate-90"></i> Hierarchy
+                            </span>
+                        </summary>
+                        <div class="p-4 bg-white space-y-5">
+                            
+                            <!-- Chart Type Segmented Control -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Chart type</label>
+                                <div class="flex border border-slate-300 rounded text-xs segmented-control overflow-hidden">
+                                    <input type="radio" name="chart_type" id="ct_treemap" class="hidden">
+                                    <label for="ct_treemap" class="flex-1 text-center py-1.5 border-r border-slate-300 cursor-pointer hover:bg-slate-50 text-slate-600">Treemap</label>
+                                    
+                                    <input type="radio" name="chart_type" id="ct_circles" class="hidden" checked onchange="redrawCanvas()">
+                                    <label for="ct_circles" class="flex-1 text-center py-1.5 border-r border-slate-300 cursor-pointer hover:bg-slate-50 text-slate-800 font-medium">Circles</label>
+                                    
+                                    <input type="radio" name="chart_type" id="ct_sunburst" class="hidden">
+                                    <label for="ct_sunburst" class="flex-1 text-center py-1.5 border-r border-slate-300 cursor-pointer hover:bg-slate-50 text-slate-600">Sunburst</label>
+                                    
+                                    <input type="radio" name="chart_type" id="ct_bars" class="hidden">
+                                    <label for="ct_bars" class="flex-1 text-center py-1.5 cursor-pointer hover:bg-slate-50 text-slate-600">Bars</label>
+                                </div>
+                            </div>
+
+                            <!-- Dropdowns row -->
+                            <div class="flex gap-3">
+                                <div class="flex-1">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">Sort by <i class="ph-fill ph-question text-slate-400"></i></label>
+                                    <select class="w-full border border-slate-300 rounded px-2 py-1 text-sm bg-white outline-none">
+                                        <option>Value</option>
+                                        <option>Name</option>
+                                    </select>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">Size cells by</label>
+                                    <select class="w-full border border-slate-300 rounded px-2 py-1 text-sm bg-white outline-none">
+                                        <option>Sum</option>
+                                        <option>Count</option>
+                                    </select>
+                                </div>
+                                <div class="w-16">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">Depth</label>
+                                    <input type="number" value="2" class="w-full border border-slate-300 rounded px-2 py-1 text-sm bg-white outline-none">
+                                </div>
+                            </div>
+
+                            <!-- Toggle -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Automatic height</label>
+                                <div class="flex border border-slate-300 rounded w-24 text-xs segmented-control overflow-hidden">
+                                    <input type="radio" name="auto_ht" id="ah_on" class="hidden" checked>
+                                    <label for="ah_on" class="flex-1 text-center py-1 border-r border-slate-300 cursor-pointer text-slate-800 font-medium">On</label>
+                                    
+                                    <input type="radio" name="auto_ht" id="ah_off" class="hidden">
+                                    <label for="ah_off" class="flex-1 text-center py-1 cursor-pointer text-slate-600">Off</label>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Accordion Generators -->
+                    <!-- Labels, Colors, Legend, etc. -->
+                    <script>
+                        const sections = [
+                            'Labels', 'Colors', 'Legend', 'Popups and panels', 
+                            'Controls', 'Controls styling', 'Animations', 
+                            'Number formatting', 'Layout', 'Header', 'Footer'
+                        ];
+                        
+                        const container = document.getElementById('accordions');
+                        sections.forEach(sec => {
+                            const details = document.createElement('details');
+                            details.className = 'border-b border-slate-200 group';
+                            details.innerHTML = `
+                                <summary class="flex items-center justify-between p-3 bg-[#f8f9fa] hover:bg-slate-100 text-slate-700 cursor-pointer select-none transition-colors">
+                                    <span class="text-sm font-bold flex items-center gap-2">
+                                        <i class="ph-bold ph-caret-right transition-transform group-open:rotate-90 text-slate-400"></i> ${sec}
+                                    </span>
+                                </summary>
+                                <div class="p-4 bg-white text-sm text-slate-500 italic">
+                                    Settings for ${sec.toLowerCase()} will appear here.
+                                </div>
+                            `;
+                            container.appendChild(details);
+                        });
+                    </script>
+
+                </div>
+
+                <!-- Search settings footer -->
+                <div class="p-3 border-t border-slate-200 bg-white sticky bottom-0">
+                    <div class="relative">
+                        <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" placeholder="Search for setting" class="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded text-sm focus:outline-none focus:border-brand-teal transition-colors">
+                    </div>
+                </div>
+
+            </aside>
+            
+            <!-- Chat bubble floating over editor -->
+            <button class="absolute bottom-6 right-[340px] bg-[#3b82f6] hover:bg-blue-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-colors z-10">
+                <i class="ph-fill ph-chat-circle-text text-2xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Export Notification Overlay -->
+    <div id="export-toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-[#2e9e63] text-white px-6 py-3 rounded shadow-2xl font-bold flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-4 pointer-events-none z-50">
+        <i class="ph-bold ph-check-circle text-xl"></i>
+        Visualization Exported Successfully!
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- View Switching Logic ---
+        function switchView(viewName) {
+            const gallery = document.getElementById('view-gallery');
+            const editor = document.getElementById('view-editor');
+            
+            if (viewName === 'editor') {
+                gallery.classList.add('hidden');
+                editor.classList.remove('hidden');
+                // Allow layout to settle, then draw canvas
+                setTimeout(initCanvasAndDraw, 50);
+            } else {
+                editor.classList.add('hidden');
+                gallery.classList.remove('hidden');
+            }
+        }
+
+        // --- Export Simulation ---
+        function exportVisualization() {
+            const toast = document.getElementById('export-toast');
+            toast.classList.remove('opacity-0', '-translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-4');
+            }, 3000);
+        }
+
+        // --- Generate Gallery Cards ---
+        const templatesData = [
+            { id: 'bubble', name: 'Packed circles', img: 'circles', colors: ['#47a1b0', '#eab308', '#a855f7', '#ec4899'] },
+            { id: 'tree', name: 'Treemap', img: 'rects', colors: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1'] },
+            { id: 'sunburst', name: 'Sunburst', img: 'radial', colors: ['#ec4899', '#f43f5e', '#fb923c', '#fcd34d'] },
+            { id: 'line', name: 'Line chart', img: 'lines', colors: ['#8b5cf6', '#3b82f6', '#06b6d4', '#14b8a6'] },
+            { id: 'bar', name: 'Bar chart', img: 'bars_h', colors: ['#6366f1', '#6366f1', '#6366f1', '#6366f1'] },
+            { id: 'col', name: 'Column chart', img: 'bars_v', colors: ['#8b5cf6', '#a855f7', '#c084fc', '#d8b4fe'] },
+            { id: 'pie', name: 'Donut chart', img: 'donut', colors: ['#3b82f6', '#1d4ed8', '#93c5fd', '#bfdbfe'] },
+            { id: 'area', name: 'Area chart', img: 'area', colors: ['#f59e0b', '#f97316', '#ef4444', '#ec4899'] }
+        ];
+
+        const grid = document.getElementById('template-grid');
+        templatesData.forEach(tpl => {
+            const card = document.createElement('div');
+            card.className = "bg-white border border-slate-200 rounded overflow-hidden hover:border-brand-teal hover:shadow-md transition-all cursor-pointer flex flex-col group";
+            card.onclick = () => switchView('editor');
+            
+            // Generate a fake CSS-based thumbnail to match the style
+            let thumbnailHTML = '';
+            if(tpl.img === 'circles') {
+                thumbnailHTML = `
+                    <div class="absolute inset-0 flex items-center justify-center p-4">
+                        <div class="w-16 h-16 rounded-full opacity-80 mix-blend-multiply absolute -ml-8 -mt-8" style="background-color: ${tpl.colors[0]}"></div>
+                        <div class="w-20 h-20 rounded-full opacity-80 mix-blend-multiply absolute ml-6 -mt-4" style="background-color: ${tpl.colors[1]}"></div>
+                        <div class="w-14 h-14 rounded-full opacity-80 mix-blend-multiply absolute -ml-6 mt-10" style="background-color: ${tpl.colors[2]}"></div>
+                        <div class="w-12 h-12 rounded-full opacity-80 mix-blend-multiply absolute ml-10 mt-8" style="background-color: ${tpl.colors[3]}"></div>
+                    </div>`;
+            } else if (tpl.img === 'bars_h') {
+                thumbnailHTML = `
+                    <div class="absolute inset-x-4 inset-y-6 flex flex-col gap-2 justify-center">
+                        <div class="h-4 w-full bg-[${tpl.colors[0]}]"></div>
+                        <div class="h-4 w-4/5 bg-[${tpl.colors[0]}] opacity-90"></div>
+                        <div class="h-4 w-3/5 bg-[${tpl.colors[0]}] opacity-80"></div>
+                        <div class="h-4 w-1/3 bg-[${tpl.colors[0]}] opacity-70"></div>
+                    </div>`;
+            } else if (tpl.img === 'bars_v') {
+                thumbnailHTML = `
+                    <div class="absolute inset-x-6 inset-y-4 flex gap-2 items-end justify-center">
+                        <div class="w-4 h-full bg-[${tpl.colors[0]}]"></div>
+                        <div class="w-4 h-4/5 bg-[${tpl.colors[1]}]"></div>
+                        <div class="w-4 h-3/5 bg-[${tpl.colors[2]}]"></div>
+                        <div class="w-4 h-1/3 bg-[${tpl.colors[3]}]"></div>
+                    </div>`;
+            } else if (tpl.img === 'donut') {
+                thumbnailHTML = `
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-24 h-24 rounded-full border-[12px] border-[${tpl.colors[0]}] border-t-[${tpl.colors[2]}] border-r-[${tpl.colors[1]}]"></div>
+                    </div>`;
+            } else {
+                thumbnailHTML = `
+                    <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                        <i class="ph-fill ph-chart-polar text-5xl text-[${tpl.colors[0]}]"></i>
+                    </div>`;
+            }
+
+            card.innerHTML = `
+                <div class="aspect-[4/3] bg-[#f8f9fa] relative border-b border-slate-100 overflow-hidden">
+                    ${thumbnailHTML}
+                    
+                    <!-- Hover overlay -->
+                    <div class="absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
+                        <span class="bg-brand-teal text-white text-xs font-bold px-4 py-2 rounded shadow-sm">Use template</span>
+                    </div>
+                </div>
+                <div class="p-3 text-center">
+                    <h3 class="text-xs text-slate-600 font-medium group-hover:text-brand-teal transition-colors">${tpl.name}</h3>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        // --- Canvas Rendering Logic (Recreating Screenshot 2) ---
+        let canvas, ctx;
+
+        function initCanvasAndDraw() {
+            const container = document.getElementById('canvas-container');
+            canvas = document.getElementById('viz-canvas');
+            
+            // Set canvas resolution for crisp rendering
+            const rect = container.getBoundingClientRect();
+            // Scale by device pixel ratio for retina displays
+            const dpr = window.devicePixelRatio || 1;
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            
+            ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            
+            redrawCanvas();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if(document.getElementById('view-editor').classList.contains('hidden')) return;
+                const newRect = container.getBoundingClientRect();
+                canvas.width = newRect.width * dpr;
+                canvas.height = newRect.height * dpr;
+                ctx.scale(dpr, dpr);
+                redrawCanvas();
+            });
+        }
+
+        function redrawCanvas() {
+            if(!ctx) return;
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+
+            ctx.clearRect(0, 0, w, h);
+            
+            // Title logic based on radio buttons
+            const isTreemap = document.getElementById('ct_treemap').checked;
+            
+            if(isTreemap) {
+                // Draw a simple Treemap mock
+                ctx.fillStyle = '#47a1b0'; ctx.fillRect(w*0.1, h*0.1, w*0.4, h*0.8);
+                ctx.fillStyle = '#eab308'; ctx.fillRect(w*0.5, h*0.1, w*0.4, h*0.4);
+                ctx.fillStyle = '#a855f7'; ctx.fillRect(w*0.5, h*0.5, w*0.2, h*0.4);
+                ctx.fillStyle = '#ec4899'; ctx.fillRect(w*0.7, h*0.5, w*0.2, h*0.4);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 24px Inter, sans-serif';
+                ctx.fillText('Drama', w*0.15, h*0.2);
+                ctx.fillText('Animation', w*0.55, h*0.2);
+                ctx.fillText('Romance', w*0.52, h*0.6);
+                ctx.fillText('Comedy', w*0.72, h*0.6);
+
+                return;
+            }
+
+            // --- Bubble Chart Logic (Default) ---
+            
+            // Define bubbles simulating the Film Studio hierarchy from Screenshot 2
+            const bubbles = [
+                // Warner Bros (Teal)
+                {x: 0.28, y: 0.5, r: 0.18, c: '#47a1b0', text: 'Comedy', sub: 'Warner Bros.'},
+                {x: 0.40, y: 0.5, r: 0.06, c: '#62b5c4', text: 'Romance'},
+                {x: 0.35, y: 0.62, r: 0.04, c: '#368996', text: 'Fantasy'},
+                
+                // Disney / Animation (Yellow)
+                {x: 0.62, y: 0.52, r: 0.2, c: '#f5b041', text: 'Animation', sub: 'Disney'},
+                {x: 0.73, y: 0.52, r: 0.12, c: '#f8c471', text: 'Comedy'},
+                
+                // Independent / Romance (Purple)
+                {x: 0.42, y: 0.78, r: 0.15, c: '#9b59b6', text: 'Romance', sub: 'Independent'},
+                {x: 0.52, y: 0.75, r: 0.07, c: '#af7ac5', text: 'Comedy'},
+                
+                // Universal / Comedy (Pink)
+                {x: 0.68, y: 0.78, r: 0.12, c: '#ec7063', text: 'Comedy', sub: 'Universal'},
+                
+                // Sony (Orange)
+                {x: 0.26, y: 0.28, r: 0.08, c: '#eb984e', text: 'Sony', subTop: true},
+                
+                // Summit / Drama (Cyan)
+                {x: 0.45, y: 0.28, r: 0.14, c: '#76d7c4', text: 'Drama', subTop: true, subText: 'Summit'},
+                
+                // Fox / Comedy (Indigo)
+                {x: 0.65, y: 0.25, r: 0.09, c: '#5c6bc0', text: 'Comedy', subTop: true, subText: 'Fox'},
+                
+                // Paramount (Blue)
+                {x: 0.25, y: 0.75, r: 0.09, c: '#5dade2', text: 'Comedy', subTop: true, subText: 'Paramount'},
+            ];
+
+            // Center offsets to make it look organic
+            const cx = w / 2;
+            const cy = h / 2;
+            const scale = Math.min(w, h);
+
+            bubbles.forEach(b => {
+                const px = b.x * w;
+                const py = b.y * h;
+                const pr = b.r * scale;
+
+                // Draw Circle
+                ctx.beginPath();
+                ctx.arc(px, py, pr, 0, Math.PI * 2);
+                ctx.fillStyle = b.c;
+                ctx.fill();
+                
+                // Light inner border for definition
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw Text
+                if(b.text && pr > 15) {
+                    ctx.fillStyle = 'white';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    // Main Text
+                    const fontSize = Math.max(10, pr * 0.25);
+                    ctx.font = `${fontSize}px Inter, sans-serif`;
+                    ctx.globalAlpha = 0.9;
+                    ctx.fillText(b.text, px, py);
+                    
+                    // Sub Title (Parent Node)
+                    if (b.sub) {
+                        ctx.font = `bold ${Math.max(10, fontSize * 0.6)}px Inter, sans-serif`;
+                        ctx.globalAlpha = 1;
+                        ctx.fillText(b.sub, px, py - fontSize - 5);
+                    }
+                    if (b.subTop) {
+                        ctx.font = `bold ${Math.max(10, fontSize * 0.6)}px Inter, sans-serif`;
+                        ctx.globalAlpha = 1;
+                        ctx.fillText(b.subText || b.text, px, py - pr - 10);
+                    }
+                    ctx.globalAlpha = 1;
+                }
+            });
+            
+            // Add some tiny decorative nodes (green/brown) from screenshot
+            const decor = [
+                {x: 0.18, y: 0.65, r: 0.02, c: '#229954'},
+                {x: 0.16, y: 0.68, r: 0.015, c: '#229954'},
+                {x: 0.72, y: 0.65, r: 0.015, c: '#229954'},
+                {x: 0.55, y: 0.22, r: 0.02, c: '#a04000'},
+                {x: 0.35, y: 0.22, r: 0.015, c: '#6e2c00'}
+            ];
+            decor.forEach(b => {
+                ctx.beginPath();
+                ctx.arc(b.x * w, b.y * h, b.r * scale, 0, Math.PI * 2);
+                ctx.fillStyle = b.c;
+                ctx.fill();
+            });
+        }
+    </script>
+</body>
+</html>

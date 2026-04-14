@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenichi Animation Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0f1115',
+                            800: '#161920',
+                            700: '#222631',
+                            600: '#2e3442'
+                        },
+                        brand: {
+                            500: '#3b82f6',
+                            600: '#2563eb'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1115; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e3442; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6; 
+        }
+        
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 0.375rem;
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-gray-200 h-screen overflow-hidden flex flex-col font-sans">
+
+    <!-- Top Navigation -->
+    <header class="h-16 bg-dark-800 border-b border-dark-700 flex items-center justify-between px-6 shrink-0">
+        <div class="flex items-center gap-3">
+            <i class="ph-fill ph-play-circle text-brand-500 text-3xl"></i>
+            <h1 class="font-bold text-xl tracking-tight text-white">Kenichi<span class="text-gray-400 font-normal">Studio</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div id="recording-indicator" class="hidden items-center gap-2 text-red-500 text-sm font-semibold animate-pulse">
+                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                Recording Video...
+            </div>
+            <button id="export-btn" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2 rounded-md font-medium transition-colors flex items-center gap-2 shadow-lg shadow-brand-500/20">
+                <i class="ph-bold ph-export"></i>
+                Export Animation
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Sidebar: Templates -->
+        <aside class="w-64 bg-dark-800 border-r border-dark-700 flex flex-col shrink-0">
+            <div class="p-4 border-b border-dark-700">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Animation Templates</h2>
+            </div>
+            <div id="template-list" class="flex-1 overflow-y-auto p-3 space-y-2">
+                <!-- Templates generated via JS -->
+            </div>
+        </aside>
+
+        <!-- Center: Canvas Preview -->
+        <section class="flex-1 bg-dark-900 flex flex-col items-center justify-center p-8 relative">
+            
+            <!-- Custom Toast Notification -->
+            <div id="toast" class="absolute top-6 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-full shadow-2xl font-medium transform transition-all duration-300 opacity-0 -translate-y-4 pointer-events-none z-50 flex items-center gap-2">
+                <i class="ph-bold ph-check-circle text-xl"></i>
+                <span id="toast-msg">Export Complete!</span>
+            </div>
+
+            <!-- Canvas Wrapper to maintain aspect ratio -->
+            <div class="relative w-full max-w-4xl aspect-video bg-black rounded-lg shadow-2xl overflow-hidden ring-1 ring-dark-700 group">
+                <canvas id="stage" class="w-full h-full block"></canvas>
+                
+                <!-- Playback controls overlay -->
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark-800/80 backdrop-blur-md px-4 py-2 rounded-full border border-dark-600 flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button id="restart-btn" class="text-gray-300 hover:text-white transition-colors" title="Restart Animation">
+                        <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
+                    </button>
+                    <div class="w-px h-4 bg-dark-600"></div>
+                    <span id="time-display" class="font-mono text-xs text-gray-400">00:00</span>
+                </div>
+            </div>
+            
+            <p class="text-dark-600 mt-6 text-sm">Preview rendering in real-time at 60fps</p>
+        </section>
+
+        <!-- Right Sidebar: Properties -->
+        <aside class="w-80 bg-dark-800 border-l border-dark-700 flex flex-col shrink-0">
+            <div class="p-4 border-b border-dark-700 flex items-center justify-between">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Properties</h2>
+                <i class="ph-bold ph-sliders-horizontal text-gray-400"></i>
+            </div>
+            <div id="properties-panel" class="flex-1 overflow-y-auto p-5 space-y-6">
+                <!-- Controls generated via JS -->
+            </div>
+        </aside>
+
+    </main>
+
+    <script>
+        // --- 1. State Management ---
+        let currentTemplateId = 'chart';
+        let config = {};
+        let animationTime = 0;
+        let lastTimestamp = 0;
+        let isRecording = false;
+        
+        // --- 2. Canvas Setup ---
+        const canvas = document.getElementById('stage');
+        const ctx = canvas.getContext('2d');
+        const W = 1920; // Internal 1080p rendering resolution
+        const H = 1080;
+        canvas.width = W;
+        canvas.height = H;
+
+        // --- 3. Templates Definition ---
+        const templates = [
+            {
+                id: 'chart',
+                name: 'Data Race Chart',
+                icon: 'ph-chart-bar',
+                category: 'Data Viz',
+                defaultConfig: {
+                    title: "Revenue Growth",
+                    color1: "#3b82f6",
+                    color2: "#10b981",
+                    color3: "#8b5cf6",
+                    speed: 1.5,
+                    bgColor: "#0f1115"
+                },
+                controls: [
+                    { key: 'title', label: 'Chart Title', type: 'text' },
+                    { key: 'color1', label: 'Item 1 Color', type: 'color' },
+                    { key: 'color2', label: 'Item 2 Color', type: 'color' },
+                    { key: 'color3', label: 'Item 3 Color', type: 'color' },
+                    { key: 'speed', label: 'Animation Speed', type: 'range', min: 0.5, max: 3, step: 0.1 },
+                    { key: 'bgColor', label: 'Background Color', type: 'color' }
+                ],
+                render: (ctx, t, cfg) => {
+                    ctx.fillStyle = cfg.bgColor;
+                    ctx.fillRect(0, 0, W, H);
+                    
+                    const time = t * cfg.speed;
+                    
+                    // Title
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 70px Inter, sans-serif';
+                    ctx.fillText(cfg.title, 100, 150);
+                    
+                    // Bars logic (procedural easing)
+                    const bars = [
+                        { name: "Product A", color: cfg.color1, targetVal: 1400, delay: 0 },
+                        { name: "Product B", color: cfg.color2, targetVal: 950, delay: 0.5 },
+                        { name: "Product C", color: cfg.color3, targetVal: 1100, delay: 0.2 }
+                    ];
+
+                    bars.forEach((bar, i) => {
+                        const y = 300 + (i * 180);
+                        // Easing function
+                        let progress = Math.max(0, Math.min(1, (time - bar.delay) / 2));
+                        // easeInOutCubic
+                        const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                        
+                        const currentWidth = ease * bar.targetVal;
+                        
+                        // Draw Bar
+                        ctx.fillStyle = bar.color;
+                        ctx.beginPath();
+                        ctx.roundRect(100, y, currentWidth, 100, 10);
+                        ctx.fill();
+
+                        // Draw Label
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = '50px Inter, sans-serif';
+                        ctx.fillText(bar.name, 100, y - 20);
+                        
+                        // Draw Value
+                        if (currentWidth > 50) {
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = 'bold 40px Inter, sans-serif';
+                            ctx.fillText('$' + Math.floor(currentWidth * 10), 100 + currentWidth + 20, y + 65);
+                        }
+                    });
+                }
+            },
+            {
+                id: 'math',
+                name: 'Sine Wave Viz',
+                icon: 'ph-wave-sine',
+                category: 'Educational',
+                defaultConfig: {
+                    equation: "y = sin(x)",
+                    frequency: 2,
+                    amplitude: 200,
+                    waveColor: "#ec4899",
+                    bgColor: "#161920"
+                },
+                controls: [
+                    { key: 'equation', label: 'Display Equation', type: 'text' },
+                    { key: 'frequency', label: 'Frequency', type: 'range', min: 1, max: 10, step: 0.5 },
+                    { key: 'amplitude', label: 'Amplitude', type: 'range', min: 50, max: 400, step: 10 },
+                    { key: 'waveColor', label: 'Wave Color', type: 'color' },
+                    { key: 'bgColor', label: 'Background Color', type: 'color' }
+                ],
+                render: (ctx, t, cfg) => {
+                    ctx.fillStyle = cfg.bgColor;
+                    ctx.fillRect(0, 0, W, H);
+
+                    // Grid
+                    ctx.strokeStyle = '#2e3442';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(100, H/2); ctx.lineTo(W-100, H/2); // X axis
+                    ctx.moveTo(W/2, 100); ctx.lineTo(W/2, H-100); // Y axis
+                    ctx.stroke();
+
+                    // Text
+                    ctx.fillStyle = cfg.waveColor;
+                    ctx.font = 'italic bold 60px "Times New Roman", serif';
+                    ctx.fillText(cfg.equation, 150, 150);
+
+                    // Draw Wave progressively
+                    ctx.strokeStyle = cfg.waveColor;
+                    ctx.lineWidth = 8;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.beginPath();
+                    
+                    // Reveal over 3 seconds
+                    const revealProgress = Math.min(1, t / 3);
+                    const drawWidth = (W - 200) * revealProgress;
+
+                    for (let x = 0; x < drawWidth; x += 5) {
+                        const actualX = 100 + x;
+                        const angle = (x / (W-200)) * Math.PI * 2 * cfg.frequency;
+                        // Move wave over time
+                        const phaseShift = t * 2; 
+                        const y = H/2 - Math.sin(angle - phaseShift) * cfg.amplitude;
+                        
+                        if (x === 0) ctx.moveTo(actualX, y);
+                        else ctx.lineTo(actualX, y);
+                    }
+                    ctx.stroke();
+                }
+            },
+            {
+                id: 'youtube',
+                name: 'Social Lower Third',
+                icon: 'ph-youtube-logo',
+                category: 'Motion Graphics',
+                defaultConfig: {
+                    name: "John Doe",
+                    handle: "@johndoe_dev",
+                    accentColor: "#ef4444",
+                    boxColor: "#ffffff",
+                    textColor: "#000000"
+                },
+                controls: [
+                    { key: 'name', label: 'Main Name', type: 'text' },
+                    { key: 'handle', label: 'Social Handle', type: 'text' },
+                    { key: 'accentColor', label: 'Accent Color', type: 'color' },
+                    { key: 'boxColor', label: 'Box Color', type: 'color' },
+                    { key: 'textColor', label: 'Text Color', type: 'color' }
+                ],
+                render: (ctx, t, cfg) => {
+                    // Transparent/checkerboard background for overlay usage
+                    ctx.clearRect(0, 0, W, H);
+                    
+                    // Intro animation (Slide in)
+                    let introEase = Math.min(1, t / 1.5);
+                    introEase = 1 - Math.pow(1 - introEase, 4); // easeOutQuart
+                    
+                    // Outro animation (Slide out after 5s)
+                    let outroEase = t > 5 ? Math.max(0, 1 - (t - 5) / 1) : 1;
+                    outroEase = outroEase * outroEase; // easeInQuad
+
+                    const totalEase = introEase * outroEase;
+                    if(totalEase <= 0.01) return; // invisible
+
+                    ctx.save();
+                    // Slide from bottom left
+                    ctx.translate(150, H - 250 + (1-totalEase)*200);
+                    ctx.globalAlpha = totalEase;
+
+                    // Shadow
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.shadowBlur = 30;
+                    ctx.shadowOffsetY = 15;
+
+                    // Main Box
+                    ctx.fillStyle = cfg.boxColor;
+                    ctx.beginPath();
+                    ctx.roundRect(0, 0, 700, 160, 20);
+                    ctx.fill();
+
+                    // Accent Line
+                    ctx.fillStyle = cfg.accentColor;
+                    ctx.shadowColor = 'transparent';
+                    ctx.beginPath();
+                    ctx.roundRect(0, 0, 15, 160, {tl: 20, bl: 20, tr: 0, br: 0});
+                    ctx.fill();
+
+                    // Text
+                    ctx.fillStyle = cfg.textColor;
+                    ctx.font = 'bold 55px Inter, sans-serif';
+                    ctx.fillText(cfg.name, 60, 75);
+                    
+                    ctx.fillStyle = cfg.accentColor;
+                    ctx.font = '35px Inter, sans-serif';
+                    ctx.fillText(cfg.handle, 60, 130);
+
+                    ctx.restore();
+                }
+            }
+        ];
+
+        // --- 4. UI Generation ---
+        function initUI() {
+            // Render Template List
+            const listEl = document.getElementById('template-list');
+            listEl.innerHTML = '';
+            templates.forEach(tpl => {
+                const btn = document.createElement('button');
+                btn.className = `w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${tpl.id === currentTemplateId ? 'bg-brand-600 text-white' : 'hover:bg-dark-700 text-gray-400'}`;
+                btn.innerHTML = `
+                    <div class="w-10 h-10 rounded bg-black/20 flex items-center justify-center shrink-0">
+                        <i class="ph-bold ${tpl.icon} text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-sm text-gray-100">${tpl.name}</div>
+                        <div class="text-xs opacity-70">${tpl.category}</div>
+                    </div>
+                `;
+                btn.onclick = () => selectTemplate(tpl.id);
+                listEl.appendChild(btn);
+            });
+
+            renderProperties();
+        }
+
+        function selectTemplate(id) {
+            currentTemplateId = id;
+            const tpl = templates.find(t => t.id === id);
+            // Deep copy default config
+            config = JSON.parse(JSON.stringify(tpl.defaultConfig));
+            animationTime = 0; // Restart animation
+            initUI(); // Re-render lists to update active states
+        }
+
+        function renderProperties() {
+            const panel = document.getElementById('properties-panel');
+            panel.innerHTML = '';
+            
+            const tpl = templates.find(t => t.id === currentTemplateId);
+            
+            tpl.controls.forEach(ctrl => {
+                const wrap = document.createElement('div');
+                wrap.className = 'space-y-2';
+                
+                const label = document.createElement('label');
+                label.className = 'block text-xs font-medium text-gray-400';
+                label.innerText = ctrl.label;
+                wrap.appendChild(label);
+
+                if (ctrl.type === 'text') {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = config[ctrl.key];
+                    input.className = 'w-full bg-dark-900 border border-dark-600 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors';
+                    input.oninput = (e) => config[ctrl.key] = e.target.value;
+                    wrap.appendChild(input);
+                } 
+                else if (ctrl.type === 'color') {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center gap-3';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'color';
+                    input.value = config[ctrl.key];
+                    input.className = 'w-10 h-10 rounded cursor-pointer bg-transparent';
+                    
+                    const hex = document.createElement('span');
+                    hex.className = 'text-sm font-mono text-gray-300 uppercase';
+                    hex.innerText = config[ctrl.key];
+
+                    input.oninput = (e) => {
+                        config[ctrl.key] = e.target.value;
+                        hex.innerText = e.target.value;
+                    };
+                    
+                    div.appendChild(input);
+                    div.appendChild(hex);
+                    wrap.appendChild(div);
+                }
+                else if (ctrl.type === 'range') {
+                    const input = document.createElement('input');
+                    input.type = 'range';
+                    input.min = ctrl.min;
+                    input.max = ctrl.max;
+                    input.step = ctrl.step;
+                    input.value = config[ctrl.key];
+                    input.className = 'w-full accent-brand-500';
+                    input.oninput = (e) => config[ctrl.key] = parseFloat(e.target.value);
+                    wrap.appendChild(input);
+                }
+
+                panel.appendChild(wrap);
+            });
+        }
+
+        // --- 5. Render Loop ---
+        function renderLoop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const delta = (timestamp - lastTimestamp) / 1000; // seconds
+            lastTimestamp = timestamp;
+
+            animationTime += delta;
+
+            const tpl = templates.find(t => t.id === currentTemplateId);
+            if (tpl) {
+                // Clear canvas completely
+                ctx.clearRect(0, 0, W, H);
+                // Draw template
+                tpl.render(ctx, animationTime, config);
+            }
+
+            // Update UI timer
+            const mins = Math.floor(animationTime / 60).toString().padStart(2, '0');
+            const secs = Math.floor(animationTime % 60).toString().padStart(2, '0');
+            document.getElementById('time-display').innerText = `${mins}:${secs}`;
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        document.getElementById('restart-btn').onclick = () => {
+            animationTime = 0;
+        };
+
+        // --- 6. Export Engine (MediaRecorder) ---
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.className = `absolute top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl font-medium transform transition-all duration-300 z-50 flex items-center gap-2 ${isError ? 'bg-red-500' : 'bg-green-500'} text-white opacity-100 translate-y-0`;
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-4');
+            }, 3000);
+        }
+
+        document.getElementById('export-btn').onclick = () => {
+            if (isRecording) return;
+            isRecording = true;
+            
+            // Restart animation to capture from beginning
+            animationTime = 0; 
+            
+            const btn = document.getElementById('export-btn');
+            const indicator = document.getElementById('recording-indicator');
+            btn.classList.add('hidden');
+            indicator.classList.remove('hidden');
+            indicator.classList.add('flex');
+
+            try {
+                // Capture canvas stream at 60fps
+                const stream = canvas.captureStream(60);
+                // We export in WebM format which is natively supported by browsers
+                const options = { mimeType: 'video/webm; codecs=vp9' };
+                let mediaRecorder;
+                
+                try {
+                    mediaRecorder = new MediaRecorder(stream, options);
+                } catch (e) {
+                    // Fallback codec
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                }
+
+                const chunks = [];
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `kenichi_export_${Date.now()}.webm`;
+                    a.click();
+                    
+                    URL.revokeObjectURL(url);
+                    
+                    // Reset UI
+                    isRecording = false;
+                    btn.classList.remove('hidden');
+                    indicator.classList.add('hidden');
+                    indicator.classList.remove('flex');
+                    showToast('Video exported successfully!');
+                };
+
+                mediaRecorder.start();
+
+                // Automatically stop recording after 6 seconds
+                setTimeout(() => {
+                    if (mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                    }
+                }, 6000);
+
+            } catch (err) {
+                console.error("Export failed:", err);
+                isRecording = false;
+                btn.classList.remove('hidden');
+                indicator.classList.add('hidden');
+                indicator.classList.remove('flex');
+                showToast('Export failed. Browser unsupported.', true);
+            }
+        };
+
+        // --- 7. Initialization ---
+        selectTemplate('chart'); // Load default
+        requestAnimationFrame(renderLoop); // Start loop
+
+    </script>
+</body>
+</html>

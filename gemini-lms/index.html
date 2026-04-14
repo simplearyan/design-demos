@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IITM Dashboard // Gemini Style</title>
+    
+    <!-- Fonts: Outfit (Display) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gemini: {
+                            bg: 'var(--bg-color)',
+                            surface: 'var(--surface-color)',
+                            surfaceHover: 'var(--surface-hover)',
+                            border: 'var(--border-color)',
+                            text: 'var(--text-color)',
+                            textMuted: 'var(--text-muted)',
+                            primary: 'var(--primary-color)',
+                            accent: 'var(--accent-color)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 40px -10px var(--primary-color)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            /* Light Mode (Gemini Light) */
+            --bg-color: #FFFFFF;
+            --surface-color: #F0F4F9;
+            --surface-hover: #E1E5EA;
+            --border-color: #E3E3E3;
+            --text-color: #1F1F1F;
+            --text-muted: #444746;
+            --primary-color: #0B57D0;
+            --accent-color: #D3E3FD;
+        }
+
+        .dark {
+            /* Dark Mode (Gemini Dark) */
+            --bg-color: #131314;
+            --surface-color: #1E1F20;
+            --surface-hover: #2D2E30;
+            --border-color: #444746;
+            --text-color: #E3E3E3;
+            --text-muted: #C4C7C5;
+            --primary-color: #A8C7FA;
+            --accent-color: #0F294D;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .dark .text-gradient {
+            background: linear-gradient(to right, #8baaaa 0%, #ae8b9c 100%); /* Subtle pastel for dark mode */
+            background: linear-gradient(90deg, #A8C7FA, #D3E3FD);
+        }
+
+        /* Card Hover Effect */
+        .course-card {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+        }
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
+        }
+        .dark .course-card:hover {
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+            border-color: var(--text-muted);
+        }
+
+        /* Sidebar Item */
+        .nav-item.active {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .dark .nav-item.active {
+            background-color: #004A77;
+            color: #C2E7FF;
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen flex selection:bg-blue-500/20">
+
+    <!-- Sidebar (Desktop) -->
+    <aside class="hidden lg:flex flex-col w-72 h-screen sticky top-0 border-r border-gemini-border p-6 bg-gemini-bg z-20">
+        
+        <!-- Logo -->
+        <div class="flex items-center gap-3 mb-10 px-2">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-700 to-orange-600 flex items-center justify-center shadow-lg text-white font-bold">
+                <img src="https://upload.wikimedia.org/wikipedia/en/6/69/IIT_Madras_Logo.svg" alt="IITM" class="w-6 h-6 brightness-200 grayscale-0">
+            </div>
+            <div class="flex flex-col">
+                <span class="font-display font-bold text-lg leading-tight">IIT Madras</span>
+                <span class="text-[10px] text-gemini-textMuted uppercase tracking-wider font-bold">BS Data Science</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 space-y-1">
+            <a href="#" class="nav-item active flex items-center gap-4 px-4 py-3 rounded-full transition-all text-sm">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                Dashboard
+            </a>
+            <a href="#" class="nav-item flex items-center gap-4 px-4 py-3 rounded-full text-gemini-textMuted hover:bg-gemini-surfaceHover transition-all text-sm">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                My Courses
+            </a>
+            <a href="#" class="nav-item flex items-center gap-4 px-4 py-3 rounded-full text-gemini-textMuted hover:bg-gemini-surfaceHover transition-all text-sm">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                Calendar
+            </a>
+            <a href="#" class="nav-item flex items-center gap-4 px-4 py-3 rounded-full text-gemini-textMuted hover:bg-gemini-surfaceHover transition-all text-sm">
+                <i data-lucide="file-bar-chart" class="w-5 h-5"></i>
+                Grades
+            </a>
+            <a href="#" class="nav-item flex items-center gap-4 px-4 py-3 rounded-full text-gemini-textMuted hover:bg-gemini-surfaceHover transition-all text-sm">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                Forum
+            </a>
+        </nav>
+
+        <!-- User Profile (Bottom Sidebar) -->
+        <div class="mt-auto pt-6 border-t border-gemini-border">
+            <div class="flex items-center gap-3 px-2">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-[2px]">
+                    <div class="w-full h-full rounded-full bg-gemini-surface flex items-center justify-center">
+                        <span class="font-bold text-xs">AS</span>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-semibold">Aryan S.</span>
+                    <span class="text-xs text-gemini-textMuted">21f1000000@ds.study</span>
+                </div>
+                <button class="ml-auto text-gemini-textMuted hover:text-gemini-primary">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 min-w-0">
+        
+        <!-- Header -->
+        <header class="h-20 border-b border-gemini-border flex items-center justify-between px-6 sticky top-0 bg-gemini-bg/80 backdrop-blur-md z-10">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden p-2 rounded-full hover:bg-gemini-surfaceHover">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <h1 class="text-xl font-display font-semibold hidden sm:block">Welcome back, Aryan</h1>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gemini-surface border border-gemini-border text-xs font-mono">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Jan 2026 Term
+                </div>
+                
+                <button class="p-2 rounded-full hover:bg-gemini-surfaceHover relative">
+                    <i data-lucide="bell" class="w-5 h-5 text-gemini-textMuted"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-gemini-bg"></span>
+                </button>
+                
+                <!-- Theme Toggle -->
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gemini-surfaceHover text-gemini-textMuted transition-colors">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
+            
+            <!-- Stats / Term Overview -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- CGPA Card -->
+                <div class="p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border flex flex-col justify-between h-40 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-blue-500/20 transition-all"></div>
+                    <div>
+                        <span class="text-xs font-bold text-gemini-textMuted uppercase tracking-widest">Cumulative GPA</span>
+                        <div class="text-5xl font-display font-bold mt-2 text-gemini-primary">7.0</div>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gemini-textMuted">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
+                        <span>Consistent performance</span>
+                    </div>
+                </div>
+
+                <!-- Credits Card -->
+                <div class="p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border flex flex-col justify-between h-40 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-purple-500/20 transition-all"></div>
+                    <div>
+                        <span class="text-xs font-bold text-gemini-textMuted uppercase tracking-widest">Credits Completed</span>
+                        <div class="text-5xl font-display font-bold mt-2 text-purple-500">44</div>
+                    </div>
+                    <div class="w-full bg-gemini-border h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-purple-500 h-full w-[40%] rounded-full"></div>
+                    </div>
+                </div>
+
+                <!-- Next Deadline -->
+                <div class="p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border flex flex-col justify-between h-40 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-orange-500/20 transition-all"></div>
+                    <div>
+                        <span class="text-xs font-bold text-gemini-textMuted uppercase tracking-widest">Upcoming Deadline</span>
+                        <div class="text-xl font-display font-bold mt-3">Statistics II: Wk 4</div>
+                        <div class="text-sm text-gemini-textMuted mt-1">Graded Assignment</div>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-bold text-orange-500 bg-orange-500/10 px-3 py-1.5 rounded-full w-fit">
+                        <i data-lucide="clock" class="w-3 h-3"></i>
+                        Due in 12 hours
+                    </div>
+                </div>
+            </section>
+
+            <!-- Courses Grid -->
+            <section>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-display font-bold">My Current Courses</h2>
+                    <button class="text-sm font-medium text-gemini-primary hover:underline">View All</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Course 1: Statistics II -->
+                    <div class="course-card rounded-[2rem] bg-gemini-surface border border-gemini-border overflow-hidden flex flex-col h-full group">
+                        <!-- Card Header -->
+                        <div class="h-32 bg-gradient-to-r from-[#2E0208] to-[#5C0816] p-6 relative">
+                            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                            <span class="relative z-10 px-2 py-1 rounded bg-black/30 text-white text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm border border-white/10">Foundation Level</span>
+                        </div>
+                        
+                        <!-- Card Body -->
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="mb-4">
+                                <h3 class="text-2xl font-bold font-display mb-1 group-hover:text-gemini-primary transition-colors">Statistics for Data Science II</h3>
+                                <p class="text-sm text-gemini-textMuted">Course ID: BSMA1004 &bull; 4 Credits</p>
+                            </div>
+
+                            <!-- Quick Stats -->
+                            <div class="grid grid-cols-3 gap-4 mb-6">
+                                <div class="text-center p-3 rounded-xl bg-gemini-bg">
+                                    <div class="text-xs text-gemini-textMuted mb-1">Score</div>
+                                    <div class="font-bold text-green-500">92%</div>
+                                </div>
+                                <div class="text-center p-3 rounded-xl bg-gemini-bg">
+                                    <div class="text-xs text-gemini-textMuted mb-1">Attendance</div>
+                                    <div class="font-bold">100%</div>
+                                </div>
+                                <div class="text-center p-3 rounded-xl bg-gemini-bg">
+                                    <div class="text-xs text-gemini-textMuted mb-1">Week</div>
+                                    <div class="font-bold">04</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-6 border-t border-gemini-border flex justify-between items-center">
+                                <span class="text-xs font-mono text-gemini-textMuted">REPEAT FULL COURSE</span>
+                                <button class="px-5 py-2.5 rounded-full bg-gemini-textMuted/10 hover:bg-gemini-primary hover:text-white transition-all text-sm font-bold flex items-center gap-2">
+                                    Go to Course <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course 2: Mathematics II -->
+                    <div class="course-card rounded-[2rem] bg-gemini-surface border border-gemini-border overflow-hidden flex flex-col h-full group">
+                        <!-- Card Header -->
+                        <div class="h-32 bg-gradient-to-r from-[#0F172A] to-[#1E293B] p-6 relative">
+                            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                            <span class="relative z-10 px-2 py-1 rounded bg-black/30 text-white text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm border border-white/10">Foundation Level</span>
+                        </div>
+                        
+                        <!-- Card Body -->
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="mb-4">
+                                <h3 class="text-2xl font-bold font-display mb-1 group-hover:text-gemini-primary transition-colors">Mathematics for Data Science II</h3>
+                                <p class="text-sm text-gemini-textMuted">Course ID: BSMA1003 &bull; 4 Credits</p>
+                            </div>
+
+                            <!-- Quick Stats -->
+                            <div class="grid grid-cols-3 gap-4 mb-6">
+                                <div class="text-center p-3 rounded-xl bg-gemini-bg">
+                                    <div class="text-xs text-gemini-textMuted mb-1">Score</div>
+                                    <div class="font-bold text-yellow-500">78%</div>
+                                </div>
+                                <div class="text-center p-3 rounded-xl bg-gemini-bg">
+                                    <div class="text-xs text-gemini-textMuted mb-1">Attendance</div>
+                                    <div class="font-bold">85%</div>
+                                </div>
+                                <div class="text-center p-3 rounded-xl bg-gemini-bg">
+                                    <div class="text-xs text-gemini-textMuted mb-1">Week</div>
+                                    <div class="font-bold">04</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-6 border-t border-gemini-border flex justify-between items-center">
+                                <span class="text-xs font-mono text-gemini-textMuted">REPEAT FULL COURSE</span>
+                                <button class="px-5 py-2.5 rounded-full bg-gemini-textMuted/10 hover:bg-gemini-primary hover:text-white transition-all text-sm font-bold flex items-center gap-2">
+                                    Go to Course <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Quick Links -->
+            <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="#" class="p-4 rounded-2xl bg-gemini-surface border border-gemini-border hover:bg-gemini-surfaceHover flex flex-col items-center justify-center gap-2 text-center transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gemini-textMuted">Hall Ticket</span>
+                </a>
+                <a href="#" class="p-4 rounded-2xl bg-gemini-surface border border-gemini-border hover:bg-gemini-surfaceHover flex flex-col items-center justify-center gap-2 text-center transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
+                        <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gemini-textMuted">Exam City</span>
+                </a>
+                <a href="#" class="p-4 rounded-2xl bg-gemini-surface border border-gemini-border hover:bg-gemini-surfaceHover flex flex-col items-center justify-center gap-2 text-center transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500">
+                        <i data-lucide="book" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gemini-textMuted">Previous Papers</span>
+                </a>
+                <a href="#" class="p-4 rounded-2xl bg-gemini-surface border border-gemini-border hover:bg-gemini-surfaceHover flex flex-col items-center justify-center gap-2 text-center transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gemini-textMuted">Fee Payment</span>
+                </a>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 w-full bg-gemini-surface border-t border-gemini-border pb-safe z-50">
+        <div class="flex justify-around items-center h-16">
+            <a href="#" class="flex flex-col items-center gap-1 text-gemini-primary">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold">Home</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gemini-textMuted hover:text-gemini-text">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Courses</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gemini-textMuted hover:text-gemini-text">
+                <i data-lucide="file-bar-chart" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Grades</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gemini-textMuted hover:text-gemini-text">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        lucide.createIcons();
+
+        // Simple Theme Logic
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Init Theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</body>
+</html>

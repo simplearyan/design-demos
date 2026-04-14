@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics II // Course View</title>
+    
+    <!-- Fonts: Outfit (Display) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gemini: {
+                            bg: 'var(--bg-color)',
+                            surface: 'var(--surface-color)',
+                            surfaceHover: 'var(--surface-hover)',
+                            border: 'var(--border-color)',
+                            text: 'var(--text-color)',
+                            textMuted: 'var(--text-muted)',
+                            primary: 'var(--primary-color)',
+                            accent: 'var(--accent-color)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 40px -10px var(--primary-color)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            /* Light Mode */
+            --bg-color: #FFFFFF;
+            --surface-color: #F0F4F9;
+            --surface-hover: #E1E5EA;
+            --border-color: #E3E3E3;
+            --text-color: #1F1F1F;
+            --text-muted: #444746;
+            --primary-color: #0B57D0;
+            --accent-color: #D3E3FD;
+        }
+
+        .dark {
+            /* Dark Mode */
+            --bg-color: #131314;
+            --surface-color: #1E1F20;
+            --surface-hover: #2D2E30;
+            --border-color: #444746;
+            --text-color: #E3E3E3;
+            --text-muted: #C4C7C5;
+            --primary-color: #A8C7FA;
+            --accent-color: #0F294D;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Module Card */
+        .module-card {
+            transition: all 0.2s ease;
+        }
+        .module-card:hover {
+            background-color: var(--surface-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Sidebar Item */
+        .nav-item {
+            color: var(--text-muted);
+        }
+        .nav-item.active {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .dark .nav-item.active {
+            background-color: #004A77;
+            color: #C2E7FF;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+    </style>
+</head>
+<body class="font-sans min-h-screen flex selection:bg-blue-500/20">
+
+    <!-- Sidebar (Desktop) -->
+    <aside class="hidden lg:flex flex-col w-72 h-screen sticky top-0 border-r border-gemini-border p-6 bg-gemini-bg z-20">
+        
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-3 mb-10 px-2 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-700 to-orange-600 flex items-center justify-center shadow-lg text-white font-bold group-hover:scale-105 transition-transform">
+                <img src="https://upload.wikimedia.org/wikipedia/en/6/69/IIT_Madras_Logo.svg" alt="IITM" class="w-6 h-6 brightness-200 grayscale-0">
+            </div>
+            <div class="flex flex-col">
+                <span class="font-display font-bold text-lg leading-tight">IIT Madras</span>
+                <span class="text-[10px] text-gemini-textMuted uppercase tracking-wider font-bold">BS Data Science</span>
+            </div>
+        </a>
+
+        <!-- Navigation -->
+        <nav class="flex-1 space-y-1">
+            <a href="index.html" class="nav-item flex items-center gap-4 px-4 py-3 rounded-full hover:bg-gemini-surfaceHover transition-all text-sm">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                Dashboard
+            </a>
+            <a href="#" class="nav-item active flex items-center gap-4 px-4 py-3 rounded-full transition-all text-sm">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                Statistics II
+            </a>
+            <a href="#" class="nav-item flex items-center gap-4 px-4 py-3 rounded-full hover:bg-gemini-surfaceHover transition-all text-sm">
+                <i data-lucide="video" class="w-5 h-5"></i>
+                Live Sessions
+            </a>
+            <a href="#" class="nav-item flex items-center gap-4 px-4 py-3 rounded-full hover:bg-gemini-surfaceHover transition-all text-sm">
+                <i data-lucide="file-question" class="w-5 h-5"></i>
+                Assignments
+            </a>
+            <a href="#" class="nav-item flex items-center gap-4 px-4 py-3 rounded-full hover:bg-gemini-surfaceHover transition-all text-sm">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                Discussion
+            </a>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="mt-auto pt-6 border-t border-gemini-border">
+            <div class="flex items-center gap-3 px-2">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-[2px]">
+                    <div class="w-full h-full rounded-full bg-gemini-surface flex items-center justify-center">
+                        <span class="font-bold text-xs">AS</span>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-semibold">Aryan S.</span>
+                    <span class="text-xs text-gemini-textMuted">21f1000000</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+        
+        <!-- Header -->
+        <header class="h-20 border-b border-gemini-border flex items-center justify-between px-6 bg-gemini-bg/95 backdrop-blur-md z-10 flex-shrink-0">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden p-2 rounded-full hover:bg-gemini-surfaceHover">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                
+                <div class="flex flex-col">
+                    <h1 class="text-lg font-display font-bold leading-tight">Statistics for Data Science II</h1>
+                    <span class="text-xs text-gemini-textMuted flex items-center gap-2">
+                        BSMA1004 <span class="w-1 h-1 rounded-full bg-gemini-textMuted"></span> 4 Credits
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gemini-surface border border-gemini-border text-xs font-bold text-gemini-textMuted">
+                    <i data-lucide="trophy" class="w-3 h-3 text-yellow-500"></i>
+                    Score: 92%
+                </div>
+                
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gemini-surfaceHover text-gemini-textMuted transition-colors">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Course Content -->
+        <div class="flex-1 overflow-y-auto p-6 md:p-10 space-y-8">
+            
+            <!-- Hero / Progress Section -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main Info Card -->
+                <div class="lg:col-span-2 p-8 rounded-[2rem] bg-gradient-to-br from-blue-900 to-slate-900 text-white relative overflow-hidden flex flex-col justify-between min-h-[240px]">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                    <div class="absolute top-0 right-0 p-8 opacity-20">
+                        <i data-lucide="bar-chart-2" class="w-32 h-32"></i>
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <span class="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-bold mb-4 backdrop-blur-md">WEEK 04 &bull; ACTIVE</span>
+                        <h2 class="text-3xl md:text-4xl font-display font-bold mb-2">Hypothesis Testing</h2>
+                        <p class="text-blue-100/80 max-w-lg text-sm md:text-base">
+                            This week covers null and alternative hypotheses, Type I and Type II errors, and power of a test.
+                        </p>
+                    </div>
+
+                    <div class="relative z-10 flex gap-4 mt-8">
+                        <button class="px-6 py-3 rounded-full bg-white text-blue-900 font-bold text-sm hover:bg-blue-50 transition-colors flex items-center gap-2">
+                            <i data-lucide="play-circle" class="w-4 h-4"></i> Resume Week 4
+                        </button>
+                        <button class="px-6 py-3 rounded-full bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10">
+                            Download Slides
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instructor / Quick Links -->
+                <div class="flex flex-col gap-6">
+                    <!-- Instructor -->
+                    <div class="p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border">
+                        <span class="text-xs font-bold text-gemini-textMuted uppercase tracking-widest block mb-4">Course Instructor</span>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gray-300 overflow-hidden">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Prof" alt="Instructor" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <div class="font-bold font-display">Dr. Andrew T.</div>
+                                <div class="text-xs text-gemini-textMuted">Dept. of Electrical Eng.</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gemini-border flex gap-2">
+                            <button class="flex-1 py-2 rounded-xl bg-gemini-bg hover:bg-gemini-surfaceHover border border-gemini-border text-xs font-bold transition-colors">Office Hours</button>
+                            <button class="flex-1 py-2 rounded-xl bg-gemini-bg hover:bg-gemini-surfaceHover border border-gemini-border text-xs font-bold transition-colors">Email</button>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming -->
+                    <div class="p-6 rounded-[2rem] bg-gemini-surface border border-gemini-border flex-1 flex flex-col justify-center">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <span class="text-xs font-bold text-gemini-textMuted uppercase tracking-widest">Next Deadline</span>
+                                <div class="text-lg font-bold mt-1">Graded Assignment 4</div>
+                            </div>
+                            <div class="p-2 rounded-full bg-orange-500/10 text-orange-500">
+                                <i data-lucide="clock" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gemini-textMuted mb-4">Due: Feb 20, 11:59 PM</div>
+                        <button class="w-full py-2 rounded-xl bg-gemini-primary text-white text-xs font-bold hover:opacity-90 transition-opacity">
+                            Submit Assignment
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weeks / Modules List -->
+            <section>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-display font-bold">Course Modules</h3>
+                    <div class="flex gap-2">
+                        <button class="p-2 rounded-lg hover:bg-gemini-surfaceHover text-gemini-textMuted"><i data-lucide="filter" class="w-4 h-4"></i></button>
+                        <button class="p-2 rounded-lg hover:bg-gemini-surfaceHover text-gemini-textMuted"><i data-lucide="arrow-down-up" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    
+                    <!-- Week 4 (Current) -->
+                    <div class="module-card p-6 rounded-2xl bg-gemini-surface border border-gemini-primary/30 relative overflow-hidden group">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gemini-primary"></div>
+                        <div class="flex flex-col md:flex-row gap-6 md:items-center justify-between relative z-10">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-12 h-12 rounded-xl bg-gemini-primary flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
+                                    04
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold font-display text-gemini-primary mb-1">Hypothesis Testing</h4>
+                                    <div class="flex flex-wrap gap-3 text-xs text-gemini-textMuted">
+                                        <span class="flex items-center gap-1"><i data-lucide="video" class="w-3 h-3"></i> 5 Videos</span>
+                                        <span class="flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> 2 Notes</span>
+                                        <span class="flex items-center gap-1"><i data-lucide="help-circle" class="w-3 h-3"></i> 1 Quiz</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 pl-16 md:pl-0">
+                                <div class="flex flex-col items-end gap-1">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-gemini-textMuted">Progress</span>
+                                    <div class="w-32 h-2 bg-gemini-bg rounded-full overflow-hidden">
+                                        <div class="bg-gemini-primary h-full w-[45%] rounded-full"></div>
+                                    </div>
+                                </div>
+                                <button class="p-3 rounded-full bg-gemini-bg hover:bg-gemini-primary hover:text-white transition-colors border border-gemini-border">
+                                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Week 3 (Completed) -->
+                    <div class="module-card p-6 rounded-2xl bg-gemini-surface border border-gemini-border opacity-80 hover:opacity-100 group">
+                        <div class="flex flex-col md:flex-row gap-6 md:items-center justify-between">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-12 h-12 rounded-xl bg-gemini-bg border border-gemini-border flex items-center justify-center text-gemini-textMuted font-bold text-lg">
+                                    <i data-lucide="check" class="w-6 h-6 text-green-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold font-display mb-1 text-gemini-textMuted group-hover:text-gemini-text transition-colors">Bayesian Inference</h4>
+                                    <div class="flex flex-wrap gap-3 text-xs text-gemini-textMuted">
+                                        <span class="flex items-center gap-1"><i data-lucide="video" class="w-3 h-3"></i> 4 Videos</span>
+                                        <span class="flex items-center gap-1"><i data-lucide="file-check" class="w-3 h-3"></i> Graded Assignment: 100/100</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pl-16 md:pl-0">
+                                <button class="px-4 py-2 rounded-lg border border-gemini-border text-xs font-bold hover:bg-gemini-bg transition-colors text-gemini-textMuted">
+                                    Review
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Week 2 (Completed) -->
+                    <div class="module-card p-6 rounded-2xl bg-gemini-surface border border-gemini-border opacity-80 hover:opacity-100 group">
+                        <div class="flex flex-col md:flex-row gap-6 md:items-center justify-between">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-12 h-12 rounded-xl bg-gemini-bg border border-gemini-border flex items-center justify-center text-gemini-textMuted font-bold text-lg">
+                                    <i data-lucide="check" class="w-6 h-6 text-green-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold font-display mb-1 text-gemini-textMuted group-hover:text-gemini-text transition-colors">Random Variables</h4>
+                                    <div class="flex flex-wrap gap-3 text-xs text-gemini-textMuted">
+                                        <span class="flex items-center gap-1"><i data-lucide="video" class="w-3 h-3"></i> 6 Videos</span>
+                                        <span class="flex items-center gap-1"><i data-lucide="file-check" class="w-3 h-3"></i> Graded Assignment: 95/100</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pl-16 md:pl-0">
+                                <button class="px-4 py-2 rounded-lg border border-gemini-border text-xs font-bold hover:bg-gemini-bg transition-colors text-gemini-textMuted">
+                                    Review
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Week 5 (Locked) -->
+                    <div class="module-card p-6 rounded-2xl bg-gemini-bg border border-gemini-border border-dashed opacity-60">
+                        <div class="flex gap-4 items-center">
+                            <div class="w-12 h-12 rounded-xl bg-gemini-surface flex items-center justify-center text-gemini-textMuted font-bold text-lg">
+                                05
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold font-display mb-1 text-gemini-textMuted">Linear Regression</h4>
+                                <p class="text-xs text-gemini-textMuted flex items-center gap-1">
+                                    <i data-lucide="lock" class="w-3 h-3"></i> Unlocks Feb 24
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="lg:hidden fixed bottom-0 w-full bg-gemini-surface border-t border-gemini-border pb-safe z-50">
+        <div class="flex justify-around items-center h-16">
+            <a href="index.html" class="flex flex-col items-center gap-1 text-gemini-textMuted hover:text-gemini-text">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Home</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gemini-primary">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold">Course</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gemini-textMuted hover:text-gemini-text">
+                <i data-lucide="file-bar-chart" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Grades</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gemini-textMuted hover:text-gemini-text">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        lucide.createIcons();
+
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</body>
+</html>
