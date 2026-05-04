@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YouTube Watch Playlist</title>
+    
+    <!-- Google Fonts: Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Roboto', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        yt: {
+                            black: '#0f0f0f',
+                            dark: '#212121',
+                            darker: '#181818',
+                            light: '#f2f2f2',
+                            borderDark: '#3f3f3f',
+                            borderLight: '#e5e5e5',
+                            hoverDark: '#272727',
+                            hoverLight: '#e5e5e5',
+                            red: '#ff0000',
+                            activePlaylistLight: '#e5e5e5',
+                            activePlaylistDark: '#272727'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Custom scrollbar for playlist queue on desktop */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 4px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #717171;
+        }
+        body {
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-yt-black text-black dark:text-white font-sans antialiased overflow-x-hidden">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 right-0 h-14 bg-white dark:bg-yt-black flex items-center justify-between px-4 z-50">
+        <div class="flex items-center gap-4">
+            <button id="menu-toggle" class="p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition">
+                <i class="ph ph-list text-2xl"></i>
+            </button>
+            <a href="index.html" class="flex items-center gap-1" title="YouTube Home">
+                <i class="ph-fill ph-youtube-logo text-yt-red text-3xl"></i>
+                <span class="text-xl font-semibold tracking-tighter hidden sm:block">YouTube</span>
+            </a>
+        </div>
+
+        <!-- Center Search -->
+        <div class="hidden sm:flex items-center flex-1 max-w-[600px] ml-10">
+            <div class="flex w-full">
+                <div class="flex items-center flex-1 border border-yt-borderLight dark:border-yt-borderDark rounded-l-full px-4 py-0.5 bg-white dark:bg-yt-black focus-within:border-blue-500 ml-8">
+                    <i class="ph ph-magnifying-glass text-gray-500 hidden md:block mr-2"></i>
+                    <input type="text" placeholder="Search" class="w-full bg-transparent outline-none py-1.5 dark:text-white text-base">
+                </div>
+                <button class="px-5 border border-l-0 border-yt-borderLight dark:border-yt-borderDark rounded-r-full bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark transition">
+                    <i class="ph ph-magnifying-glass text-xl"></i>
+                </button>
+            </div>
+            <button class="ml-4 p-2.5 rounded-full bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark transition flex-shrink-0">
+                <i class="ph-fill ph-microphone text-xl"></i>
+            </button>
+        </div>
+
+        <div class="flex items-center gap-1 sm:gap-3">
+            <button class="sm:hidden p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition">
+                <i class="ph ph-magnifying-glass text-2xl"></i>
+            </button>
+            <button class="p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition" id="theme-toggle" title="Toggle Theme">
+                <i class="ph ph-moon text-2xl dark:hidden"></i>
+                <i class="ph ph-sun text-2xl hidden dark:block"></i>
+            </button>
+            <button class="hidden md:block p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition">
+                <i class="ph ph-video-camera text-2xl"></i>
+            </button>
+            <button class="p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition relative">
+                <i class="ph ph-bell text-2xl"></i>
+                <span class="absolute top-1.5 right-1.5 bg-yt-red text-white text-[10px] font-bold px-1 rounded-full border-2 border-white dark:border-yt-black">9+</span>
+            </button>
+            <button class="p-1 ml-1 sm:ml-2">
+                <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+            </button>
+        </div>
+    </header>
+
+    <!-- OFF-CANVAS SIDEBAR DRAWER -->
+    <!-- On Watch pages, YouTube typically hides the permanent sidebar to give max width to the video player -->
+    <aside id="drawer-sidebar" class="fixed top-0 left-0 bottom-0 w-[240px] bg-white dark:bg-yt-black z-[60] overflow-y-auto no-scrollbar transform -translate-x-full transition-transform duration-300">
+        <div class="h-14 flex items-center px-4 gap-4 sticky top-0 bg-white dark:bg-yt-black z-10 border-b border-transparent">
+            <button id="close-drawer" class="p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition">
+                <i class="ph ph-list text-2xl"></i>
+            </button>
+            <a href="index.html" class="flex items-center gap-1" title="YouTube Home">
+                <i class="ph-fill ph-youtube-logo text-yt-red text-3xl"></i>
+                <span class="text-xl font-semibold tracking-tighter">YouTube</span>
+            </a>
+        </div>
+        <div class="px-3 py-3 pb-20">
+            <div class="border-b border-yt-borderLight dark:border-yt-borderDark pb-3 mb-3">
+                <a href="index.html" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg font-medium">
+                    <i class="ph ph-house text-2xl"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                    <i class="ph ph-monitor-play text-2xl"></i>
+                    <span>Shorts</span>
+                </a>
+                <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                    <i class="ph ph-youtube-logo text-2xl"></i>
+                    <span>Subscriptions</span>
+                </a>
+            </div>
+            <!-- More links can go here -->
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="pt-14 pb-4 min-h-screen max-w-[1800px] mx-auto flex flex-col lg:flex-row px-0 sm:px-6 lg:px-6 gap-0 lg:gap-6">
+        
+        <!-- LEFT COLUMN (Video Player & Info) -->
+        <div class="flex-1 w-full min-w-0">
+            
+            <!-- Video Player Mockup -->
+            <div class="w-full bg-black aspect-video sm:mt-6 sm:rounded-xl overflow-hidden relative group">
+                <img src="https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=1280&h=720" alt="Video Player" class="w-full h-full object-cover opacity-70">
+                
+                <!-- Play Button Overlay -->
+                <div class="absolute inset-0 flex items-center justify-center cursor-pointer">
+                    <i class="ph-fill ph-play-circle text-white text-7xl lg:text-8xl drop-shadow-2xl hover:scale-110 transition duration-200"></i>
+                </div>
+
+                <!-- Player Controls Bar -->
+                <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="w-full h-1 bg-white/30 rounded cursor-pointer mb-3 relative">
+                        <div class="absolute top-0 left-0 h-full bg-yt-red w-1/4 rounded"></div>
+                        <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-3 h-3 bg-yt-red rounded-full"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-white">
+                        <div class="flex items-center gap-4">
+                            <button><i class="ph-fill ph-pause text-2xl"></i></button>
+                            <button><i class="ph-fill ph-skip-forward text-2xl"></i></button>
+                            <button><i class="ph-fill ph-speaker-high text-2xl"></i></button>
+                            <span class="text-sm font-medium">45:10 / 3:00:00</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button><i class="ph ph-subtitles text-2xl"></i></button>
+                            <button><i class="ph ph-gear text-2xl"></i></button>
+                            <button><i class="ph ph-corners-out text-2xl"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Info & Meta -->
+            <div class="px-4 sm:px-0 mt-3 sm:mt-4">
+                <h1 class="text-[20px] font-bold text-black dark:text-white leading-tight">
+                    Relaxing Jazz Music & Rain Sounds for Studying (Currently Playing)
+                </h1>
+
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mt-3 gap-4">
+                    
+                    <!-- Channel Info -->
+                    <div class="flex items-center gap-3">
+                        <img src="https://i.pravatar.cc/150?u=channel3" alt="Channel" class="w-10 h-10 rounded-full object-cover">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-base text-black dark:text-white">Cozy Vibes <i class="ph-fill ph-check-circle text-[12px] text-gray-500"></i></span>
+                            <span class="text-xs text-gray-600 dark:text-gray-400">1.2M subscribers</span>
+                        </div>
+                        <button class="ml-3 bg-black dark:bg-white text-white dark:text-black font-medium text-sm px-4 py-2 rounded-full hover:bg-gray-800 dark:hover:bg-gray-200 transition">
+                            Subscribe
+                        </button>
+                    </div>
+
+                    <!-- Action Buttons (Scrollable horizontally on mobile) -->
+                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar w-full md:w-auto pb-1 md:pb-0 touch-pan-x">
+                        
+                        <!-- Like / Dislike -->
+                        <div class="flex items-center bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark rounded-full transition flex-shrink-0">
+                            <button class="flex items-center gap-2 px-4 py-2 border-r border-gray-300 dark:border-gray-600 font-medium text-sm">
+                                <i class="ph ph-thumbs-up text-xl"></i> 124K
+                            </button>
+                            <button class="px-4 py-2 font-medium text-sm">
+                                <i class="ph ph-thumbs-down text-xl"></i>
+                            </button>
+                        </div>
+
+                        <!-- Share -->
+                        <button class="flex items-center gap-2 bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark rounded-full px-4 py-2 font-medium text-sm transition flex-shrink-0">
+                            <i class="ph ph-share-fat text-xl"></i> Share
+                        </button>
+
+                        <!-- Download -->
+                        <button class="flex items-center gap-2 bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark rounded-full px-4 py-2 font-medium text-sm transition flex-shrink-0">
+                            <i class="ph ph-download-simple text-xl"></i> Download
+                        </button>
+
+                        <!-- More -->
+                        <button class="bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark rounded-full p-2 transition flex-shrink-0">
+                            <i class="ph-bold ph-dots-three text-xl"></i>
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- Description Box -->
+                <div class="mt-4 bg-yt-light dark:bg-yt-dark rounded-xl p-3 hover:bg-gray-200 dark:hover:bg-yt-hoverDark transition cursor-pointer">
+                    <div class="flex font-medium text-sm gap-2">
+                        <span>4.5M views</span>
+                        <span>1 month ago</span>
+                        <span class="text-blue-500">#Jazz</span>
+                        <span class="text-blue-500">#Relaxing</span>
+                    </div>
+                    <p class="text-sm mt-1 line-clamp-2">
+                        Welcome to the Late Night Coding Sessions & Chill Vibes playlist! Enjoy this relaxing 3 hours of jazz piano, smooth saxophone, and steady rain sounds...
+                    </p>
+                    <span class="text-sm font-medium mt-1 block">Show more</span>
+                </div>
+                
+                <!-- Comments Placeholder -->
+                <div class="mt-6 flex items-center justify-between">
+                     <h2 class="text-xl font-bold">2,143 Comments</h2>
+                     <i class="ph ph-sort-descending text-2xl hidden md:block"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN (Playlist Queue) -->
+        <div class="w-full lg:w-[400px] xl:w-[420px] flex-shrink-0 px-4 sm:px-0 mt-6 lg:mt-6">
+            
+            <div class="border border-yt-borderLight dark:border-yt-borderDark rounded-xl overflow-hidden flex flex-col h-auto lg:h-[calc(100vh-100px)] lg:sticky lg:top-20">
+                
+                <!-- Playlist Header -->
+                <div class="p-4 bg-gray-100 dark:bg-[#212121]">
+                    <h2 class="text-lg font-bold text-black dark:text-white leading-snug">
+                        Late Night Coding Sessions & Chill Vibes
+                    </h2>
+                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-1 mb-3">
+                        Cozy Vibes - 1 / 8
+                    </div>
+                    
+                    <div class="flex items-center gap-3 text-black dark:text-white">
+                        <button class="p-1.5 hover:bg-gray-200 dark:hover:bg-yt-hoverDark rounded-full transition" title="Loop playlist">
+                            <i class="ph ph-repeat text-xl"></i>
+                        </button>
+                        <button class="p-1.5 hover:bg-gray-200 dark:hover:bg-yt-hoverDark rounded-full transition" title="Shuffle playlist">
+                            <i class="ph ph-shuffle text-xl"></i>
+                        </button>
+                        <button class="p-1.5 ml-auto hover:bg-gray-200 dark:hover:bg-yt-hoverDark rounded-full transition" title="Save playlist">
+                            <i class="ph ph-plus-square text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Playlist Queue (Scrollable) -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-[#181818] p-2" id="playlist-queue">
+                    <!-- Javascript will inject list here -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- Theme Management ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            localStorage.setItem('theme', htmlElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // --- Off-Canvas Sidebar Logic ---
+        const menuToggleBtn = document.getElementById('menu-toggle');
+        const drawerSidebar = document.getElementById('drawer-sidebar');
+        const closeDrawerBtn = document.getElementById('close-drawer');
+        
+        // Create an overlay background for the drawer
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black/50 z-50 hidden cursor-pointer transition-opacity';
+        document.body.appendChild(overlay);
+
+        function openDrawer() {
+            overlay.classList.remove('hidden');
+            drawerSidebar.classList.remove('-translate-x-full');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            overlay.classList.add('hidden');
+            drawerSidebar.classList.add('-translate-x-full');
+            document.body.style.overflow = '';
+        }
+
+        menuToggleBtn.addEventListener('click', openDrawer);
+        closeDrawerBtn.addEventListener('click', closeDrawer);
+        overlay.addEventListener('click', closeDrawer);
+
+        // --- Mock Playlist Queue Data & Rendering ---
+        const queueVideos = [
+            {
+                id: 1,
+                title: "Relaxing Jazz Music & Rain Sounds for Studying",
+                thumbnail: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=320&h=180",
+                duration: "3:00:00",
+                channel: "Cozy Vibes",
+                playing: true
+            },
+            {
+                id: 2,
+                title: "Lofi hip hop radio - beats to relax/study to",
+                thumbnail: "https://images.unsplash.com/photo-1516280440502-86923485abdf?auto=format&fit=crop&q=80&w=320&h=180",
+                duration: "LIVE",
+                channel: "ChilledCow",
+                playing: false
+            },
+            {
+                id: 3,
+                title: "Beautiful Piano Music 24/7 - Study Music, Relaxing Music",
+                thumbnail: "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&q=80&w=320&h=180",
+                duration: "2:15:30",
+                channel: "Rousseau",
+                playing: false
+            },
+            {
+                id: 4,
+                title: "Cyberpunk Ambient City Sounds - Sci-Fi Ambience",
+                thumbnail: "https://images.unsplash.com/photo-1515630278258-407f66498911?auto=format&fit=crop&q=80&w=320&h=180",
+                duration: "1:00:00",
+                channel: "Futurescapes",
+                playing: false
+            },
+            {
+                id: 5,
+                title: "Focus Music for Work and Studying, Background Music",
+                thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=320&h=180",
+                duration: "4:30:00",
+                channel: "Deep Focus",
+                playing: false
+            },
+            {
+                id: 6,
+                title: "Dark Academia Ambience - Classical Music & Rain",
+                thumbnail: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=320&h=180",
+                duration: "1:25:00",
+                channel: "Aesthetic Sounds",
+                playing: false
+            },
+            {
+                id: 7,
+                title: "Japanese Garden Ambience - Water Sounds, Birds",
+                thumbnail: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=320&h=180",
+                duration: "2:00:00",
+                channel: "Nature Zen",
+                playing: false
+            },
+            {
+                id: 8,
+                title: "Synthesizer Retrowave Mix - Midnight Drive",
+                thumbnail: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=320&h=180",
+                duration: "45:00",
+                channel: "Synth Central",
+                playing: false
+            }
+        ];
+
+        function renderQueue() {
+            const container = document.getElementById('playlist-queue');
+            
+            const html = queueVideos.map((video, index) => {
+                // Determine styling based on whether the video is currently playing
+                const activeClasses = video.playing 
+                    ? 'bg-yt-activePlaylistLight dark:bg-yt-activePlaylistDark' 
+                    : 'hover:bg-gray-100 dark:hover:bg-yt-hoverDark';
+                
+                // Show a play icon instead of index number if currently playing
+                const indexOrIcon = video.playing
+                    ? '<i class="ph-fill ph-play text-xs text-black dark:text-white"></i>'
+                    : index + 1;
+
+                return `
+                <div class="flex items-start gap-2 p-2 rounded-lg cursor-pointer group transition ${activeClasses}">
+                    
+                    <!-- Index Number / Play Icon -->
+                    <div class="flex items-center justify-center w-5 h-8 flex-shrink-0 text-[11px] text-gray-500 font-medium">
+                        ${indexOrIcon}
+                    </div>
+                    
+                    <!-- Thumbnail -->
+                    <div class="relative w-[100px] sm:w-[120px] aspect-video flex-shrink-0 rounded-lg overflow-hidden bg-gray-200 dark:bg-yt-darker">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="w-full h-full object-cover">
+                        <span class="absolute bottom-1 right-1 ${video.duration === 'LIVE' ? 'bg-yt-red' : 'bg-black/80'} text-white text-[10px] font-medium px-1 rounded">
+                            ${video.duration}
+                        </span>
+                        <!-- Overlay Play icon on hover -->
+                        <div class="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center transition-opacity">
+                            <i class="ph-fill ph-play text-white text-xl"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Details -->
+                    <div class="flex-1 min-w-0 pr-1 py-0.5">
+                        <h3 class="text-sm font-medium text-black dark:text-white line-clamp-2 leading-tight pr-4">
+                            ${video.title}
+                        </h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 hover:text-black dark:hover:text-white transition truncate">
+                            ${video.channel}
+                        </p>
+                    </div>
+                </div>
+            `}).join('');
+
+            container.innerHTML = html;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQueue);
+    </script>
+</body>
+</html>

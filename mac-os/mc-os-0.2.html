@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>macOS Web Environment</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        mac: {
+                            red: '#ff5f56',
+                            yellow: '#ffbd2e',
+                            green: '#27c93f',
+                        }
+                    },
+                    transitionTimingFunction: {
+                        'spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.2)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            /* High-quality CSS Mesh Gradient mimicking macOS Sonoma / Ventura */
+            background-color: #000000;
+            background-image: 
+                radial-gradient(at 80% 0%, hsla(220,100%,50%,0.5) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsla(280,100%,50%,0.6) 0px, transparent 50%),
+                radial-gradient(at 80% 100%, hsla(320,100%,50%,0.5) 0px, transparent 50%),
+                radial-gradient(at 0% 0%, hsla(180,100%,50%,0.5) 0px, transparent 50%);
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Traffic light hover icons */
+        .traffic-light-icon {
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+        .traffic-lights:hover .traffic-light-icon {
+            opacity: 0.5;
+        }
+
+        /* App specific icons */
+        .icon-finder { background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%); }
+        .icon-notes { background: linear-gradient(180deg, #ffde59 0%, #ffbd2e 100%); }
+        .icon-terminal { background: linear-gradient(180deg, #374151 0%, #111827 100%); }
+        .icon-safari { background: #ffffff; }
+        .icon-messages { background: linear-gradient(180deg, #34d399 0%, #10b981 100%); }
+
+        /* Dock Icon animations */
+        .dock-icon {
+            transition: width 0.1s ease, height 0.1s ease, transform 0.2s ease, margin 0.1s ease;
+            transform-origin: bottom;
+        }
+
+        /* Window animations */
+        .mac-window {
+            transform: scale(0.85);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.2s ease;
+        }
+        .mac-window.open {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mac-window.maximized {
+            top: 28px !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: calc(100vh - 28px) !important;
+            border-radius: 0;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen overflow-hidden text-black dark:text-white select-none">
+
+    <!-- Top Menu Bar -->
+    <nav class="fixed top-0 left-0 w-full h-7 bg-white/30 dark:bg-black/40 backdrop-blur-2xl flex items-center justify-between px-4 text-[13px] font-medium z-[9999] border-b border-white/10 shadow-sm">
+        <div class="flex items-center gap-4">
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default"></span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default font-bold" id="active-app-name">Finder</span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default hidden sm:inline-block">File</span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default hidden sm:inline-block">Edit</span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default hidden sm:inline-block">View</span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default hidden md:inline-block">Go</span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default hidden md:inline-block">Window</span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default hidden md:inline-block">Help</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default hidden sm:inline-block"><i data-lucide="wifi" class="w-4 h-4"></i></span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default hidden sm:inline-block"><i data-lucide="battery-medium" class="w-4 h-4"></i></span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default"><i data-lucide="search" class="w-4 h-4"></i></span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default"><i data-lucide="command" class="w-4 h-4"></i></span>
+            <span class="hover:bg-white/20 px-1.5 py-0.5 rounded cursor-default font-medium" id="clock">Mon 9:41 AM</span>
+        </div>
+    </nav>
+
+    <!-- Notes Window -->
+    <div class="mac-window absolute top-[15%] left-[20%] w-[800px] max-w-[95vw] h-[500px] bg-gray-50/90 dark:bg-[#1e1e1e]/90 backdrop-blur-3xl rounded-xl shadow-2xl border border-white/20 dark:border-white/10 flex flex-col overflow-hidden z-[100]" id="notes-app">
+        <!-- Window Header -->
+        <div class="h-12 w-full flex items-center px-4 border-b border-gray-200/50 dark:border-white/10 window-handle cursor-default" id="notes-header">
+            <div class="traffic-lights flex gap-2 mr-6">
+                <button class="w-3 h-3 rounded-full bg-mac-red border border-red-600/50 flex items-center justify-center" onclick="toggleApp('notes-app', false)">
+                    <i data-lucide="x" class="w-2 h-2 text-black traffic-light-icon"></i>
+                </button>
+                <button class="w-3 h-3 rounded-full bg-mac-yellow border border-yellow-600/50 flex items-center justify-center" onclick="toggleApp('notes-app', false)">
+                    <i data-lucide="minus" class="w-2 h-2 text-black traffic-light-icon"></i>
+                </button>
+                <button class="w-3 h-3 rounded-full bg-mac-green border border-green-600/50 flex items-center justify-center" onclick="maximizeWindow('notes-app')">
+                    <i data-lucide="plus" class="w-2 h-2 text-black traffic-light-icon"></i>
+                </button>
+            </div>
+            <div class="flex gap-4">
+                <i data-lucide="sidebar" class="w-4 h-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"></i>
+                <i data-lucide="square-pen" class="w-4 h-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"></i>
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="flex flex-1 h-[calc(100%-3rem)]">
+            <!-- Sidebar -->
+            <div class="w-64 bg-gray-100/50 dark:bg-black/20 border-r border-gray-200/50 dark:border-white/10 p-3 flex flex-col gap-2">
+                <div class="px-3 py-2 bg-mac-yellow/90 text-black rounded-lg cursor-pointer note-sidebar-item">
+                    <h4 class="text-[13px] font-semibold mb-1 truncate">New Note</h4>
+                    <p class="text-[11px] opacity-70 truncate note-preview">No additional text</p>
+                </div>
+            </div>
+            <!-- Editor -->
+            <div class="flex-1 flex flex-col p-6 bg-transparent">
+                <div class="text-center text-xs text-gray-500 font-medium mb-6" id="note-date">October 24, 2026 at 9:41 AM</div>
+                <textarea class="flex-1 bg-transparent border-none outline-none resize-none text-[15px] leading-relaxed text-gray-800 dark:text-gray-200 font-sans" id="note-editor" placeholder="Start writing your note here..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal Window -->
+    <div class="mac-window absolute top-[25%] left-[30%] w-[600px] max-w-[95vw] h-[400px] bg-black/80 backdrop-blur-3xl rounded-xl shadow-2xl border border-white/20 flex flex-col overflow-hidden z-[100]" id="terminal-app">
+        <!-- Window Header -->
+        <div class="h-10 w-full flex items-center px-4 window-handle cursor-default" id="terminal-header">
+            <div class="traffic-lights flex gap-2 absolute left-4">
+                <button class="w-3 h-3 rounded-full bg-mac-red border border-red-600/50 flex items-center justify-center" onclick="toggleApp('terminal-app', false)">
+                    <i data-lucide="x" class="w-2 h-2 text-black traffic-light-icon"></i>
+                </button>
+                <button class="w-3 h-3 rounded-full bg-mac-yellow border border-yellow-600/50 flex items-center justify-center" onclick="toggleApp('terminal-app', false)">
+                    <i data-lucide="minus" class="w-2 h-2 text-black traffic-light-icon"></i>
+                </button>
+                <button class="w-3 h-3 rounded-full bg-mac-green border border-green-600/50 flex items-center justify-center" onclick="maximizeWindow('terminal-app')">
+                    <i data-lucide="plus" class="w-2 h-2 text-black traffic-light-icon"></i>
+                </button>
+            </div>
+            <div class="w-full text-center text-gray-400 text-xs font-semibold flex items-center justify-center gap-2">
+                <i data-lucide="folder" class="w-3 h-3"></i> user — zsh — 80x24
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="flex-1 p-3 bg-transparent text-white font-mono text-sm overflow-y-auto">
+            <div class="mb-2">Last login: <span id="term-time"></span> on ttys000</div>
+            <div class="flex text-green-400">
+                <span class="mr-2">user@macbook ~ %</span>
+                <span class="typing-animation text-white">npm run dev</span>
+            </div>
+            <div class="text-gray-300 mt-2">
+                > starting dev server...<br>
+                > ready on http://localhost:3000
+            </div>
+            <div class="flex text-green-400 mt-2">
+                <span class="mr-2">user@macbook ~ %</span>
+                <span class="w-2 h-4 bg-gray-400 animate-pulse inline-block align-middle"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Dock -->
+    <div class="fixed bottom-3 left-1/2 -translate-x-1/2 h-16 px-3 bg-white/20 dark:bg-black/30 backdrop-blur-3xl rounded-2xl border border-white/30 dark:border-white/10 flex items-end gap-3 shadow-2xl z-[9000]" id="dock">
+        
+        <!-- Finder -->
+        <div class="relative flex flex-col items-center cursor-pointer group" onclick="document.getElementById('active-app-name').innerText = 'Finder'">
+            <div class="absolute -top-10 bg-white/50 dark:bg-black/50 text-black dark:text-white px-3 py-1 rounded-md text-xs backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">Finder</div>
+            <div class="dock-icon icon-finder w-12 h-12 rounded-[14px] shadow-lg flex items-center justify-center border border-gray-300 dark:border-gray-600">
+                <!-- Custom Finder SVG Face -->
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="w-1 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-60"></div>
+        </div>
+
+        <!-- Safari -->
+        <div class="relative flex flex-col items-center cursor-pointer group" onclick="document.getElementById('active-app-name').innerText = 'Safari'">
+            <div class="absolute -top-10 bg-white/50 dark:bg-black/50 text-black dark:text-white px-3 py-1 rounded-md text-xs backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">Safari</div>
+            <div class="dock-icon icon-safari w-12 h-12 rounded-[14px] shadow-lg flex items-center justify-center border border-gray-200">
+                <i data-lucide="compass" class="w-9 h-9 text-blue-500" stroke-width="1.5"></i>
+            </div>
+            <div class="w-1 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-0 transition-opacity" id="safari-dot"></div>
+        </div>
+
+        <!-- Messages -->
+        <div class="relative flex flex-col items-center cursor-pointer group" onclick="document.getElementById('active-app-name').innerText = 'Messages'">
+            <div class="absolute -top-10 bg-white/50 dark:bg-black/50 text-black dark:text-white px-3 py-1 rounded-md text-xs backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">Messages</div>
+            <div class="dock-icon icon-messages w-12 h-12 rounded-[14px] shadow-lg flex items-center justify-center border border-emerald-500/50">
+                <i data-lucide="message-circle" class="w-8 h-8 text-white fill-white" stroke-width="1.5"></i>
+            </div>
+            <div class="w-1 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-0 transition-opacity" id="messages-dot"></div>
+        </div>
+
+        <!-- Notes -->
+        <div class="relative flex flex-col items-center cursor-pointer group" onclick="toggleApp('notes-app', true)">
+            <div class="absolute -top-10 bg-white/50 dark:bg-black/50 text-black dark:text-white px-3 py-1 rounded-md text-xs backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">Notes</div>
+            <div class="dock-icon icon-notes w-12 h-12 rounded-[14px] shadow-lg flex items-center justify-center border border-yellow-500/50 relative overflow-hidden">
+                <div class="absolute top-0 w-full h-4 bg-yellow-400"></div>
+                <div class="absolute top-5 w-3/4 h-[1px] bg-gray-800/20 shadow-[0_5px_0_rgba(0,0,0,0.1),0_10px_0_rgba(0,0,0,0.1)]"></div>
+            </div>
+            <div class="w-1 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-0 transition-opacity" id="notes-dot"></div>
+        </div>
+
+        <!-- Terminal -->
+        <div class="relative flex flex-col items-center cursor-pointer group" onclick="toggleApp('terminal-app', true)">
+            <div class="absolute -top-10 bg-white/50 dark:bg-black/50 text-black dark:text-white px-3 py-1 rounded-md text-xs backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">Terminal</div>
+            <div class="dock-icon icon-terminal w-12 h-12 rounded-[14px] shadow-lg flex items-center justify-center border border-gray-600 relative">
+                <i data-lucide="terminal" class="w-7 h-7 text-white" stroke-width="2"></i>
+            </div>
+            <div class="w-1 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-0 transition-opacity" id="terminal-dot"></div>
+        </div>
+        
+        <!-- Divider -->
+        <div class="w-[1px] h-10 bg-black/20 dark:bg-white/20 mx-1 mb-2"></div>
+
+        <!-- Settings -->
+        <div class="relative flex flex-col items-center cursor-pointer group" onclick="document.getElementById('active-app-name').innerText = 'System Settings'">
+            <div class="absolute -top-10 bg-white/50 dark:bg-black/50 text-black dark:text-white px-3 py-1 rounded-md text-xs backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">System Settings</div>
+            <div class="dock-icon bg-gray-200 dark:bg-gray-700 w-12 h-12 rounded-[14px] shadow-lg flex items-center justify-center border border-gray-300 dark:border-gray-600">
+                <i data-lucide="settings" class="w-8 h-8 text-gray-700 dark:text-gray-300" stroke-width="1.5"></i>
+            </div>
+            <div class="w-1 h-1 bg-black dark:bg-white rounded-full mt-1 opacity-0 transition-opacity" id="settings-dot"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // --- LIVE CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+            document.getElementById('clock').innerText = now.toLocaleDateString('en-US', options).replace(',', '');
+            document.getElementById('note-date').innerText = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' });
+            
+            // Set Terminal login time once
+            if(!document.getElementById('term-time').innerText) {
+                document.getElementById('term-time').innerText = now.toLocaleDateString('en-US', options).replace(',', '');
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- APP MANAGEMENT ---
+        let highestZIndex = 100;
+
+        function toggleApp(appId, show) {
+            const app = document.getElementById(appId);
+            const prefix = appId.split('-')[0]; // e.g. notes or terminal
+            const dot = document.getElementById(prefix + '-dot');
+            const appName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+            
+            if (show) {
+                app.classList.add('open');
+                if(dot) dot.classList.replace('opacity-0', 'opacity-60');
+                app.style.zIndex = ++highestZIndex;
+                document.getElementById('active-app-name').innerText = appName;
+            } else {
+                app.classList.remove('open');
+                if(dot) dot.classList.replace('opacity-60', 'opacity-0');
+                document.getElementById('active-app-name').innerText = 'Finder';
+            }
+        }
+
+        function maximizeWindow(appId) {
+            const app = document.getElementById(appId);
+            app.classList.toggle('maximized');
+        }
+
+        // --- DRAGGABLE WINDOW LOGIC ---
+        function makeDraggable(element, handle) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            handle.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                // Don't drag if clicking traffic lights
+                if(e.target.closest('.traffic-lights') || e.target.closest('i')) return;
+                
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+                
+                // Bring window to front
+                element.style.zIndex = ++highestZIndex;
+                const prefix = element.id.split('-')[0];
+                document.getElementById('active-app-name').innerText = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                // Prevent dragging above menu bar
+                if(e.clientY < 28) return; 
+
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                // Avoid dragging if maximized
+                if(!element.classList.contains('maximized')) {
+                    element.style.top = (element.offsetTop - pos2) + "px";
+                    element.style.left = (element.offsetLeft - pos1) + "px";
+                }
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        makeDraggable(document.getElementById('notes-app'), document.getElementById('notes-header'));
+        makeDraggable(document.getElementById('terminal-app'), document.getElementById('terminal-header'));
+
+        // Bring to front on click anywhere on the window
+        document.querySelectorAll('.mac-window').forEach(win => {
+            win.addEventListener('mousedown', function() {
+                this.style.zIndex = ++highestZIndex;
+                const prefix = this.id.split('-')[0];
+                document.getElementById('active-app-name').innerText = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+            });
+        });
+
+        // --- DOCK MAGNIFICATION EFFECT ---
+        const dock = document.getElementById('dock');
+        const icons = document.querySelectorAll('.dock-icon');
+        const baseSize = 48; // w-12 = 48px
+        const maxSize = 72;
+        const range = 150; 
+
+        dock.addEventListener('mousemove', (e) => {
+            icons.forEach(icon => {
+                const rect = icon.getBoundingClientRect();
+                const iconCenterX = rect.left + rect.width / 2;
+                const distance = Math.abs(e.clientX - iconCenterX);
+
+                if (distance < range) {
+                    const scale = 1 + ((maxSize - baseSize) / baseSize) * (1 - distance / range);
+                    icon.style.width = `${baseSize * scale}px`;
+                    icon.style.height = `${baseSize * scale}px`;
+                    // Push up slightly
+                    icon.style.marginBottom = `${(baseSize * scale - baseSize) / 2}px`; 
+                } else {
+                    resetIcon(icon);
+                }
+            });
+        });
+
+        dock.addEventListener('mouseleave', () => {
+            icons.forEach(resetIcon);
+        });
+
+        function resetIcon(icon) {
+            icon.style.width = `${baseSize}px`;
+            icon.style.height = `${baseSize}px`;
+            icon.style.marginBottom = `0px`;
+        }
+
+        // --- NOTES AUTO-SAVE LOGIC ---
+        const editor = document.getElementById('note-editor');
+        
+        const savedNote = localStorage.getItem('mac-note-tailwind');
+        if(savedNote) {
+            editor.value = savedNote;
+            updateSidebarPreview(savedNote);
+        }
+
+        editor.addEventListener('input', () => {
+            localStorage.setItem('mac-note-tailwind', editor.value);
+            updateSidebarPreview(editor.value);
+        });
+
+        function updateSidebarPreview(text) {
+            const preview = text.length > 25 ? text.substring(0, 25) + '...' : text;
+            document.querySelector('.note-preview').innerText = preview || 'No additional text';
+        }
+
+        // Open Terminal initially to show off multiple windows
+        setTimeout(() => {
+            toggleApp('terminal-app', true);
+        }, 500);
+
+    </script>
+</body>
+</html>

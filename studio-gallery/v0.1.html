@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Studio Gallery Pro</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        zinc: {
+                            750: '#27272a',
+                            850: '#1f1f22',
+                            950: '#09090b',
+                        }
+                    }
+                } 
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root { color-scheme: light dark; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-y: scroll;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.5); }
+
+        /* Grid Pattern Background */
+        .pattern-grid {
+            background-size: 30px 30px;
+            background-image: 
+                linear-gradient(to right, rgba(150, 150, 150, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(150, 150, 150, 0.05) 1px, transparent 1px);
+        }
+
+        .filter-btn { transition: all 0.2s ease; }
+        .filter-btn.active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+        }
+        
+        .mock-window {
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover .mock-window {
+            transform: scale(1.05) rotate(1deg);
+        }
+    </style>
+</head>
+<body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-300 min-h-screen flex flex-col pattern-grid">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 w-full h-16 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-200 dark:border-white/10 flex items-center justify-between px-4 sm:px-8 z-40 transition-colors">
+        
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i data-lucide="layers" class="w-4 h-4 text-white"></i>
+            </div>
+            <h1 class="font-bold text-lg tracking-tight hidden sm:block">Studio<span class="font-normal text-zinc-500 dark:text-zinc-400">Gallery</span></h1>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-md mx-4">
+            <div class="relative flex items-center">
+                <i data-lucide="search" class="absolute left-3 w-4 h-4 text-zinc-400"></i>
+                <input type="text" id="search-input" placeholder="Search studios..." class="w-full bg-zinc-100 dark:bg-black/40 border border-zinc-200 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 focus:border-blue-500 dark:focus:border-blue-500 rounded-full py-2 pl-10 pr-4 text-sm text-zinc-800 dark:text-zinc-200 outline-none transition-all shadow-inner placeholder-zinc-500 dark:placeholder-zinc-600" oninput="handleSearch()">
+            </div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <div class="flex items-center gap-3">
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 transition-colors ring-1 ring-zinc-200 dark:ring-white/10">
+                <i data-lucide="sun" class="w-4 h-4 hidden dark:block" id="icon-light"></i>
+                <i data-lucide="moon" class="w-4 h-4 block dark:hidden" id="icon-dark"></i>
+            </button>
+            <a href="#" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold text-sm hover:opacity-90 transition-opacity shadow-lg">
+                <i data-lucide="github" class="w-4 h-4"></i> Source
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 sm:py-12 flex flex-col">
+        
+        <!-- Hero Section -->
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h2 class="text-3xl sm:text-5xl font-bold tracking-tight mb-4 text-zinc-900 dark:text-white">Discover Creative Engines</h2>
+            <p class="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">Explore a curated collection of high-performance, browser-based studios for animation, drawing, and 3D rendering.</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-10" id="filter-container">
+            <button class="filter-btn active px-4 py-2 rounded-full border border-zinc-200 dark:border-white/10 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900" data-category="All" onclick="setCategory('All')">All Studios</button>
+            <button class="filter-btn px-4 py-2 rounded-full border border-zinc-200 dark:border-white/10 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900" data-category="Animation" onclick="setCategory('Animation')">Animation</button>
+            <button class="filter-btn px-4 py-2 rounded-full border border-zinc-200 dark:border-white/10 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900" data-category="Drawing" onclick="setCategory('Drawing')">Drawing & Art</button>
+            <button class="filter-btn px-4 py-2 rounded-full border border-zinc-200 dark:border-white/10 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900" data-category="Utility" onclick="setCategory('Utility')">Utilities</button>
+            <button class="filter-btn px-4 py-2 rounded-full border border-zinc-200 dark:border-white/10 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900" data-category="3D" onclick="setCategory('3D')">3D & WebGL</button>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8" id="studio-grid">
+            <!-- Cards will be injected here by JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-zinc-500 dark:text-zinc-400">
+            <i data-lucide="search-x" class="w-16 h-16 mb-4 opacity-50"></i>
+            <h3 class="text-lg font-semibold">No studios found</h3>
+            <p class="text-sm mt-2">Try adjusting your search or filters.</p>
+            <button onclick="resetFilters()" class="mt-4 text-blue-500 hover:underline text-sm font-medium">Clear filters</button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-zinc-200 dark:border-white/10 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md mt-auto">
+        <p>© 2026 Studio Gallery Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // --- Theme Logic ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialize Theme from system or local storage
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- Mock Data ---
+        const studios = [
+            {
+                id: 1,
+                title: "Macify Web Studio",
+                category: "Utility",
+                description: "Turn any website URL or screenshot into a stunning, customizable macOS window mockup. Export in 4K.",
+                icon: "monitor",
+                gradient: "from-sky-400 to-blue-600",
+                tags: ["Mockups", "iFrame", "Export"],
+                badgeColor: "bg-sky-500/10 text-sky-600 dark:text-sky-400 ring-sky-500/20"
+            },
+            {
+                id: 2,
+                title: "Sumi-e Studio Pro",
+                category: "Drawing",
+                description: "Authentic Japanese ink brush simulation powered by p5.js physics. Create beautiful calligraphy and ink bleeds.",
+                icon: "feather",
+                gradient: "from-rose-500 to-red-700",
+                tags: ["p5.js", "Physics", "WebM"],
+                badgeColor: "bg-rose-500/10 text-rose-600 dark:text-rose-400 ring-rose-500/20"
+            },
+            {
+                id: 3,
+                title: "Title Animator Pro",
+                category: "Animation",
+                description: "Cinematic text animation engine. Create typewriter effects, spring pops, and RGB glitches with timeline control.",
+                icon: "type",
+                gradient: "from-fuchsia-500 to-purple-600",
+                tags: ["Typography", "Timeline", "Video"],
+                badgeColor: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 ring-fuchsia-500/20"
+            },
+            {
+                id: 4,
+                title: "Waveform Studio Pro",
+                category: "Utility",
+                description: "Upload audio or video and generate highly customizable, audio-reactive waveform visualizers.",
+                icon: "audio-lines",
+                gradient: "from-orange-500 to-rose-600",
+                tags: ["Audio", "Web Audio API", "Visuals"],
+                badgeColor: "bg-orange-500/10 text-orange-600 dark:text-orange-400 ring-orange-500/20"
+            },
+            {
+                id: 5,
+                title: "Emoji Motion Studio",
+                category: "Animation",
+                description: "Physics-based emoji particle engine. Create zero-G floats, fountains, and explosions with accurate collisions.",
+                icon: "smile",
+                gradient: "from-yellow-400 to-amber-600",
+                tags: ["Physics", "Particles", "Fun"],
+                badgeColor: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 ring-yellow-500/20"
+            },
+            {
+                id: 6,
+                title: "Mixamo 3D Studio",
+                category: "3D",
+                description: "Import FBX/GLB characters and animations from Mixamo. View, control playback speed, and record in high-res.",
+                icon: "box",
+                gradient: "from-blue-500 to-indigo-700",
+                tags: ["Three.js", "WebGL", "FBX"],
+                badgeColor: "bg-blue-500/10 text-blue-600 dark:text-blue-400 ring-blue-500/20"
+            },
+            {
+                id: 7,
+                title: "Rough Animator",
+                category: "Drawing",
+                description: "Draw shapes and paths that are mathematically transformed into sketchy, hand-drawn styles using Rough.js.",
+                icon: "pen-tool",
+                gradient: "from-indigo-500 to-purple-600",
+                tags: ["Rough.js", "Vector", "Export"],
+                badgeColor: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-indigo-500/20"
+            },
+            {
+                id: 8,
+                title: "Social Animator Pro",
+                category: "Utility",
+                description: "Generate animated, pixel-perfect mockups of Twitter, Instagram, and YouTube posts. Stroke-by-stroke text reveals.",
+                icon: "share-2",
+                gradient: "from-blue-400 to-cyan-500",
+                tags: ["Social Media", "UI", "Canvas"],
+                badgeColor: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 ring-cyan-500/20"
+            },
+            {
+                id: 9,
+                title: "Motion Math Studio",
+                category: "Animation",
+                description: "Render complex LaTeX formulas and animate them natively on canvas using SVG caching and morphing.",
+                icon: "sigma",
+                gradient: "from-emerald-400 to-teal-600",
+                tags: ["LaTeX", "Education", "MathJax"],
+                badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/20"
+            }
+        ];
+
+        let currentCategory = 'All';
+        let currentSearch = '';
+
+        // --- Filtering & Rendering ---
+        function setCategory(category) {
+            currentCategory = category;
+            
+            // Update UI buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-500', 'text-white', 'border-blue-500');
+                btn.classList.add('text-zinc-600', 'dark:text-zinc-300', 'bg-white', 'dark:bg-zinc-900', 'border-zinc-200', 'dark:border-white/10');
+                
+                if (btn.dataset.category === category) {
+                    btn.classList.add('active');
+                    btn.classList.remove('text-zinc-600', 'dark:text-zinc-300', 'bg-white', 'dark:bg-zinc-900', 'border-zinc-200', 'dark:border-white/10');
+                }
+            });
+
+            renderGrid();
+        }
+
+        function handleSearch() {
+            currentSearch = document.getElementById('search-input').value.toLowerCase();
+            renderGrid();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            currentSearch = '';
+            setCategory('All');
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('studio-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            // Filter logic
+            const filtered = studios.filter(studio => {
+                const matchesCategory = currentCategory === 'All' || studio.category === currentCategory;
+                const matchesSearch = studio.title.toLowerCase().includes(currentSearch) || 
+                                      studio.description.toLowerCase().includes(currentSearch) ||
+                                      studio.tags.some(t => t.toLowerCase().includes(currentSearch));
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+
+            let html = '';
+            filtered.forEach(studio => {
+                const tagsHtml = studio.tags.map(tag => 
+                    `<span class="px-2 py-1 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 text-[10px] font-medium rounded-md ring-1 ring-zinc-200 dark:ring-white/10">${tag}</span>`
+                ).join('');
+
+                html += `
+                    <div class="card-hover relative bg-white dark:bg-zinc-900/60 backdrop-blur-xl rounded-2xl border border-zinc-200 dark:border-white/10 overflow-hidden shadow-lg shadow-zinc-200/50 dark:shadow-none flex flex-col">
+                        
+                        <!-- Thumbnail Area -->
+                        <div class="h-48 w-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center border-b border-zinc-200 dark:border-white/5 p-6 group cursor-pointer">
+                            <!-- Background glow -->
+                            <div class="absolute inset-0 opacity-20 bg-gradient-to-br ${studio.gradient}"></div>
+                            
+                            <!-- Mock UI Window -->
+                            <div class="mock-window w-full h-full bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-white/10 flex flex-col overflow-hidden relative z-10 group-hover:shadow-2xl transition-all">
+                                <div class="h-6 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-white/5 flex items-center px-2 gap-1.5 shrink-0">
+                                    <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                                    <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                                    <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                                </div>
+                                <div class="flex-1 bg-gradient-to-br ${studio.gradient} opacity-90 flex items-center justify-center">
+                                    <i data-lucide="${studio.icon}" class="w-10 h-10 text-white drop-shadow-md transform group-hover:scale-110 transition-transform duration-300"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Area -->
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="font-bold text-lg text-zinc-900 dark:text-white tracking-tight">${studio.title}</h3>
+                                <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full ring-1 ${studio.badgeColor}">${studio.category}</span>
+                            </div>
+                            
+                            <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-5 line-clamp-2 leading-relaxed flex-1">${studio.description}</p>
+                            
+                            <div class="flex flex-wrap gap-1.5 mb-5">
+                                ${tagsHtml}
+                            </div>
+                            
+                            <button class="w-full py-2.5 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-800 dark:text-white rounded-xl text-sm font-semibold transition-colors ring-1 ring-zinc-200 dark:ring-white/10 flex items-center justify-center gap-2 group">
+                                Open Studio <i data-lucide="arrow-right" class="w-4 h-4 text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-white transition-colors"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        // Initial Render
+        renderGrid();
+
+    </script>
+</body>
+</html>

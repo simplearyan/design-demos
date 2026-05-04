@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Animators Library</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for a cleaner look */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+        }
+
+        /* Subtle animation for preview cards to make them feel "alive" */
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .animate-preview {
+            animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Fade in animation for view transitions */
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 h-screen flex flex-col overflow-hidden antialiased">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-gray-200 flex items-center justify-between px-4 lg:px-6 bg-white z-20 flex-shrink-0">
+        <div class="flex items-center gap-4">
+            <!-- Menu Toggle -->
+            <button id="sidebarToggle" class="p-2 rounded-md text-gray-500 hover:bg-gray-100 focus:outline-none">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+            
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white group-hover:bg-brand-700 transition-colors">
+                    <i data-lucide="aperture" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-xl tracking-tight hidden sm:block">AnimCanvas</span>
+            </a>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-2xl px-4 lg:px-12">
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-brand-600">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </div>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-full leading-5 bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 sm:text-sm transition-all duration-200" 
+                    placeholder="Search animations, templates, or creators..."
+                >
+            </div>
+        </div>
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-2 sm:gap-4">
+            <button class="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Create
+            </button>
+            <button class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-pink-500 text-white flex items-center justify-center font-semibold text-sm shadow-sm ring-2 ring-white">
+                ME
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden relative">
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900/50 z-40 hidden lg:hidden transition-opacity opacity-0"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-[280px] lg:w-64 bg-white shadow-2xl lg:shadow-none border-r border-gray-200 transform -translate-x-full lg:translate-x-0 lg:static lg:h-full transition-all duration-300 ease-in-out flex flex-col pt-4 lg:pt-6 shrink-0">
+            <!-- Close button for mobile -->
+            <div class="lg:hidden px-4 pb-2 flex justify-end">
+                <button id="closeSidebar" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full focus:outline-none transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto custom-scrollbar px-3 pb-4 space-y-1" id="navMenu">
+                <!-- Nav items generated by JS -->
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar bg-white relative w-full">
+            <div class="max-w-7xl mx-auto p-6 md:p-10 lg:p-12">
+                
+                <!-- Gallery View -->
+                <div id="galleryView" class="animate-fade-in">
+                    <!-- Page Header -->
+                    <div class="mb-10 max-w-3xl">
+                        <h1 id="pageTitle" class="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4 leading-tight">
+                            Free animated background templates
+                        </h1>
+                        <p id="pageDesc" class="text-lg text-gray-600 leading-relaxed">
+                            <strong class="font-semibold text-gray-900">Elevate your designs</strong> with our collection of free, user-friendly animated background templates ready for your canvas.
+                        </p>
+                    </div>
+
+                    <!-- Grid -->
+                    <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                        <!-- Cards generated by JS -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
+                            <i data-lucide="search-x" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900">No templates found</h3>
+                        <p class="text-gray-500 mt-1">Try adjusting your search term.</p>
+                    </div>
+                </div>
+
+                <!-- Detail View -->
+                <div id="detailView" class="hidden flex-col gap-6 lg:gap-8 animate-fade-in">
+                    <!-- Breadcrumb -->
+                    <button id="backBtn" class="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors w-fit group">
+                        <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i> 
+                        <span id="backBtnText">Back</span>
+                    </button>
+
+                    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+                        <!-- Left: Preview Canvas -->
+                        <div class="flex-1 flex flex-col gap-4">
+                            <div id="detailCanvas" class="w-full aspect-video rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden relative">
+                                <!-- Dynamic Content injected here -->
+                            </div>
+                            
+                            <!-- Player Controls Bar -->
+                            <div class="flex items-center justify-between text-sm text-gray-500 px-2">
+                                <div class="flex items-center gap-4">
+                                    <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-700 transition-colors">
+                                        <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                                    </button>
+                                    <div class="h-1.5 w-32 md:w-64 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-brand-500 w-1/3"></div>
+                                    </div>
+                                    <span class="font-medium text-gray-600">0:01 / 0:03</span>
+                                </div>
+                                <div class="hidden sm:flex items-center gap-3">
+                                    <span>1080 × 1080</span>
+                                    <span>•</span>
+                                    <span>60 fps</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Details & Config -->
+                        <div class="w-full lg:w-[380px] shrink-0 flex flex-col gap-8">
+                            <div>
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span id="detailCategory" class="text-[11px] font-bold uppercase tracking-wider text-brand-700 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-100">Category</span>
+                                </div>
+                                <h1 id="detailTitle" class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Template Title</h1>
+                                <p class="text-gray-500 leading-relaxed text-[15px]">A fully customizable, clean animation designed to give your project a dynamic edge. Easy to adapt to your brand.</p>
+                            </div>
+
+                            <button class="w-full bg-gray-900 hover:bg-black text-white font-semibold py-3.5 px-4 rounded-xl shadow-sm transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
+                                <i data-lucide="layout-template" class="w-5 h-5"></i> Open in Editor
+                            </button>
+
+                            <!-- Mock Adjustments -->
+                            <div class="border-t border-gray-100 pt-6">
+                                <h3 class="font-semibold text-gray-900 mb-5 flex items-center gap-2">
+                                    <i data-lucide="sliders" class="w-4 h-4 text-gray-400"></i> Quick Adjustments
+                                </h3>
+                                <div class="space-y-5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Primary Text</label>
+                                        <input type="text" id="detailTextInput" value="MORPH" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Accent</label>
+                                            <button class="w-full flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-3 py-2.5 hover:bg-gray-50 transition-colors">
+                                                <div id="detailAccentColor" class="w-5 h-5 rounded-md shadow-inner bg-[#00c2ff]"></div>
+                                                <span class="text-sm font-medium text-gray-700">#00C2FF</span>
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Background</label>
+                                            <button class="w-full flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-3 py-2.5 hover:bg-gray-50 transition-colors">
+                                                <div id="detailBgColor" class="w-5 h-5 rounded-md shadow-inner bg-[#12122b]"></div>
+                                                <span class="text-sm font-medium text-gray-700">#12122B</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Creator profile mock -->
+                            <div class="border-t border-gray-100 pt-6 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-sm ring-2 ring-white">AC</div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900">AnimCanvas Team</p>
+                                    <p class="text-xs text-gray-500">Official Creator</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const navItems = [
+            { id: 'templates', label: 'Templates', icon: 'layout-template' },
+            { id: 'community', label: 'Community', icon: 'users' },
+            { divider: true },
+            { id: 'new', label: 'New', icon: 'sparkles' },
+            { id: 'devices', label: 'Devices', icon: 'smartphone' },
+            { id: 'logos', label: 'Logos', icon: 'box' },
+            { id: 'social', label: 'Social media', icon: 'message-circle' },
+            { id: 'video', label: 'Video titles', icon: 'play-square' },
+            { id: 'ads', label: 'Ads', icon: 'megaphone' },
+            { id: 'websites', label: 'Websites', icon: 'globe' },
+            { id: 'ui', label: 'UI elements', icon: 'layout' },
+            { id: 'charts', label: 'Charts', icon: 'bar-chart-2' },
+            { id: 'icons', label: 'Icons', icon: 'smile' },
+            { id: 'buttons', label: 'Buttons', icon: 'mouse-pointer-click' },
+            { id: 'text', label: 'Text', icon: 'type' },
+            { id: 'backgrounds', label: 'Backgrounds', icon: 'image', active: true },
+            { id: 'showreels', label: 'Showreels', icon: 'film' },
+        ];
+
+        const templatesData = [
+            { id: 1, title: 'Animated Search Bar', category: 'ui', color: 'bg-gray-100', content: '<div class="w-3/4 max-w-sm bg-white rounded-full h-10 shadow-sm flex items-center px-4 gap-2 border border-gray-200"><i data-lucide="search" class="w-4 h-4 text-gray-400"></i><div class="h-2 w-32 bg-gray-200 rounded animate-pulse"></div></div>' },
+            { id: 2, title: 'Simple Notification [iOS]', category: 'ui', color: 'bg-gray-100', content: '<div class="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-sm flex gap-3 items-start w-64 border border-gray-100"><div class="w-10 h-10 bg-green-500 rounded-xl flex-shrink-0"></div><div class="space-y-1.5 pt-1"><div class="h-2.5 w-20 bg-gray-800 rounded"></div><div class="h-2 w-24 bg-gray-400 rounded"></div></div></div>' },
+            { id: 3, title: 'Morph: Inflating Text', category: 'text', color: 'bg-[#12122b]', content: '<div class="text-[#00c2ff] font-black text-5xl tracking-tighter transform scale-110 animate-preview" style="font-family: impact, sans-serif;">MORPH</div>' },
+            { id: 4, title: 'The Track: Personal Record', category: 'social', color: 'bg-[#6b0000]', content: '<div class="relative w-32 h-40 bg-red-600 rounded-lg overflow-hidden flex items-center justify-center shadow-lg"><div class="absolute inset-0 bg-black/20"></div><div class="relative bg-white/10 backdrop-blur p-3 rounded border border-white/20 w-11/12"><div class="text-white text-[10px] font-bold">Congratulations!</div><div class="text-white text-sm font-black mt-1">100m in 11.2s</div></div></div>' },
+            { id: 5, title: 'Gradients: Haze', category: 'backgrounds', color: 'bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-200 animate-preview', content: '' },
+            { id: 6, title: 'Circle Cascade', category: 'backgrounds', color: 'bg-[#f42c5e]', content: '<div class="relative w-full h-full flex items-center justify-center overflow-hidden"><div class="w-32 h-32 border-[8px] border-[#d8f070] rounded-full absolute"></div><div class="w-20 h-20 border-[8px] border-[#d8f070] rounded-full absolute"></div><div class="w-8 h-8 bg-[#d8f070] rounded-full absolute"></div></div>' },
+            { id: 7, title: 'Floating Devices Mockup', category: 'devices', color: 'bg-indigo-50', content: '<div class="w-24 h-40 bg-white rounded-xl shadow-xl border-4 border-gray-800 animate-bounce" style="animation-duration: 3s;"></div>' },
+            { id: 8, title: 'Retro Grid Synthwave', category: 'backgrounds', color: 'bg-purple-900', content: '<div class="w-full h-full" style="background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .1) 25%, rgba(255, 255, 255, .1) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .1) 75%, rgba(255, 255, 255, .1) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .1) 25%, rgba(255, 255, 255, .1) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .1) 75%, rgba(255, 255, 255, .1) 76%, transparent 77%, transparent); background-size: 30px 30px; transform: perspective(500px) rotateX(60deg);"></div>' },
+            { id: 9, title: 'Minimalist Line Chart', category: 'charts', color: 'bg-white border border-gray-100', content: '<svg class="w-full h-full text-blue-500" viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M0,40 Q20,20 40,30 T80,10 T100,20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>' },
+        ];
+
+        // --- STATE ---
+        let currentCategory = 'backgrounds';
+        let searchQuery = '';
+
+        // --- DOM ELEMENTS ---
+        const navMenuEl = document.getElementById('navMenu');
+        const cardGridEl = document.getElementById('cardGrid');
+        const pageTitleEl = document.getElementById('pageTitle');
+        const pageDescEl = document.getElementById('pageDesc');
+        const emptyStateEl = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
+        
+        // Views
+        const galleryView = document.getElementById('galleryView');
+        const detailView = document.getElementById('detailView');
+        const backBtn = document.getElementById('backBtn');
+        const backBtnText = document.getElementById('backBtnText');
+
+        // Sidebar Mobile
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderNav() {
+            navMenuEl.innerHTML = '';
+            navItems.forEach(item => {
+                if (item.divider) {
+                    const divider = document.createElement('div');
+                    divider.className = 'my-4 border-t border-gray-100 ml-4';
+                    navMenuEl.appendChild(divider);
+                    return;
+                }
+
+                const isActive = item.id === currentCategory;
+                const link = document.createElement('a');
+                link.href = '#';
+                link.className = `flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-medium transition-colors ${
+                    isActive 
+                    ? 'bg-brand-50 text-brand-700' 
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                }`;
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    setCategory(item.id, item.label);
+                    if (window.innerWidth < 1024) toggleSidebar(); // Close sidebar on mobile after click
+                };
+
+                link.innerHTML = `
+                    <i data-lucide="${item.icon}" class="w-5 h-5 ${isActive ? 'text-brand-600' : 'text-gray-400'}"></i>
+                    ${item.label}
+                `;
+                navMenuEl.appendChild(link);
+            });
+            lucide.createIcons();
+        }
+
+        function renderCards() {
+            cardGridEl.innerHTML = '';
+            
+            let filteredData = templatesData;
+            
+            // Filter by search
+            if (searchQuery) {
+                filteredData = filteredData.filter(item => 
+                    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            } else if (currentCategory !== 'templates') {
+                // If not "Templates" (which acts as 'all' in this mock), filter by category
+                // For demonstration, we'll just show some cards if the category matches, or random ones to keep UI populated
+                const categoryMatch = filteredData.filter(item => item.category === currentCategory);
+                if (categoryMatch.length > 0) {
+                    filteredData = categoryMatch;
+                } else {
+                    // Fallback to show all if category is empty to simulate a rich library
+                    filteredData = templatesData.slice(0, 4); 
+                }
+            }
+
+            if (filteredData.length === 0) {
+                cardGridEl.classList.add('hidden');
+                emptyStateEl.classList.remove('hidden');
+                emptyStateEl.classList.add('flex');
+            } else {
+                cardGridEl.classList.remove('hidden');
+                emptyStateEl.classList.add('hidden');
+                emptyStateEl.classList.remove('flex');
+
+                filteredData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'group cursor-pointer flex flex-col gap-3';
+                    card.innerHTML = `
+                        <!-- Canvas/Image Area -->
+                        <div class="w-full aspect-[4/3] rounded-xl overflow-hidden flex items-center justify-center relative transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-lg ${item.color}">
+                            ${item.content}
+                            
+                            <!-- Hover Overlay Action -->
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-white text-gray-900 text-sm font-semibold py-2 px-4 rounded-full shadow-md pointer-events-none">
+                                    Preview
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Title -->
+                        <div>
+                            <h3 class="text-[15px] font-semibold text-gray-900 leading-snug group-hover:text-brand-600 transition-colors">${item.title}</h3>
+                        </div>
+                    `;
+                    
+                    // Add click event for details view
+                    card.addEventListener('click', () => showDetailView(item));
+                    
+                    cardGridEl.appendChild(card);
+                });
+                lucide.createIcons();
+            }
+        }
+
+        // --- ACTIONS ---
+
+        function showDetailView(item) {
+            galleryView.classList.add('hidden');
+            detailView.classList.remove('hidden');
+            detailView.classList.add('flex');
+            
+            // Set up Detail Content
+            const canvas = document.getElementById('detailCanvas');
+            canvas.className = `w-full aspect-video rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden relative ${item.color}`;
+            
+            // Add a scaling wrapper so the component looks slightly larger in the hero canvas
+            canvas.innerHTML = `<div class="transform scale-125 md:scale-150 origin-center">${item.content}</div>`;
+            
+            document.getElementById('detailTitle').innerText = item.title;
+            document.getElementById('detailCategory').innerText = item.category;
+            
+            // Mock dynamic colors based on the item (just for visuals)
+            const isDarkBg = item.color.includes('bg-[#12122b]') || item.color.includes('bg-purple-900') || item.color.includes('bg-[#6b0000]');
+            document.getElementById('detailBgColor').style.backgroundColor = isDarkBg ? '#12122b' : '#f8fafc';
+            document.getElementById('detailAccentColor').style.backgroundColor = item.category === 'text' ? '#00c2ff' : '#8b5cf6';
+
+            // Set Breadcrumb text
+            const currentNav = navItems.find(i => i.id === currentCategory) || { label: 'Templates' };
+            backBtnText.innerText = `Back to ${currentNav.label}`;
+            
+            // Scroll to top safely
+            const mainContent = document.querySelector('main');
+            if(mainContent) mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hideDetailView() {
+            detailView.classList.add('hidden');
+            detailView.classList.remove('flex');
+            galleryView.classList.remove('hidden');
+            const mainContent = document.querySelector('main');
+            if(mainContent) mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setCategory(id, label) {
+            hideDetailView(); // Ensure we go back to gallery when changing categories
+            
+            currentCategory = id;
+            searchInput.value = ''; // Clear search on category change
+            searchQuery = '';
+            
+            // Update Page Headers
+            if(id === 'templates') {
+                pageTitleEl.innerText = 'All Templates';
+                pageDescEl.innerHTML = 'Browse our complete collection of high-quality templates.';
+            } else {
+                pageTitleEl.innerText = `Free animated ${label.toLowerCase()} templates`;
+                pageDescEl.innerHTML = `<strong class="font-semibold text-gray-900">Elevate your designs</strong> with our collection of free, user-friendly animated ${label.toLowerCase()} templates.`;
+            }
+            
+            renderNav();
+            renderCards();
+        }
+
+        function toggleSidebar() {
+            if (window.innerWidth >= 1024) {
+                // Desktop: Toggle negative margin to hide/show sidebar
+                sidebar.classList.toggle('lg:-ml-64');
+            } else {
+                // Mobile: Toggle translation and overlay
+                const isClosed = sidebar.classList.contains('-translate-x-full');
+                if (isClosed) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebarOverlay.classList.remove('hidden');
+                    // Small delay to allow display:block to apply before opacity transition
+                    setTimeout(() => sidebarOverlay.classList.remove('opacity-0'), 10);
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebarOverlay.classList.add('opacity-0');
+                    setTimeout(() => sidebarOverlay.classList.add('hidden'), 300);
+                }
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+
+        searchInput.addEventListener('input', (e) => {
+            hideDetailView(); // Search should return to gallery view
+            searchQuery = e.target.value;
+            // Optionally update heading to show search mode
+            if(searchQuery) {
+                pageTitleEl.innerText = `Search results for "${searchQuery}"`;
+                pageDescEl.innerHTML = 'Find exactly what you need for your next animation.';
+            } else {
+                // Restore category heading
+                const currentNavItem = navItems.find(i => i.id === currentCategory);
+                setCategory(currentCategory, currentNavItem ? currentNavItem.label : 'backgrounds');
+                return; // setCategory already calls renderCards
+            }
+            renderCards();
+        });
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        closeSidebar.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+        backBtn.addEventListener('click', hideDetailView);
+
+        // --- INIT ---
+        renderNav();
+        renderCards();
+
+    </script>
+</body>
+</html>

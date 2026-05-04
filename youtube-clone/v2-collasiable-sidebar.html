@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YouTube Clone</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        yt: {
+                            black: '#0f0f0f',
+                            dark: '#212121',
+                            darker: '#181818',
+                            light: '#f2f2f2',
+                            borderDark: '#3f3f3f',
+                            borderLight: '#e5e5e5',
+                            hoverDark: '#272727',
+                            hoverLight: '#e5e5e5',
+                            red: '#ff0000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* Hide Scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Smooth transitions for theme */
+        body {
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        /* Prevent pull-to-refresh on mobile for native feel */
+        body {
+            overscroll-behavior-y: none;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-yt-black text-black dark:text-white font-sans antialiased overflow-x-hidden">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 right-0 h-14 bg-white dark:bg-yt-black flex items-center justify-between px-4 z-50">
+        <!-- Left: Menu & Logo -->
+        <div class="flex items-center gap-4">
+            <button id="menu-toggle" class="hidden sm:flex p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition">
+                <i class="ph ph-list text-2xl"></i>
+            </button>
+            <a href="#" class="flex items-center gap-1" title="YouTube Home">
+                <i class="ph-fill ph-youtube-logo text-yt-red text-3xl"></i>
+                <span class="text-xl font-semibold tracking-tighter hidden sm:block">YouTube</span>
+            </a>
+        </div>
+
+        <!-- Center: Search -->
+        <div class="hidden sm:flex items-center flex-1 max-w-[600px] ml-10">
+            <div class="flex w-full">
+                <div class="flex items-center flex-1 border border-yt-borderLight dark:border-yt-borderDark rounded-l-full px-4 py-0.5 bg-white dark:bg-yt-black focus-within:border-blue-500 ml-8">
+                    <i class="ph ph-magnifying-glass text-gray-500 hidden md:block mr-2"></i>
+                    <input type="text" placeholder="Search" class="w-full bg-transparent outline-none py-1.5 dark:text-white text-base">
+                </div>
+                <button class="px-5 border border-l-0 border-yt-borderLight dark:border-yt-borderDark rounded-r-full bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark transition">
+                    <i class="ph ph-magnifying-glass text-xl"></i>
+                </button>
+            </div>
+            <button class="ml-4 p-2.5 rounded-full bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark transition flex-shrink-0">
+                <i class="ph-fill ph-microphone text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Right: Icons -->
+        <div class="flex items-center gap-1 sm:gap-3">
+            <button class="sm:hidden p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition">
+                <i class="ph ph-magnifying-glass text-2xl"></i>
+            </button>
+            <button class="p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition" id="theme-toggle" title="Toggle Theme">
+                <i class="ph ph-moon text-2xl dark:hidden"></i>
+                <i class="ph ph-sun text-2xl hidden dark:block"></i>
+            </button>
+            <button class="hidden md:block p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition">
+                <i class="ph ph-video-camera text-2xl"></i>
+            </button>
+            <button class="p-2 rounded-full hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark transition relative">
+                <i class="ph ph-bell text-2xl"></i>
+                <span class="absolute top-1.5 right-1.5 bg-yt-red text-white text-[10px] font-bold px-1 rounded-full border-2 border-white dark:border-yt-black">9+</span>
+            </button>
+            <button class="p-1 ml-1 sm:ml-2">
+                <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+            </button>
+        </div>
+    </header>
+
+    <!-- SIDEBARS -->
+    <!-- Mini Sidebar (Tablet) -->
+    <aside id="mini-sidebar" class="hidden sm:flex lg:hidden flex-col fixed top-14 left-0 bottom-0 w-[72px] bg-white dark:bg-yt-black z-40 overflow-y-auto no-scrollbar items-center py-2">
+        <a href="#" class="flex flex-col items-center justify-center w-full py-4 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-xl gap-1">
+            <i class="ph-fill ph-house text-2xl"></i>
+            <span class="text-[10px]">Home</span>
+        </a>
+        <a href="#" class="flex flex-col items-center justify-center w-full py-4 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-xl gap-1">
+            <i class="ph ph-monitor-play text-2xl"></i>
+            <span class="text-[10px]">Shorts</span>
+        </a>
+        <a href="#" class="flex flex-col items-center justify-center w-full py-4 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-xl gap-1">
+            <i class="ph ph-youtube-logo text-2xl"></i>
+            <span class="text-[10px]">Subscriptions</span>
+        </a>
+        <a href="#" class="flex flex-col items-center justify-center w-full py-4 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-xl gap-1">
+            <i class="ph ph-user-circle-play text-2xl"></i>
+            <span class="text-[10px]">You</span>
+        </a>
+    </aside>
+
+    <!-- Full Sidebar (Desktop) -->
+    <aside id="full-sidebar" class="hidden lg:flex flex-col fixed top-14 left-0 bottom-0 w-[240px] bg-white dark:bg-yt-black z-40 overflow-y-auto no-scrollbar px-3 py-3 pb-20">
+        <div class="border-b border-yt-borderLight dark:border-yt-borderDark pb-3 mb-3">
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 bg-yt-light dark:bg-yt-dark rounded-lg font-medium">
+                <i class="ph-fill ph-house text-2xl"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-monitor-play text-2xl"></i>
+                <span>Shorts</span>
+            </a>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-youtube-logo text-2xl"></i>
+                <span>Subscriptions</span>
+            </a>
+        </div>
+        <div class="border-b border-yt-borderLight dark:border-yt-borderDark pb-3 mb-3">
+            <h3 class="px-3 text-base font-semibold mb-1 flex items-center gap-2">You <i class="ph ph-caret-right"></i></h3>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-clock-counter-clockwise text-2xl"></i>
+                <span>History</span>
+            </a>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-playlist text-2xl"></i>
+                <span>Playlists</span>
+            </a>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-clock text-2xl"></i>
+                <span>Watch Later</span>
+            </a>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-thumbs-up text-2xl"></i>
+                <span>Liked videos</span>
+            </a>
+        </div>
+        <div>
+            <h3 class="px-3 text-base font-semibold mb-1 mt-2">Explore</h3>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-fire text-2xl"></i>
+                <span>Trending</span>
+            </a>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-music-note text-2xl"></i>
+                <span>Music</span>
+            </a>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-game-controller text-2xl"></i>
+                <span>Gaming</span>
+            </a>
+            <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hoverLight dark:hover:bg-yt-hoverDark rounded-lg">
+                <i class="ph ph-trophy text-2xl"></i>
+                <span>Sports</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MOBILE BOTTOM NAVIGATION (Native App Feel) -->
+    <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-yt-black border-t border-yt-borderLight dark:border-yt-borderDark flex justify-around items-center h-12 z-50 pb-safe">
+        <a href="#" class="flex flex-col items-center justify-center w-full h-full text-black dark:text-white">
+            <i class="ph-fill ph-house text-[22px]"></i>
+            <span class="text-[10px] mt-0.5">Home</span>
+        </a>
+        <a href="#" class="flex flex-col items-center justify-center w-full h-full text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white">
+            <i class="ph ph-monitor-play text-[22px]"></i>
+            <span class="text-[10px] mt-0.5">Shorts</span>
+        </a>
+        <div class="flex items-center justify-center w-full h-full">
+            <button class="flex items-center justify-center w-10 h-10 rounded-full border border-black dark:border-white">
+                <i class="ph ph-plus text-2xl"></i>
+            </button>
+        </div>
+        <a href="#" class="flex flex-col items-center justify-center w-full h-full text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white">
+            <i class="ph ph-youtube-logo text-[22px]"></i>
+            <span class="text-[10px] mt-0.5">Subscriptions</span>
+        </a>
+        <a href="#" class="flex flex-col items-center justify-center w-full h-full text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white">
+            <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+            <span class="text-[10px] mt-0.5">You</span>
+        </a>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main id="main-content" class="pt-14 pb-16 sm:pb-0 sm:ml-[72px] lg:ml-[240px] min-h-screen transition-all duration-300">
+        
+        <!-- Categories Filter Bar -->
+        <div class="sticky top-14 z-30 bg-white/95 dark:bg-yt-black/95 backdrop-blur-sm px-4 py-3 flex gap-3 overflow-x-auto no-scrollbar touch-pan-x">
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-black text-white dark:bg-white dark:text-black text-sm font-medium transition">All</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">Gaming</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">Music</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">Live</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">JavaScript</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">Podcasts</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">Mixes</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">News</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">Recent</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">Watched</button>
+            <button class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-yt-light dark:bg-yt-dark hover:bg-gray-200 dark:hover:bg-yt-hoverDark text-sm font-medium transition">New to you</button>
+        </div>
+
+        <!-- Video Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 gap-y-8 p-4 sm:p-6" id="video-grid">
+            <!-- Videos injected by JavaScript -->
+        </div>
+
+    </main>
+
+    <script>
+        // --- Theme Management ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+
+        // Check for saved theme or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            const isDark = htmlElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // --- Sidebar Toggle Logic ---
+        const menuToggleBtn = document.getElementById('menu-toggle');
+        const fullSidebar = document.getElementById('full-sidebar');
+        const miniSidebar = document.getElementById('mini-sidebar');
+        const mainContent = document.getElementById('main-content');
+        
+        // Create an overlay for the tablet off-canvas drawer
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 top-14 bg-black/50 z-30 hidden lg:hidden cursor-pointer transition-opacity';
+        document.body.appendChild(overlay);
+
+        menuToggleBtn.addEventListener('click', () => {
+            if (window.innerWidth >= 1024) {
+                // Desktop: Toggle between full and mini sidebar classes
+                fullSidebar.classList.toggle('lg:flex');
+                miniSidebar.classList.toggle('lg:hidden');
+                mainContent.classList.toggle('lg:ml-[240px]');
+            } else {
+                // Tablet: Toggle off-canvas drawer
+                if (fullSidebar.classList.contains('hidden')) {
+                    fullSidebar.classList.remove('hidden');
+                    fullSidebar.classList.add('flex', 'shadow-2xl');
+                    overlay.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; // Stop background scrolling
+                } else {
+                    closeDrawer();
+                }
+            }
+        });
+
+        function closeDrawer() {
+            if (window.innerWidth < 1024) {
+                fullSidebar.classList.add('hidden');
+                fullSidebar.classList.remove('flex', 'shadow-2xl');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        overlay.addEventListener('click', closeDrawer);
+
+        // Reset drawer state on window resize to avoid visual bugs
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+                fullSidebar.classList.remove('flex', 'shadow-2xl');
+                
+                // Ensure hidden class is present so desktop relies purely on 'lg:flex' for visibility
+                if (!fullSidebar.classList.contains('hidden')) {
+                    fullSidebar.classList.add('hidden');
+                }
+            }
+        });
+
+        // --- Mock Data & Video Rendering ---
+        const videos = [
+            {
+                id: 1,
+                title: "Building a Native iOS App with React Native - Full Course",
+                thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "1:45:20",
+                channel: {
+                    name: "Code Academy",
+                    avatar: "https://i.pravatar.cc/150?u=channel1"
+                },
+                views: "1.2M views",
+                postedAt: "2 days ago"
+            },
+            {
+                id: 2,
+                title: "Top 10 Hidden Gems in Switzerland you MUST Visit",
+                thumbnail: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "14:22",
+                channel: {
+                    name: "Wanderlust Travels",
+                    avatar: "https://i.pravatar.cc/150?u=channel2"
+                },
+                views: "850K views",
+                postedAt: "1 week ago"
+            },
+            {
+                id: 3,
+                title: "Relaxing Jazz Music & Rain Sounds for Studying",
+                thumbnail: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "3:00:00",
+                channel: {
+                    name: "Cozy Vibes",
+                    avatar: "https://i.pravatar.cc/150?u=channel3"
+                },
+                views: "4.5M views",
+                postedAt: "1 month ago"
+            },
+            {
+                id: 4,
+                title: "I Tried Making the World's Biggest Burger",
+                thumbnail: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "22:15",
+                channel: {
+                    name: "Chef Extreme",
+                    avatar: "https://i.pravatar.cc/150?u=channel4"
+                },
+                views: "12M views",
+                postedAt: "3 days ago"
+            },
+            {
+                id: 5,
+                title: "Complete Python Bootcamp 2026: Go from zero to hero",
+                thumbnail: "https://images.unsplash.com/photo-1526379095098-d400fd0bfce8?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "24:05:10",
+                channel: {
+                    name: "Tech Mastery",
+                    avatar: "https://i.pravatar.cc/150?u=channel5"
+                },
+                views: "2.1M views",
+                postedAt: "5 months ago"
+            },
+            {
+                id: 6,
+                title: "Elden Ring: Shadow of the Erdtree - Official Trailer",
+                thumbnail: "https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "3:10",
+                channel: {
+                    name: "Bandai Namco",
+                    avatar: "https://i.pravatar.cc/150?u=channel6"
+                },
+                views: "8.9M views",
+                postedAt: "2 weeks ago"
+            },
+            {
+                id: 7,
+                title: "How to fix your posture in 5 minutes a day",
+                thumbnail: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "8:45",
+                channel: {
+                    name: "Health Hub",
+                    avatar: "https://i.pravatar.cc/150?u=channel7"
+                },
+                views: "340K views",
+                postedAt: "4 days ago"
+            },
+            {
+                id: 8,
+                title: "Designing a Modern House from Scratch (Architect's Process)",
+                thumbnail: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "18:30",
+                channel: {
+                    name: "Design Build",
+                    avatar: "https://i.pravatar.cc/150?u=channel8"
+                },
+                views: "1.1M views",
+                postedAt: "1 month ago"
+            },
+            {
+                id: 9,
+                title: "The Fermi Paradox: Where Are All The Aliens?",
+                thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "15:20",
+                channel: {
+                    name: "Space Explained",
+                    avatar: "https://i.pravatar.cc/150?u=channel9"
+                },
+                views: "5.6M views",
+                postedAt: "1 year ago"
+            },
+            {
+                id: 10,
+                title: "I Built a Smart Mirror from Scratch",
+                thumbnail: "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "12:55",
+                channel: {
+                    name: "DIY Tech",
+                    avatar: "https://i.pravatar.cc/150?u=channel10"
+                },
+                views: "980K views",
+                postedAt: "2 weeks ago"
+            },
+            {
+                id: 11,
+                title: "Best Camera Settings for Street Photography",
+                thumbnail: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "10:15",
+                channel: {
+                    name: "Photo Pro",
+                    avatar: "https://i.pravatar.cc/150?u=channel11"
+                },
+                views: "450K views",
+                postedAt: "3 weeks ago"
+            },
+            {
+                id: 12,
+                title: "My Morning Routine 2026",
+                thumbnail: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&q=80&w=640&h=360",
+                duration: "16:40",
+                channel: {
+                    name: "Lifestyle Vlogs",
+                    avatar: "https://i.pravatar.cc/150?u=channel12"
+                },
+                views: "2.3M views",
+                postedAt: "6 months ago"
+            }
+        ];
+
+        function renderVideos() {
+            const grid = document.getElementById('video-grid');
+            
+            const videoHTML = videos.map(video => `
+                <div class="flex flex-col gap-3 cursor-pointer group">
+                    <!-- Thumbnail Container -->
+                    <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-yt-darker">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <span class="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-medium px-1.5 py-0.5 rounded">
+                            ${video.duration}
+                        </span>
+                    </div>
+                    
+                    <!-- Video Details -->
+                    <div class="flex gap-3 items-start pr-6 sm:pr-0">
+                        <img src="${video.channel.avatar}" alt="${video.channel.name}" class="w-9 h-9 rounded-full object-cover mt-0.5 flex-shrink-0">
+                        <div class="flex flex-col">
+                            <h3 class="text-sm font-semibold text-black dark:text-white line-clamp-2 leading-snug group-hover:text-blue-500 transition-colors">
+                                ${video.title}
+                            </h3>
+                            <div class="text-[13px] text-gray-600 dark:text-gray-400 mt-1 flex flex-col">
+                                <span class="hover:text-black dark:hover:text-white transition-colors">${video.channel.name}</span>
+                                <div class="flex items-center">
+                                    <span>${video.views}</span>
+                                    <span class="mx-1 text-[10px]">•</span>
+                                    <span>${video.postedAt}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- More Options Icon (Vertical dots) visible on hover/mobile -->
+                        <button class="absolute right-4 sm:relative sm:right-auto sm:ml-auto p-1.5 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity rounded-full hover:bg-gray-200 dark:hover:bg-yt-hoverDark">
+                            <i class="ph-bold ph-dots-three-vertical text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            grid.innerHTML = videoHTML;
+        }
+
+        // Initialize the videos on load
+        document.addEventListener('DOMContentLoaded', renderVideos);
+    </script>
+</body>
+</html>

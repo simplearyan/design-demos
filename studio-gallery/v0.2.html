@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Studio Collection</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    fontFamily: { 
+                        /* Prioritize Apple system fonts for authentic macOS feel */
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'sans-serif'] 
+                    },
+                    colors: {
+                        zinc: {
+                            850: '#1f1f22',
+                            950: '#09090b',
+                        }
+                    }
+                } 
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts Fallback -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root { color-scheme: light dark; }
+        
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-y: scroll;
+        }
+
+        /* Minimalist Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.4); }
+
+        /* Subtle Background Grid */
+        .pattern-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(150, 150, 150, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(150, 150, 150, 0.05) 1px, transparent 1px);
+        }
+
+        /* Apple-style Filter Buttons */
+        .filter-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .filter-btn:hover:not(.active) { opacity: 0.7; }
+
+        /* Card Hover Physics */
+        .card-container {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card-container:hover {
+            transform: translateY(-4px);
+        }
+        .mock-window {
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
+        }
+        .card-container:hover .mock-window {
+            transform: scale(1.04) rotate(0.5deg);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+        }
+        .icon-arrow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-container:hover .icon-arrow {
+            transform: translate(2px, -2px);
+        }
+    </style>
+</head>
+<body class="bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 transition-colors duration-300 min-h-screen flex flex-col pattern-grid">
+
+    <!-- Glass Header -->
+    <header class="sticky top-0 w-full h-[60px] bg-white/70 dark:bg-[#09090b]/70 backdrop-blur-2xl border-b border-zinc-200/50 dark:border-white/5 flex items-center justify-between px-5 sm:px-8 z-40 transition-colors">
+        
+        <!-- Logo -->
+        <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 dark:from-zinc-100 dark:to-zinc-300 flex items-center justify-center shadow-sm">
+                <i data-lucide="command" class="w-3.5 h-3.5 text-white dark:text-zinc-900"></i>
+            </div>
+            <h1 class="font-semibold text-[15px] tracking-tight hidden sm:block">Studio<span class="text-zinc-400 dark:text-zinc-500">Collection</span></h1>
+        </div>
+
+        <!-- Spotlight-style Search -->
+        <div class="flex-1 max-w-md mx-4">
+            <div class="relative flex items-center group">
+                <i data-lucide="search" class="absolute left-3 w-3.5 h-3.5 text-zinc-400 group-focus-within:text-zinc-600 dark:group-focus-within:text-zinc-300 transition-colors"></i>
+                <input type="text" id="search-input" placeholder="Search engines..." class="w-full bg-zinc-100/80 dark:bg-white/5 border border-transparent focus:border-zinc-300 dark:focus:border-white/20 rounded-full py-1.5 pl-9 pr-4 text-[13px] font-medium text-zinc-800 dark:text-zinc-200 outline-none transition-all placeholder-zinc-400 dark:placeholder-zinc-500" oninput="handleSearch()">
+            </div>
+        </div>
+
+        <!-- Theme Toggle & Links -->
+        <div class="flex items-center gap-3">
+            <button onclick="toggleTheme()" class="w-8 h-8 rounded-full bg-zinc-100/80 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-colors">
+                <i data-lucide="sun" class="w-4 h-4 hidden dark:block" id="icon-light"></i>
+                <i data-lucide="moon" class="w-4 h-4 block dark:hidden" id="icon-dark"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-[1200px] mx-auto w-full px-5 sm:px-8 py-10 sm:py-16 flex flex-col">
+        
+        <!-- Minimal Hero Section -->
+        <div class="mb-10 sm:mb-14">
+            <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2 sm:mb-3 text-zinc-900 dark:text-white">Creative Engines</h2>
+            <p class="text-[14px] sm:text-[15px] text-zinc-500 dark:text-zinc-400 max-w-xl font-medium">High-performance, browser-based studios engineered for rendering, animation, and design.</p>
+        </div>
+
+        <!-- Apple-style Filters -->
+        <div class="flex flex-wrap items-center gap-2 mb-8" id="filter-container">
+            <button class="filter-btn active px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all" data-category="All" onclick="setCategory('All')">All</button>
+            <button class="filter-btn px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all" data-category="Animation" onclick="setCategory('Animation')">Animation</button>
+            <button class="filter-btn px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all" data-category="Drawing" onclick="setCategory('Drawing')">Drawing</button>
+            <button class="filter-btn px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all" data-category="Utility" onclick="setCategory('Utility')">Utility</button>
+            <button class="filter-btn px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all" data-category="3D" onclick="setCategory('3D')">3D</button>
+        </div>
+
+        <!-- Studio Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="studio-grid">
+            <!-- Cards injected via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-zinc-400 dark:text-zinc-500">
+            <i data-lucide="search-x" class="w-12 h-12 mb-3 opacity-40"></i>
+            <h3 class="text-[15px] font-semibold text-zinc-600 dark:text-zinc-300">No studios found</h3>
+            <p class="text-[13px] mt-1">Try adjusting your search criteria.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-zinc-200/50 dark:border-white/5 py-6 text-center text-[12px] font-medium text-zinc-400 dark:text-zinc-500 bg-[#fafafa]/80 dark:bg-[#09090b]/80 backdrop-blur-md mt-auto">
+        <p>Built with web web technologies. Native performance.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // --- Theme Logic ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateFilterStyles();
+        }
+
+        // Initialize Theme
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- Refined Mock Data (Reduced Text Clutter) ---
+        const studios = [
+            {
+                id: 1,
+                title: "Macify Web Studio",
+                category: "Utility",
+                description: "Turn websites and screenshots into stunning 4K macOS mockups.",
+                icon: "monitor",
+                gradient: "from-sky-400 to-blue-600"
+            },
+            {
+                id: 2,
+                title: "Sumi-e Studio Pro",
+                category: "Drawing",
+                description: "Authentic Japanese ink brush physics and bleeding simulation.",
+                icon: "feather",
+                gradient: "from-rose-500 to-red-700"
+            },
+            {
+                id: 3,
+                title: "Title Animator Pro",
+                category: "Animation",
+                description: "Cinematic text animations, typewriter effects, and timeline rendering.",
+                icon: "type",
+                gradient: "from-fuchsia-500 to-purple-600"
+            },
+            {
+                id: 4,
+                title: "Waveform Studio",
+                category: "Utility",
+                description: "Generate highly customizable, audio-reactive waveform visualizers.",
+                icon: "audio-lines",
+                gradient: "from-orange-500 to-rose-600"
+            },
+            {
+                id: 5,
+                title: "Emoji Motion",
+                category: "Animation",
+                description: "Physics-based emoji particle engine with precise collision dynamics.",
+                icon: "smile",
+                gradient: "from-yellow-400 to-amber-600"
+            },
+            {
+                id: 6,
+                title: "Mixamo 3D Studio",
+                category: "3D",
+                description: "Import, view, and record 3D characters and complex FBX animations.",
+                icon: "box",
+                gradient: "from-blue-500 to-indigo-700"
+            },
+            {
+                id: 7,
+                title: "Rough Animator",
+                category: "Drawing",
+                description: "Draw mathematically transformed, hand-sketched organic vector shapes.",
+                icon: "pen-tool",
+                gradient: "from-indigo-500 to-purple-600"
+            },
+            {
+                id: 8,
+                title: "Social Animator",
+                category: "Utility",
+                description: "Animated, pixel-perfect mockups of Twitter and Instagram posts.",
+                icon: "share-2",
+                gradient: "from-cyan-400 to-blue-500"
+            },
+            {
+                id: 9,
+                title: "Motion Math",
+                category: "Animation",
+                description: "Render and animate complex LaTeX formulas natively on canvas.",
+                icon: "sigma",
+                gradient: "from-emerald-400 to-teal-600"
+            }
+        ];
+
+        let currentCategory = 'All';
+        let currentSearch = '';
+
+        // --- Filtering & Styling ---
+        function updateFilterStyles() {
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const isActive = btn.dataset.category === currentCategory;
+                
+                // Reset classes
+                btn.className = `filter-btn px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all ${btn.dataset.category}`;
+                
+                if (isActive) {
+                    btn.classList.add(isDark ? 'bg-white' : 'bg-zinc-900', isDark ? 'text-zinc-900' : 'text-white');
+                } else {
+                    btn.classList.add(isDark ? 'bg-white/5' : 'bg-zinc-100', isDark ? 'text-zinc-400' : 'text-zinc-600', isDark ? 'hover:bg-white/10' : 'hover:bg-zinc-200');
+                }
+            });
+        }
+
+        function setCategory(category) {
+            currentCategory = category;
+            updateFilterStyles();
+            renderGrid();
+        }
+
+        function handleSearch() {
+            currentSearch = document.getElementById('search-input').value.toLowerCase();
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('studio-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            const filtered = studios.filter(studio => {
+                const matchesCategory = currentCategory === 'All' || studio.category === currentCategory;
+                const matchesSearch = studio.title.toLowerCase().includes(currentSearch) || 
+                                      studio.description.toLowerCase().includes(currentSearch);
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+
+            let html = '';
+            filtered.forEach(studio => {
+                html += `
+                    <a href="#" class="card-container block bg-white dark:bg-zinc-900/40 backdrop-blur-2xl rounded-[20px] border border-zinc-200/80 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-xl dark:shadow-none">
+                        
+                        <!-- Thumbnail Area -->
+                        <div class="h-[170px] w-full relative overflow-hidden bg-zinc-100/50 dark:bg-black/40 flex items-center justify-center p-6 border-b border-zinc-100 dark:border-white/5">
+                            <div class="absolute inset-0 opacity-[0.15] dark:opacity-20 bg-gradient-to-br ${studio.gradient}"></div>
+                            
+                            <!-- Mock UI Window -->
+                            <div class="mock-window w-full h-full bg-white dark:bg-zinc-900/90 rounded-lg border border-zinc-200/80 dark:border-white/10 flex flex-col overflow-hidden relative z-10 shadow-sm dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+                                <div class="h-4 bg-zinc-100/80 dark:bg-zinc-800/80 border-b border-zinc-200/80 dark:border-white/5 flex items-center px-2 gap-1 shrink-0">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600"></div>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600"></div>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600"></div>
+                                </div>
+                                <div class="flex-1 bg-gradient-to-br ${studio.gradient} opacity-90 flex items-center justify-center">
+                                    <i data-lucide="${studio.icon}" class="w-7 h-7 text-white drop-shadow-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Minimal Content Area -->
+                        <div class="p-5 flex flex-col">
+                            <h3 class="font-semibold text-[15px] text-zinc-900 dark:text-zinc-100 tracking-tight mb-1">${studio.title}</h3>
+                            <p class="text-[13px] text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed mb-4">${studio.description}</p>
+                            
+                            <div class="flex items-center justify-between mt-auto">
+                                <span class="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">${studio.category}</span>
+                                <div class="w-7 h-7 rounded-full bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-zinc-400 dark:text-zinc-500 transition-colors group-hover:bg-zinc-900 dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-zinc-900">
+                                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 icon-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            });
+
+            grid.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        // Initialize
+        updateFilterStyles();
+        renderGrid();
+
+    </script>
+</body>
+</html>
